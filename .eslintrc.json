@@ -1,0 +1,10 @@
+{
+  "extends": [
+    "teppeis/node-v10",
+    "teppeis/+prettier",
+    "teppeis/+mocha"
+  ],
+  "rules": {
+    "require-await": 0
+  }
+}

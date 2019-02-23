@@ -1,0 +1,36 @@
+{
+  "name": "duck",
+  "version": "1.0.0",
+  "author": "Teppei Sato <teppeis@gmail.com>",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=10.12"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "eslint src"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "fastify": "^1.14.1",
+    "serve-static": "^1.13.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.14.1",
+    "eslint-config-teppeis": "^9.5.0",
+    "google-closure-compiler": "^20190215.0.1",
+    "google-closure-deps": "^20190121.0.0",
+    "google-closure-library": "^20190121.0.0",
+    "prettier": "^1.16.4"
+  },
+  "homepage": "https://github.com/teppeis/duck",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/teppeis/duck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/teppeis/duck/issues"
+  },
+  "keywords": [],
+  "license": "MIT"
+}
