@@ -28,10 +28,12 @@ const opts = {
   },
 };
 
+const assetsPath = '/inputs';
+const closurePath = `${assetsPath}/$$/closure-library`;
 fastify.get('/compile', opts, async (request, reply) => {
   const pageId = request.query.id;
-  const googBasePath = new URL('/inputs/$$/closure-library/closure/goog/base.js', base);
-  const depsPath = new URL('/inputs/deps.js', base);
+  const googBasePath = new URL(`${closurePath}/closure/goog/base.js`, base);
+  const depsPath = new URL(`${assetsPath}/deps.js`, base);
   // TODO: escape
   reply.code(200).type('application/javascript').send(`
     document.write('<script src="${googBasePath}"></script>');
@@ -42,9 +44,9 @@ fastify.get('/compile', opts, async (request, reply) => {
 
 // static assets
 const closureDir = path.dirname(require.resolve('google-closure-library/package.json'));
-fastify.use('/inputs/$$/closure-library', serveStatic(closureDir, {maxAge: '1d', immutable: true}));
+fastify.use(closurePath, serveStatic(closureDir, {maxAge: '1d', immutable: true}));
 const inputsDir = path.join(__dirname, '../examples/closure-scripts');
-fastify.use('/inputs', serveStatic(inputsDir));
+fastify.use(assetsPath, serveStatic(inputsDir));
 
 const start = async () => {
   try {
