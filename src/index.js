@@ -42,7 +42,7 @@ fastify.get('/compile', opts, async (request, reply) => {
 
 // static assets
 const closureDir = path.dirname(require.resolve('google-closure-library/package.json'));
-fastify.use('/inputs/$$/closure-library', serveStatic(closureDir));
+fastify.use('/inputs/$$/closure-library', serveStatic(closureDir, {maxAge: '1d', immutable: true}));
 const inputsDir = path.join(__dirname, '../examples/closure-scripts');
 fastify.use('/inputs', serveStatic(inputsDir));
 
