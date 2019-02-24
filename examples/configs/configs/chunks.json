@@ -1,0 +1,18 @@
+{
+  "id": "chunks",
+  "mode": "RAW",
+  "modules": {
+    "chunks": {
+      "inputs": ["../js/chunks_init.js", "../js/chunks.js"],
+      "deps": []
+    },
+    "chunk1": {
+      "inputs": ["../js/chunk1.js"],
+      "deps": ["chunks"]
+    },
+    "chunk2": {
+      "inputs": ["../js/chunk2.js"],
+      "deps": ["chunks"]
+    }
+  }
+}

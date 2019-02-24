@@ -1,0 +1,18 @@
+{
+  "name": "configs",
+  "version": "1.0.0",
+  "author": "Teppei Sato <teppeis@gmail.com>",
+  "main": "index.js",
+  "scripts": {
+    "deps": "closure-make-deps --root js --closure-path node_modules/google-closure-library/closure/goog --no-validate > deps.js",
+    "deps:validate": "closure-make-deps --root js --closure-path node_modules/google-closure-library/closure/goog",
+    "start": "node ../../src/index.js duck.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "google-closure-deps": "^20190121.0.0",
+    "google-closure-library": "^20190121.0.0"
+  },
+  "keywords": [],
+  "license": "MIT"
+}

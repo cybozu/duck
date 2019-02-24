@@ -1,0 +1,5 @@
+{
+  "id": "page2",
+  "mode": "RAW",
+  "inputs": ["../js/page2.js"]
+}

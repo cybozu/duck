@@ -2,15 +2,16 @@
   "name": "duck",
   "version": "1.0.0",
   "author": "Teppei Sato <teppeis@gmail.com>",
-  "main": "src/index.js",
   "engines": {
     "node": ">=10.12"
   },
+  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "test": "eslint src"
   },
   "dependencies": {
+    "common-tags": "^1.8.0",
     "cors": "^2.8.5",
     "fastify": "^1.14.1",
     "serve-static": "^1.13.2"
