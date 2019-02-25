@@ -7,6 +7,7 @@ const util = require('util');
 const serveStatic = require('serve-static');
 const cors = require('cors');
 const {stripIndents} = require('common-tags');
+const genDeps = require('./gen-deps');
 
 const PORT = 9810;
 const HOST = 'localhost';
@@ -14,7 +15,7 @@ const baseUri = new URL(`http://${HOST}:${PORT}/`);
 const assetsPath = '/inputs';
 const closurePath = `${assetsPath}/$$/closure-library`;
 const googBaseUri = new URL(`${closurePath}/closure/goog/base.js`, baseUri);
-const depsUri = new URL(`${assetsPath}/deps.js`, baseUri);
+const depsUriBase = new URL(`/deps`, baseUri);
 
 function loadConfig() {
   return require(path.join(process.cwd(), 'duck.config'));
@@ -57,12 +58,21 @@ fastify.get('/compile', opts, async (request, reply) => {
 
 async function loadPageConfig(id) {
   const content = await util.promisify(fs.readFile)(path.join(config.pageConfigPath, `${id}.json`));
-  return JSON.parse(content);
+  const pageConfig = JSON.parse(content);
+  pageConfig.paths = pageConfig.paths.map(p => path.resolve(config.pageConfigPath, p));
+  if (pageConfig.inputs) {
+    pageConfig.inputs = pageConfig.inputs.map(p => path.resolve(config.pageConfigPath, p));
+  }
+  if (pageConfig.modules) {
+    Object.values(pageConfig.modules).forEach(mod => {
+      mod.inputs = mod.inputs.map(input => path.resolve(config.pageConfigPath, input));
+    });
+  }
+  return pageConfig;
 }
 
 function inputsToUris(inputs) {
   return inputs
-    .map(input => path.resolve(config.pageConfigPath, input))
     .map(input => path.relative(config.root, input))
     .map(input => new URL(`${assetsPath}/${input}`, baseUri));
 }
@@ -82,6 +92,8 @@ function replyChunks(request, reply, pageConfig) {
     }
   }
   const rootModuleUris = moduleUris[rootId];
+  const depsUri = new URL(depsUriBase);
+  depsUri.search = `id=${pageConfig.id}`;
   reply.code(200).type('application/javascript').send(stripIndents`
     document.write('<script src="${googBaseUri}"></script>');
     document.write('<script src="${depsUri}"></script>');
@@ -99,12 +111,26 @@ function replyChunks(request, reply, pageConfig) {
 
 function replyPage(request, reply, pageConfig) {
   const uris = inputsToUris(pageConfig.inputs);
+  const depsUri = new URL(depsUriBase);
+  depsUri.search = `id=${pageConfig.id}`;
   reply.code(200).type('application/javascript').send(stripIndents`
     document.write('<script src="${googBaseUri}"></script>');
     document.write('<script src="${depsUri}"></script>');
     ${uris.map(uri => `document.write('<script>goog.require("${uri}")</script>');`).join('\n')}
   `);
 }
+
+fastify.get('/deps', opts, async (request, reply) => {
+  const pageConfig = await loadPageConfig(request.query.id);
+  const depsContent = await genDeps(
+    pageConfig,
+    path.join(config.closureLibraryPath, 'closure/goog')
+  );
+  reply
+    .code(200)
+    .type('application/javascript')
+    .send(depsContent);
+});
 
 const start = async () => {
   try {
