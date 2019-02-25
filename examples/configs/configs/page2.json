@@ -1,6 +1,6 @@
 {
   "id": "page2",
   "mode": "RAW",
-  "paths": ["../js"],
+  "paths": ["../js", "../node_modules/google-closure-library"],
   "inputs": ["../js/page2.js"]
 }

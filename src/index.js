@@ -122,10 +122,7 @@ function replyPage(request, reply, pageConfig) {
 
 fastify.get('/deps', opts, async (request, reply) => {
   const pageConfig = await loadPageConfig(request.query.id);
-  const depsContent = await genDeps(
-    pageConfig,
-    path.join(config.closureLibraryPath, 'closure/goog')
-  );
+  const depsContent = await genDeps(pageConfig, config.closureLibraryPath);
   reply
     .code(200)
     .type('application/javascript')

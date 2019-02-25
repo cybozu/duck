@@ -1,20 +1,23 @@
 'use strict';
 
+const path = require('path');
 const {parser, depFile} = require('google-closure-deps');
 const recursive = require('recursive-readdir');
 const flat = require('array.prototype.flat');
 
 const depsCache = new Map();
 
-async function genDeps(pageConfig, closureBaseDir) {
+async function genDeps(pageConfig, closureLibraryPath) {
   // TODO: invalidate updated files
   if (depsCache.has(pageConfig.id)) {
     return depsCache.get(pageConfig.id);
   }
-  // TODO: exclude closure path
+  console.log({paths: pageConfig.paths});
+  console.log({closureLibraryPath});
   // TODO: uniq
   const parseResultPromises = pageConfig.paths.map(p =>
-    recursive(p).then(files =>
+    // exclude closure-library
+    recursive(p, [path.join(closureLibraryPath, '*')]).then(files =>
       Promise.all(files.filter(file => /\.js$/.test(file)).map(parser.parseFileAsync))
     )
   );
@@ -27,6 +30,7 @@ async function genDeps(pageConfig, closureBaseDir) {
     throw e;
   }
   const deps = results.map(r => r.dependency);
+  const closureBaseDir = path.join(closureLibraryPath, 'closure', 'goog');
   const text = depFile.getDepFileText(closureBaseDir, deps);
   depsCache.set(pageConfig.id, text);
   return text;
