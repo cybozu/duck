@@ -1,8 +1,6 @@
 {
   "id": "chunks",
-  "mode": "RAW",
-  "paths": ["../js", "../node_modules/google-closure-library"],
-  // chunks
+  "inherits": "../base.json",
   "modules": {
     "chunks": {
       "inputs": ["../js/chunks_init.js", "../js/chunks.js"],

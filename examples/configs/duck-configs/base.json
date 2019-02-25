@@ -1,0 +1,4 @@
+{
+  "mode": "RAW",
+  "paths": ["../js", "../node_modules/google-closure-library"]
+}

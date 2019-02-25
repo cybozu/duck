@@ -1,0 +1,6 @@
+{
+  "id": "page1",
+  "inherits": "../base.json",
+  // you can comment here
+  "inputs": ["../js/page1.js"]
+}

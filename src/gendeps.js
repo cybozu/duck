@@ -7,17 +7,15 @@ const flat = require('array.prototype.flat');
 
 const depsCache = new Map();
 
-async function genDeps(pageConfig, closureLibraryPath) {
+async function genDeps(pageConfig, closureLibraryDir) {
   // TODO: invalidate updated files
   if (depsCache.has(pageConfig.id)) {
     return depsCache.get(pageConfig.id);
   }
-  console.log({paths: pageConfig.paths});
-  console.log({closureLibraryPath});
   // TODO: uniq
   const parseResultPromises = pageConfig.paths.map(p =>
     // exclude closure-library
-    recursive(p, [path.join(closureLibraryPath, '*')]).then(files =>
+    recursive(p, [path.join(closureLibraryDir, '*')]).then(files =>
       Promise.all(files.filter(file => /\.js$/.test(file)).map(parser.parseFileAsync))
     )
   );
@@ -30,7 +28,7 @@ async function genDeps(pageConfig, closureLibraryPath) {
     throw e;
   }
   const deps = results.map(r => r.dependency);
-  const closureBaseDir = path.join(closureLibraryPath, 'closure', 'goog');
+  const closureBaseDir = path.join(closureLibraryDir, 'closure', 'goog');
   const text = depFile.getDepFileText(closureBaseDir, deps);
   depsCache.set(pageConfig.id, text);
   return text;

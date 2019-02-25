@@ -1,6 +1,0 @@
-{
-  "id": "page1",
-  "mode": "RAW",
-  "paths": ["../js", "../node_modules/google-closure-library"],
-  "inputs": ["../js/page1.js"]
-}

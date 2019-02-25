@@ -2,19 +2,17 @@
 
 const fastify = require('fastify')({logger: true});
 const path = require('path');
-const fs = require('fs');
-const util = require('util');
 const serveStatic = require('serve-static');
 const cors = require('cors');
 const {stripIndents} = require('common-tags');
-const stripJsonComments = require('strip-json-comments');
-const genDeps = require('./gen-deps');
+const genDeps = require('./gendeps');
+const loadEntryConfig = require('./loadentryconfig');
 
 const PORT = 9810;
 const HOST = 'localhost';
 const baseUri = new URL(`http://${HOST}:${PORT}/`);
-const assetsPath = '/inputs';
-const closurePath = `${assetsPath}/$$/closure-library`;
+const inputsPath = '/inputs';
+const closurePath = `${inputsPath}/$$/closure-library`;
 const googBaseUri = new URL(`${closurePath}/closure/goog/base.js`, baseUri);
 const depsUriBase = new URL(`/deps`, baseUri);
 
@@ -28,9 +26,10 @@ const config = loadConfig();
 fastify.use(cors());
 
 // static assets
-fastify.use(closurePath, serveStatic(config.closureLibraryPath, {maxAge: '1d', immutable: true}));
-fastify.use(assetsPath, serveStatic(config.root));
+fastify.use(closurePath, serveStatic(config.closureLibraryDir, {maxAge: '1d', immutable: true}));
+fastify.use(inputsPath, serveStatic(config.inputsRoot));
 
+// route
 fastify.get('/', async (request, reply) => {
   return {hello: 'world'};
 });
@@ -49,41 +48,23 @@ const opts = {
 };
 
 fastify.get('/compile', opts, async (request, reply) => {
-  const pageConfig = await loadPageConfig(request.query.id);
-  if (pageConfig.modules) {
-    replyChunks(request, reply, pageConfig);
+  const entryConfig = await loadEntryConfig(request.query.id, config.entryConfigDir);
+  if (entryConfig.modules) {
+    replyChunks(request, reply, entryConfig);
   } else {
-    replyPage(request, reply, pageConfig);
+    replyPage(request, reply, entryConfig);
   }
 });
 
-async function loadPageConfig(id) {
-  const content = await util.promisify(fs.readFile)(
-    path.join(config.pageConfigPath, `${id}.json`),
-    'utf8'
-  );
-  const pageConfig = JSON.parse(stripJsonComments(content));
-  pageConfig.paths = pageConfig.paths.map(p => path.resolve(config.pageConfigPath, p));
-  if (pageConfig.inputs) {
-    pageConfig.inputs = pageConfig.inputs.map(p => path.resolve(config.pageConfigPath, p));
-  }
-  if (pageConfig.modules) {
-    Object.values(pageConfig.modules).forEach(mod => {
-      mod.inputs = mod.inputs.map(input => path.resolve(config.pageConfigPath, input));
-    });
-  }
-  return pageConfig;
-}
-
 function inputsToUris(inputs) {
   return inputs
-    .map(input => path.relative(config.root, input))
-    .map(input => new URL(`${assetsPath}/${input}`, baseUri));
+    .map(input => path.relative(config.inputsRoot, input))
+    .map(input => new URL(`${inputsPath}/${input}`, baseUri));
 }
 
-function replyChunks(request, reply, pageConfig) {
+function replyChunks(request, reply, entryConfig) {
   let rootId;
-  const {modules} = pageConfig;
+  const {modules} = entryConfig;
   const moduleInfo = {};
   const moduleUris = {};
   for (const id in modules) {
@@ -97,7 +78,7 @@ function replyChunks(request, reply, pageConfig) {
   }
   const rootModuleUris = moduleUris[rootId];
   const depsUri = new URL(depsUriBase);
-  depsUri.search = `id=${pageConfig.id}`;
+  depsUri.search = `id=${entryConfig.id}`;
   reply.code(200).type('application/javascript').send(stripIndents`
     document.write('<script src="${googBaseUri}"></script>');
     document.write('<script src="${depsUri}"></script>');
@@ -113,10 +94,10 @@ function replyChunks(request, reply, pageConfig) {
     `);
 }
 
-function replyPage(request, reply, pageConfig) {
-  const uris = inputsToUris(pageConfig.inputs);
+function replyPage(request, reply, entryConfig) {
+  const uris = inputsToUris(entryConfig.inputs);
   const depsUri = new URL(depsUriBase);
-  depsUri.search = `id=${pageConfig.id}`;
+  depsUri.search = `id=${entryConfig.id}`;
   reply.code(200).type('application/javascript').send(stripIndents`
     document.write('<script src="${googBaseUri}"></script>');
     document.write('<script src="${depsUri}"></script>');
@@ -125,14 +106,15 @@ function replyPage(request, reply, pageConfig) {
 }
 
 fastify.get('/deps', opts, async (request, reply) => {
-  const pageConfig = await loadPageConfig(request.query.id);
-  const depsContent = await genDeps(pageConfig, config.closureLibraryPath);
+  const entryConfig = await loadEntryConfig(request.query.id, config.entryConfigDir);
+  const depsContent = await genDeps(entryConfig, config.closureLibraryDir);
   reply
     .code(200)
     .type('application/javascript')
     .send(depsContent);
 });
 
+// start server
 const start = async () => {
   try {
     await fastify.listen(PORT, HOST);
