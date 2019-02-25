@@ -2,6 +2,7 @@
   "id": "chunks",
   "mode": "RAW",
   "paths": ["../js", "../node_modules/google-closure-library"],
+  // chunks
   "modules": {
     "chunks": {
       "inputs": ["../js/chunks_init.js", "../js/chunks.js"],

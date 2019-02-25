@@ -7,6 +7,7 @@ const util = require('util');
 const serveStatic = require('serve-static');
 const cors = require('cors');
 const {stripIndents} = require('common-tags');
+const stripJsonComments = require('strip-json-comments');
 const genDeps = require('./gen-deps');
 
 const PORT = 9810;
@@ -57,8 +58,11 @@ fastify.get('/compile', opts, async (request, reply) => {
 });
 
 async function loadPageConfig(id) {
-  const content = await util.promisify(fs.readFile)(path.join(config.pageConfigPath, `${id}.json`));
-  const pageConfig = JSON.parse(content);
+  const content = await util.promisify(fs.readFile)(
+    path.join(config.pageConfigPath, `${id}.json`),
+    'utf8'
+  );
+  const pageConfig = JSON.parse(stripJsonComments(content));
   pageConfig.paths = pageConfig.paths.map(p => path.resolve(config.pageConfigPath, p));
   if (pageConfig.inputs) {
     pageConfig.inputs = pageConfig.inputs.map(p => path.resolve(config.pageConfigPath, p));
