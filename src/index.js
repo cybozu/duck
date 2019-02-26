@@ -1,6 +1,6 @@
 'use strict';
 
-const fastify = require('fastify')({logger: true});
+const fastify = require('fastify')({logger: {prettyPrint: true}});
 const path = require('path');
 const serveStatic = require('serve-static');
 const cors = require('cors');
