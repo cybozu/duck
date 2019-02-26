@@ -12,7 +12,7 @@ const stripJsonComments = require('strip-json-comments');
  * - extend `inherits` recursively
  * - convert relative paths to absolute paths
  */
-async function loadEntryConfig(id, entryConfigDir) {
+async function loadEntryConfig(id, entryConfigDir, {mode}) {
   const {json: entryConfig, basedir} = await loadInheritedJson(
     path.join(entryConfigDir, `${id}.json`)
   );
@@ -25,6 +25,9 @@ async function loadEntryConfig(id, entryConfigDir) {
     Object.values(entryConfig.modules).forEach(mod => {
       mod.inputs = mod.inputs.map(input => path.resolve(basedir, input));
     });
+  }
+  if (mode) {
+    entryConfig.mode = mode;
   }
   return entryConfig;
 }
