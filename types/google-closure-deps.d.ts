@@ -115,6 +115,40 @@ export namespace depGraph {
      */
     resolve(fromPath, importSpec): string;
   }
+
+  /**
+   * Dependency graph that provides validation along with a topological sorting
+   * of dependencies given an entrypoint.
+   *
+   * A dependency graph is not validated by default, you must call validate() if
+   * you wish to perform validation.
+   */
+  export class Graph {
+    /** @const */
+    depsBySymbol: Map<string, Dependency>;
+    /** @const */
+    depsByPath: Map<string, Dependency>;
+    /** @const */
+    moduleResolver: ModuleResolver;
+
+    constructor(dependencies: Dependency[], moduleResolver?: ModuleResolver);
+
+    /**
+     * Validates the dependency graph. Throws an error if the graph is invalid.
+     *
+     * This method uses Tarjan's algorithm to ensure Closure files are not part
+     * of any cycle. Check it out:
+     * https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
+     */
+    validate(): void;
+
+    private resolve_(i: Import): Dependency;
+
+    /**
+     * Provides a topological sorting of dependencies given the entrypoints.
+     */
+    order(...entrypoints: Dependency[]): Dependency[];
+  }
 }
 
 export namespace depFile {

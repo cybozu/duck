@@ -1,5 +1,5 @@
 goog.provide('app.chunks_init');
 
-goog.require('goog.ui.Component');
+goog.require('goog.dom');
 
-new goog.ui.Component();
+goog.dom.getElement('output').textContent = 'from chunks_init';

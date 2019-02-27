@@ -1,5 +1,6 @@
 {
   "id": "page2",
+  "mode": "SIMPLE",
   "inherits": "../base.json",
   "inputs": ["../js/page2.js"]
 }

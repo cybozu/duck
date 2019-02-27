@@ -3,18 +3,35 @@ import fs from 'fs';
 import util from 'util';
 import stripJsonComments from 'strip-json-comments';
 
-interface EntryConfig {
-  mode: string;
+export interface EntryConfig {
+  id: string;
+  mode: ProvrMode;
   paths: string[];
-  inherits?: string[];
+  inherits?: string;
   inputs?: string[];
   modules?: {
-    [index: string]: {
-      id: string;
+    [id: string]: {
+      // string is normalized to string[]
       inputs: string[];
+      // undefined, null and string are normalized to string[]
       deps: string[];
     };
   };
+  define?: {
+    [key: string]: string;
+  };
+  externs?: string[];
+  'language-in'?: string;
+  'language-out'?: string;
+  level?: 'QUIET' | 'DEFAULT' | 'VERBOSE';
+  debug?: boolean;
+}
+
+export enum ProvrMode {
+  RAW = 'RAW',
+  WHITESPACE = 'WHITESPACE',
+  SIMPLE = 'SIMPLE',
+  ADVANCED = 'ADVANCED',
 }
 
 /**
@@ -24,7 +41,11 @@ interface EntryConfig {
  * - extend `inherits` recursively
  * - convert relative paths to absolute paths
  */
-export default async function loadEntryConfig(id, entryConfigDir, {mode}) {
+export async function loadEntryConfig(
+  id: string,
+  entryConfigDir: string,
+  {mode}: {mode?: ProvrMode}
+): Promise<EntryConfig> {
   const {json: entryConfig, basedir} = await loadInheritedJson(
     path.join(entryConfigDir, `${id}.json`)
   );
@@ -47,7 +68,7 @@ export default async function loadEntryConfig(id, entryConfigDir, {mode}) {
 /*
  * Load JSON file including comments
  */
-async function loadJson(jsonPath) {
+async function loadJson(jsonPath: string): Promise<any> {
   const content = await util.promisify(fs.readFile)(path.join(jsonPath), 'utf8');
   return JSON.parse(stripJsonComments(content));
 }
@@ -56,11 +77,11 @@ async function loadJson(jsonPath) {
  * Load and extend JSON with `inherits` prop
  */
 async function loadInheritedJson(
-  jsonPath,
-  json = null
+  jsonPath: string,
+  json: EntryConfig = null
 ): Promise<{json: EntryConfig; basedir: string}> {
   if (!json) {
-    json = await loadJson(jsonPath);
+    json = normalize(await loadJson(jsonPath));
   }
   if (!json.inherits) {
     return {json, basedir: path.dirname(jsonPath)};
@@ -70,4 +91,23 @@ async function loadInheritedJson(
   delete json.inherits;
   json = {...parent, ...json};
   return loadInheritedJson(parentPath, json);
+}
+
+function normalize(json: any): EntryConfig {
+  if (json.modules) {
+    for (const id in json.modules) {
+      const module = json.modules[id];
+      if (!module.inputs) {
+        throw new TypeError(`No module inputs: ${id}`);
+      } else if (!Array.isArray(module.inputs)) {
+        module.inputs = [module.inputs];
+      }
+      if (!module.deps) {
+        module.deps = [];
+      } else if (!Array.isArray(module.deps)) {
+        module.deps = [module.deps];
+      }
+    }
+  }
+  return json;
 }
