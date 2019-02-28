@@ -1,6 +1,6 @@
-# duck
+# @teppeis/duck
 
-Dev server and build tool for Closure Compiler.
+Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to [plovr](https://github.com/bolinfest/plovr).
 
 Status: **_WIP_**
 
