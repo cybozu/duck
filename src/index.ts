@@ -1,14 +1,14 @@
-'use strict';
+import fastify from 'fastify';
+import path from 'path';
+import serveStatic from 'serve-static';
+import cors from 'cors';
+import {stripIndents} from 'common-tags';
+import gcc from 'google-closure-compiler';
+import genDeps from './gendeps';
+import loadEntryConfig from './loadentryconfig';
+import toCompilerOptions from './tocompileroptions';
 
-const fastify = require('fastify')({logger: {prettyPrint: true}});
-const path = require('path');
-const serveStatic = require('serve-static');
-const cors = require('cors');
-const {stripIndents} = require('common-tags');
-const ClosureCompiler = require('google-closure-compiler').compiler;
-const genDeps = require('./gendeps');
-const loadEntryConfig = require('./loadentryconfig');
-const toCompilerOptions = require('./tocompileroptions');
+const ClosureCompiler = gcc.compiler;
 
 const PORT = 9810;
 const HOST = 'localhost';
@@ -18,23 +18,38 @@ const closurePath = `${inputsPath}/$$/closure-library`;
 const googBaseUri = new URL(`${closurePath}/closure/goog/base.js`, baseUri);
 const depsUriBase = new URL(`/deps`, baseUri);
 
-function loadConfig() {
+interface DuckConfig {
+  closureLibraryDir: string;
+  inputsRoot: string;
+  entryConfigDir: string;
+}
+
+function loadConfig(): DuckConfig {
   return require(path.join(process.cwd(), 'duck.config'));
 }
 
+const server = fastify({logger: {prettyPrint: true}});
 const config = loadConfig();
 
 // enable CORS at first
-fastify.use(cors());
+server.use(cors());
 
 // static assets
-fastify.use(closurePath, serveStatic(config.closureLibraryDir, {maxAge: '1d', immutable: true}));
-fastify.use(inputsPath, serveStatic(config.inputsRoot));
+server.use(closurePath, serveStatic(config.closureLibraryDir, {
+  maxAge: '1d',
+  immutable: true,
+}) as any);
+server.use(inputsPath, serveStatic(config.inputsRoot) as any);
 
 // route
-fastify.get('/', async (request, reply) => {
+server.get('/', async (request, reply) => {
   return {hello: 'world'};
 });
+
+interface Query {
+  id: string;
+  mode: 'RAW' | 'WHITESPACE' | 'SIMPLE' | 'ADVANCED';
+}
 
 const opts = {
   schema: {
@@ -49,7 +64,7 @@ const opts = {
   },
 };
 
-fastify.get('/compile', opts, async (request, reply) => {
+server.get<Query>('/compile', opts, async (request, reply) => {
   const entryConfig = await loadEntryConfig(request.query.id, config.entryConfigDir, request.query);
   if (entryConfig.modules) {
     return replyChunks(request, reply, entryConfig);
@@ -82,7 +97,7 @@ function replyChunks(request, reply, entryConfig) {
     }
   }
   const rootModuleUris = moduleUris[rootId];
-  const depsUri = new URL(depsUriBase);
+  const depsUri = new URL(depsUriBase.toString());
   depsUri.search = `id=${entryConfig.id}`;
   reply.code(200).type('application/javascript').send(stripIndents`
     document.write('<script src="${googBaseUri}"></script>');
@@ -106,7 +121,7 @@ function replyChunksCompile(request, reply, entryConfig) {
 function replyPage(request, reply, entryConfig) {
   if (entryConfig.mode === 'RAW') {
     const uris = inputsToUris(entryConfig.inputs);
-    const depsUri = new URL(depsUriBase);
+    const depsUri = new URL(depsUriBase.toString());
     depsUri.search = `id=${entryConfig.id}`;
     reply.code(200).type('application/javascript').send(stripIndents`
       document.write('<script src="${googBaseUri}"></script>');
@@ -126,7 +141,8 @@ function replyPageCompile(request, reply, entryConfig) {
     compiler.run((exitCode, stdout, stderr) => {
       if (stderr) {
         const error = new Error(stderr);
-        error.exitCode = exitCode;
+        // TODO: make a custom error
+        // error.exitCode = exitCode;
         reject(error);
       }
       reply
@@ -138,7 +154,7 @@ function replyPageCompile(request, reply, entryConfig) {
   });
 }
 
-fastify.get('/deps', opts, async (request, reply) => {
+server.get<Query>('/deps', opts, async (request, reply) => {
   const entryConfig = await loadEntryConfig(request.query.id, config.entryConfigDir, request.query);
   const depsContent = await genDeps(entryConfig, config.closureLibraryDir);
   reply
@@ -150,9 +166,9 @@ fastify.get('/deps', opts, async (request, reply) => {
 // start server
 const start = async () => {
   try {
-    await fastify.listen(PORT, HOST);
+    await server.listen(PORT, HOST);
   } catch (err) {
-    fastify.log.error(err);
+    server.log.error(err);
     process.exit(1);
   }
 };

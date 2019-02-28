@@ -1,9 +1,21 @@
-'use strict';
+import path from 'path';
+import fs from 'fs';
+import util from 'util';
+import stripJsonComments from 'strip-json-comments';
 
-const path = require('path');
-const fs = require('fs');
-const util = require('util');
-const stripJsonComments = require('strip-json-comments');
+interface EntryConfig {
+  mode: string;
+  paths: string[];
+  inherits?: string[];
+  inputs?: string[];
+  modules?: {
+    [index: string]: {
+      id: string;
+      inputs: string[];
+      deps: string[];
+    };
+  };
+}
 
 /**
  * Load entry config JSON
@@ -12,7 +24,7 @@ const stripJsonComments = require('strip-json-comments');
  * - extend `inherits` recursively
  * - convert relative paths to absolute paths
  */
-async function loadEntryConfig(id, entryConfigDir, {mode}) {
+export default async function loadEntryConfig(id, entryConfigDir, {mode}) {
   const {json: entryConfig, basedir} = await loadInheritedJson(
     path.join(entryConfigDir, `${id}.json`)
   );
@@ -43,7 +55,10 @@ async function loadJson(jsonPath) {
 /**
  * Load and extend JSON with `inherits` prop
  */
-async function loadInheritedJson(jsonPath, json = null) {
+async function loadInheritedJson(
+  jsonPath,
+  json = null
+): Promise<{json: EntryConfig; basedir: string}> {
   if (!json) {
     json = await loadJson(jsonPath);
   }
@@ -56,5 +71,3 @@ async function loadInheritedJson(jsonPath, json = null) {
   json = {...parent, ...json};
   return loadInheritedJson(parentPath, json);
 }
-
-module.exports = loadEntryConfig;

@@ -1,7 +1,6 @@
-'use strict';
-
-function toCompilerOptions(entryConfig) {
-  const opts = {};
+export default function toCompilerOptions(entryConfig) {
+  // TODO(ts): make interface
+  const opts: any = {};
   function copy(entryKey, closureKey = entryKey.replace(/-/g, '_')) {
     if (entryKey in entryConfig) {
       opts[closureKey] = entryConfig[entryKey];
@@ -50,5 +49,3 @@ function toCompilerOptions(entryConfig) {
   // * module-production-uri: string
   return opts;
 }
-
-module.exports = toCompilerOptions;

@@ -1,6 +1,8 @@
 {
   "extends": [
-    "teppeis/node-v10",
+    "teppeis/es2019",
+    "teppeis/+node",
+    "teppeis/+typescript",
     "teppeis/+prettier",
     "teppeis/+mocha"
   ],

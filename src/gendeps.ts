@@ -1,13 +1,13 @@
-'use strict';
+import path from 'path';
+import closureDeps from 'google-closure-deps';
+import recursive from 'recursive-readdir';
+import flat from 'array.prototype.flat';
 
-const path = require('path');
-const {parser, depFile} = require('google-closure-deps');
-const recursive = require('recursive-readdir');
-const flat = require('array.prototype.flat');
+const {parser, depFile} = closureDeps;
 
 const depsCache = new Map();
 
-async function genDeps(pageConfig, closureLibraryDir) {
+export default async function genDeps(pageConfig, closureLibraryDir) {
   // TODO: invalidate updated files
   if (depsCache.has(pageConfig.id)) {
     return depsCache.get(pageConfig.id);
@@ -23,9 +23,8 @@ async function genDeps(pageConfig, closureLibraryDir) {
   const errors = flat(results.map(r => r.errors));
   const hasFatalError = errors.some(err => !!err.fatal);
   if (hasFatalError) {
-    const e = new Error('Fatal parse error');
-    e.errors = errors;
-    throw e;
+    // TODO: create an custom error and send `errors`
+    throw new Error('Fatal parse error');
   }
   const deps = results.map(r => r.dependency);
   const closureBaseDir = path.join(closureLibraryDir, 'closure', 'goog');
@@ -33,5 +32,3 @@ async function genDeps(pageConfig, closureLibraryDir) {
   depsCache.set(pageConfig.id, text);
   return text;
 }
-
-module.exports = genDeps;
