@@ -1,5 +1,5 @@
 {
-  "name": "duck",
+  "name": "@teppeis/duck",
   "version": "1.0.0",
   "author": "Teppei Sato <teppeis@gmail.com>",
   "engines": {
