@@ -98,9 +98,21 @@ export namespace depGraph {
     /**
      * Asserts that this import edge is valid.
      */
-    abstract validate(to: Dependency);
+    abstract validate(to: Dependency): void;
     abstract isGoogRequire(): boolean;
     abstract isEs6Import(): boolean;
+  }
+
+  export class GoogRequire extends Import {
+    validate(to: Dependency): void;
+    isGoogRequire(): true;
+    isEs6Import(): false;
+  }
+
+  export class Es6Import extends Import {
+    validate(to: Dependency): void;
+    isGoogRequire(): true;
+    isEs6Import(): false;
   }
 
   /**

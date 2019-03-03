@@ -9,7 +9,7 @@ import serveStatic from 'serve-static';
 import {compile, toCompilerOptions} from './compiler';
 import {Dag, Node} from './dag';
 import {EntryConfig, ProvrMode, loadEntryConfig} from './entryconfig';
-import {generateDepFileText, getDependencies} from './gendeps';
+import {generateDepFileText, getDependencies, getClosureLibraryDependencies} from './gendeps';
 
 const PORT = 9810;
 const HOST = 'localhost';
@@ -190,7 +190,12 @@ async function replyChunksCompile(
     }
     return chunkCache.get(parentRequest)[requestedChunkId].src;
   }
-  const dependencies = await getDependencies(entryConfig);
+  const dependencies = flat(
+    await Promise.all([
+      getDependencies(entryConfig, config.closureLibraryDir),
+      getClosureLibraryDependencies(config.closureLibraryDir),
+    ])
+  );
   const pathToDep: Map<string, depGraph.Dependency> = new Map(
     dependencies.map(dep => [dep.path, dep] as [string, depGraph.Dependency])
   );
