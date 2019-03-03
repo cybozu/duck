@@ -2,10 +2,13 @@
   "name": "chunks",
   "version": "1.0.0",
   "author": "Teppei Sato <teppeis@gmail.com>",
+  "engines": {
+    "node": ">=10.12"
+  },
   "scripts": {
     "deps": "closure-make-deps --root js --closure-path node_modules/google-closure-library/closure/goog --no-validate > deps.js",
     "deps:validate": "closure-make-deps --root js --closure-path node_modules/google-closure-library/closure/goog",
-    "start": "node ../../lib/index.js duck.config.js"
+    "start": "node ../../lib/src/index.js duck.config.js"
   },
   "devDependencies": {
     "google-closure-deps": "^20190121.0.0",
