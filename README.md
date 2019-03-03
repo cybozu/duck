@@ -8,7 +8,7 @@ Status: **_WIP_**
 
 ## Usage
 
-See `examples/configs`.
+See [`examples/chunks`](examples/chunks).
 
 ## License
 
