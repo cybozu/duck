@@ -2,7 +2,7 @@ import assert = require('assert');
 import {Dag, Node} from '../src/dag';
 
 describe('Dag', () => {
-  describe('constructor', () => {
+  describe('constructor()', () => {
     it('no root', () => {
       assert.throws(() => {
         new Dag([]);
@@ -32,7 +32,7 @@ describe('Dag', () => {
       assert(b.children.size === 0);
     });
   });
-  describe('lca', () => {
+  describe('getLcaNode()', () => {
     it('simple', () => {
       //      c
       //     /

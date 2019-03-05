@@ -78,7 +78,7 @@ async function loadJson(jsonPath: string): Promise<any> {
  */
 async function loadInheritedJson(
   jsonPath: string,
-  json: EntryConfig = null
+  json: EntryConfig | null = null
 ): Promise<{json: EntryConfig; basedir: string}> {
   if (!json) {
     json = normalize(await loadJson(jsonPath));

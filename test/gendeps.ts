@@ -5,7 +5,7 @@ import {addDependency, getClosureLibraryDependencies} from '../src/gendeps';
 
 const closureLibraryDir = '/closure-library-test';
 
-describe('gendeps.js', () => {
+describe('gendeps', () => {
   describe('addDependency()', () => {
     it('closure module', () => {
       const dep = addDependency(

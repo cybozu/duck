@@ -22,7 +22,7 @@ export async function generateDepFileText(
 ): Promise<string> {
   // TODO: invalidate updated files
   if (depFileTextCache.has(entryConfig.id)) {
-    return depFileTextCache.get(entryConfig.id);
+    return depFileTextCache.get(entryConfig.id)!;
   }
   const dependencies = await getDependencies(entryConfig, closureLibraryDir);
   const closureBaseDir = path.join(closureLibraryDir, 'closure', 'goog');
@@ -40,7 +40,7 @@ export async function getDependencies(
 ): Promise<depGraph.Dependency[]> {
   // TODO: invalidate updated files
   if (dependenciesCache.has(entryConfig.id)) {
-    return dependenciesCache.get(entryConfig.id);
+    return dependenciesCache.get(entryConfig.id)!;
   }
   // TODO: uniq
   const parseResultPromises = entryConfig.paths.map(async p => {

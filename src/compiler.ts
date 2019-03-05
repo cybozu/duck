@@ -50,7 +50,7 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
   copy('level', 'warning_level');
   copy('debug');
 
-  const formatting = [];
+  const formatting: string[] = [];
   if (entryConfig['pretty-print']) {
     formatting.push('PRETTY_PRINT');
   }
@@ -62,7 +62,7 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
   }
 
   if (entryConfig.define) {
-    const defines = [];
+    const defines: string[] = [];
     for (const key in entryConfig.define) {
       const value = entryConfig.define[key];
       defines.push(`${key}=${value}`);

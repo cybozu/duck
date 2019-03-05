@@ -10,6 +10,7 @@ import {compile, toCompilerOptions} from './compiler';
 import {Dag, Node} from './dag';
 import {EntryConfig, ProvrMode, loadEntryConfig} from './entryconfig';
 import {generateDepFileText, getDependencies, getClosureLibraryDependencies} from './gendeps';
+import {assertString, assertNonNullable} from './assert';
 
 const PORT = 9810;
 const HOST = 'localhost';
@@ -82,7 +83,7 @@ server.get<CompileQuery>('/compile', opts, async (request, reply) => {
       return replyChunksCompile(
         reply,
         entryConfig,
-        request.raw.url,
+        assertString(request.raw.url),
         String(request.id),
         request.query
       );
@@ -103,7 +104,7 @@ function convertModuleInfos(
   url?: string,
   requestId?: string
 ): {moduleInfo: {[id: string]: string[]}; moduleUris: {[id: string]: URL[]}; rootId: string} {
-  let rootId: string;
+  let rootId: string | null = null;
   const {modules} = entryConfig;
   const moduleInfo: {[id: string]: string[]} = {};
   const moduleUris: {[id: string]: URL[]} = {};
@@ -113,6 +114,12 @@ function convertModuleInfos(
     if (entryConfig.mode === 'RAW') {
       moduleUris[id] = inputsToUrisForRaw(module.inputs);
     } else {
+      if (!url) {
+        throw new Error(`url is not defined: ${url}`);
+      }
+      if (!requestId) {
+        throw new Error(`requestId is not defined: ${requestId}`);
+      }
       const uri = new URL(url, baseUri);
       const params = uri.searchParams;
       params.set('chunk', id);
@@ -179,16 +186,18 @@ async function replyChunksCompile(
 ) {
   let requestedChunkId: string | undefined = query.chunk;
   const {parentRequest} = query;
+  // TODO: separate EntryConfigChunks from EntryConfig
+  entryConfig.modules = assertNonNullable(entryConfig.modules);
   if (!entryIdToChunkCache.has(entryConfig.id)) {
     entryIdToChunkCache.set(entryConfig.id, new Map());
   }
-  const chunkCache = entryIdToChunkCache.get(entryConfig.id);
-  if (parentRequest && chunkCache.has(parentRequest)) {
-    const parentChunkCache = chunkCache.get(parentRequest);
+  const chunkCache = entryIdToChunkCache.get(entryConfig.id)!;
+  if (requestedChunkId && parentRequest && chunkCache.has(parentRequest)) {
+    const parentChunkCache = chunkCache.get(parentRequest)!;
     if (!parentChunkCache[requestedChunkId]) {
       throw new Error(`Unexpected requested chunk: ${requestedChunkId}`);
     }
-    return chunkCache.get(parentRequest)[requestedChunkId].src;
+    return chunkCache.get(parentRequest)![requestedChunkId].src;
   }
   const dependencies = flat(
     await Promise.all([
@@ -210,8 +219,13 @@ async function replyChunksCompile(
   const chunkToTransitiveDepPath: Map<string, Set<string>> = new Map();
   const allInputPathSet: Set<string> = new Set();
   sortedChunkIds.forEach(chunkId => {
-    const chunkConfig = entryConfig.modules[chunkId];
-    const entryPoints = chunkConfig.inputs.map(input => pathToDep.get(input));
+    const chunkConfig = entryConfig.modules![chunkId];
+    const entryPoints = chunkConfig.inputs.map(input =>
+      assertNonNullable(
+        pathToDep.get(input),
+        `entryConfig.paths does not include the inputs: ${input}`
+      )
+    );
     const inputPaths = graph.order(...entryPoints).map(dep => dep.path);
     chunkToTransitiveDepPath.set(chunkId, new Set(inputPaths));
     inputPaths.forEach(input => allInputPathSet.add(input));
@@ -229,13 +243,13 @@ async function replyChunksCompile(
       }
     });
     const targetChunk = dag.getLcaNode(...chunksWithInput);
-    chunkToInputPath.get(targetChunk.id).add(inputPath);
+    assertNonNullable(chunkToInputPath.get(targetChunk.id)).add(inputPath);
   }
   const opts = toCompilerOptions(entryConfig);
   opts.js = flat([...chunkToInputPath.values()].map(inputs => [...inputs]));
   opts.chunk = sortedChunkIds.map(id => {
-    const {deps} = entryConfig.modules[id];
-    const numOfInputs = chunkToInputPath.get(id).size;
+    const {deps} = entryConfig.modules![id];
+    const numOfInputs = chunkToInputPath.get(id)!.size;
     return `${id}:${numOfInputs}:${deps.join(',')}`;
   });
   const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, url, requestId);
@@ -261,6 +275,8 @@ async function replyChunksCompile(
 const entryIdToChunkCache: Map<string, Map<string, {[id: string]: ChunkOutput}>> = new Map();
 
 function replyPageRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
+  // TODO: separate EntryConfigPage from EntryConfig
+  entryConfig.inputs = assertNonNullable(entryConfig.inputs);
   const uris = inputsToUrisForRaw(entryConfig.inputs);
   const depsUri = new URL(depsUriBase.toString());
   depsUri.search = `id=${entryConfig.id}`;

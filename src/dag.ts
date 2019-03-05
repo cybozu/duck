@@ -48,7 +48,7 @@ export class Dag {
     // populate children (inverting deps)
     nodes.forEach(node => {
       node.deps.forEach(dep => {
-        this.idToNode.get(dep).children.add(node);
+        this.idToNode.get(dep)!.children.add(node);
       });
     });
     this.populateDepth();
@@ -67,41 +67,57 @@ export class Dag {
     ancestors.add(node.id);
     node.deps.forEach(dep => {
       ancestors.add(dep);
-      this.populateAncestors(this.idToNode.get(dep), ancestors);
+      this.populateAncestors(this.idToNode.get(dep)!, ancestors);
     });
   }
 
-  private getLcaCache(u: string, v: string): Node {
+  private getLcaCache(u: string, v: string): Node | undefined {
     if (u > v) {
       [u, v] = [v, u];
     }
-    return this.lcaCache.get(u).get(v);
+    const cache = this.lcaCache.get(u);
+    if (!cache) {
+      return undefined;
+    }
+    return cache.get(v);
   }
 
   private setLcaCache(u: string, v: string, result: Node) {
     if (u > v) {
       [u, v] = [v, u];
     }
-    this.lcaCache.get(u).set(v, result);
+    const cache = this.lcaCache.get(u);
+    if (!cache) {
+      throw new Error(`Node cache not found: ${u}`);
+    }
+    cache.set(v, result);
   }
 
   /**
-   * @param nodes Specify one node at least.
+   * @param nodeIds Specify one node at least.
    * @return One of LCAs (Least Common Ancestors) of the nodes.
    * In general, LCA of DAG is not unique.
    */
-  getLcaNode(...nodes: string[]): Node {
-    if (nodes.length < 1) {
+  getLcaNode(...nodeIds: string[]): Node {
+    if (nodeIds.length < 1) {
       throw new Error('Specify one node at least');
-    } else if (nodes.length < 2) {
-      return this.idToNode.get(nodes[0]);
-    } else if (nodes.length < 3) {
-      return this.getLcaPair(nodes[0], nodes[1]);
+    } else if (nodeIds.length < 2) {
+      const lca = this.idToNode.get(nodeIds[0]);
+      if (!lca) {
+        throw new Error(`Node not found: ${nodeIds[0]}`);
+      }
+      return lca;
+    } else if (nodeIds.length < 3) {
+      return this.getLcaPair(nodeIds[0], nodeIds[1]);
     } else {
-      const lcaId = nodes.reduce((prev, cur) => {
+      const lcaId = nodeIds.reduce((prev, cur) => {
         return this.getLcaPair(prev, cur).id;
       });
-      return this.idToNode.get(lcaId);
+      const lca = this.idToNode.get(lcaId);
+      if (!lca) {
+        throw new Error(`Node not found: ${lcaId}`);
+      }
+      return lca;
     }
   }
 
@@ -124,11 +140,14 @@ export class Dag {
     }
     let least: string | null = null;
     for (const ancestor of commonAncestors) {
-      if (least === null || this.idToDepth.get(least) < this.idToDepth.get(ancestor)) {
+      if (least === null || this.idToDepth.get(least)! < this.idToDepth.get(ancestor)!) {
         least = ancestor;
       }
     }
-    result = this.idToNode.get(least);
+    if (!least) {
+      throw new Error('LCA not found');
+    }
+    result = this.idToNode.get(least)!;
     this.setLcaCache(u, v, result);
     return result;
   }
