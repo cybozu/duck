@@ -3,9 +3,16 @@ import {Dag, Node} from '../src/dag';
 
 describe('Dag', () => {
   describe('constructor()', () => {
-    it('no root', () => {
+    it('empty node list', () => {
       assert.throws(() => {
         new Dag([]);
+      }, /The `nodes` is empty/);
+    });
+    it('no root', () => {
+      const a = new Node('a', ['b']);
+      const b = new Node('b', ['a']);
+      assert.throws(() => {
+        new Dag([a, b]);
       }, /Root not found/);
     });
     it('many roots', () => {
@@ -21,6 +28,14 @@ describe('Dag', () => {
       assert.throws(() => {
         new Dag([a, a2]);
       }, /Same ID found: a/);
+    });
+    it('circular dependencies', () => {
+      const a = new Node('a');
+      const b = new Node('b', ['c']);
+      const c = new Node('c', ['b']);
+      assert.throws(() => {
+        new Dag([a, b, c]);
+      }, /Circular dependencies found/);
     });
     it('calc children', () => {
       const a = new Node('a');

@@ -24,9 +24,13 @@ export class Dag {
   private idToNode: Map<string, Node> = new Map();
   private root: Node;
   private lcaCache: Map<string, Map<string, Node>> = new Map();
-  private sortedNodes: Node[];
+  private sortedNodes: Node[] = [];
 
   constructor(nodes: Node[]) {
+    let root: Node | null = null;
+    if (nodes.length < 1) {
+      throw new Error('The `nodes` is empty');
+    }
     // populate idToNode
     nodes.forEach(node => {
       if (this.idToNode.has(node.id)) {
@@ -34,17 +38,18 @@ export class Dag {
       }
       this.idToNode.set(node.id, node);
       if (node.deps.length === 0) {
-        if (this.root) {
-          throw new Error(`Many roots found: ${this.root.id}, ${node.id}`);
+        if (root) {
+          throw new Error(`Many roots found: ${root.id}, ${node.id}`);
         }
-        this.root = node;
+        root = node;
       }
       // initialize cache
       this.lcaCache.set(node.id, new Map());
     });
-    if (!this.root) {
+    if (!root) {
       throw new Error('Root not found');
     }
+    this.root = root;
     // populate children (inverting deps)
     nodes.forEach(node => {
       node.deps.forEach(dep => {
@@ -53,7 +58,7 @@ export class Dag {
     });
     this.populateDepth();
     this.idToNode.forEach(node => {
-      this.populateAncestors(node);
+      node.ancestors = new Set(this.populateAncestors(node));
     });
   }
 
@@ -63,12 +68,15 @@ export class Dag {
     });
   }
 
-  private populateAncestors(node: Node, ancestors = node.ancestors) {
-    ancestors.add(node.id);
+  private populateAncestors(node: Node, ancestors: string[] = []): string[] {
+    if (ancestors.length > this.idToNode.size) {
+      throw new Error(`Circular dependencies found: ${ancestors}`);
+    }
+    ancestors.push(node.id);
     node.deps.forEach(dep => {
-      ancestors.add(dep);
       this.populateAncestors(this.idToNode.get(dep)!, ancestors);
     });
+    return ancestors;
   }
 
   private getLcaCache(u: string, v: string): Node | undefined {
@@ -157,7 +165,7 @@ export class Dag {
    * The result is cached and returned from the second time.
    */
   getSortedNodes(): Node[] {
-    if (this.sortedNodes) {
+    if (this.sortedNodes.length > 0) {
       return this.sortedNodes;
     }
     const visited: Set<Node> = new Set();
