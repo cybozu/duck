@@ -120,12 +120,12 @@ export namespace depGraph {
    */
   export interface ModuleResolver {
     /**
-     * @param {string} fromPath The path of the module that is doing the
+     * @param fromPath The path of the module that is doing the
      *     importing.
-     * @param {string} importSpec The raw text of the import.
-     * @return {string} The resolved path of the referenced module.
+     * @param importSpec The raw text of the import.
+     * @return The resolved path of the referenced module.
      */
-    resolve(fromPath, importSpec): string;
+    resolve(fromPath: string, importSpec: string): string;
   }
 
   /**
@@ -167,11 +167,11 @@ export namespace depFile {
   /**
    * Gets the text of a dependency file for the given dependencies.
    *
-   * @param {string} pathToClosure The path to Closure Library. Required as paths
+   * @param pathToClosure The path to Closure Library. Required as paths
    *      in goog.addDependency statements are relative to Closure's base.js.
-   * @param {!Array<!depGraph.Dependency>} dependencies
-   * @param {!depGraph.ModuleResolver=} moduleResolver
-   * @return {string}
+   * @param dependencies
+   * @param moduleResolver
+   * @return
    */
   export function getDepFileText(
     pathToClosure: string,
