@@ -52,6 +52,16 @@ commands:
             - ~/.npm/_cacache
 
 jobs:
+  node-v6:
+    docker:
+      - image: node:6
+    steps:
+      - test-nodejs-v6
+  node-v8:
+    docker:
+      - image: node:8
+    steps:
+      - test-nodejs
   node-v10:
     docker:
       - image: node:10
@@ -66,7 +76,5 @@ jobs:
 workflows:
   node-multi-build:
     jobs:
-      - node-v6
-      - node-v8
       - node-v10
       - node-v11
