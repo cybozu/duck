@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/common-tags": "^1.8.0",
     "@types/mocha": "^5.2.6",
-    "@types/node": "^10.12.29",
+    "@types/node": "^10.12.30",
     "@types/recursive-readdir": "^2.2.0",
     "@types/serve-static": "^1.13.2",
     "@types/strip-json-comments": "0.0.30",
