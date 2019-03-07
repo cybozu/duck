@@ -6,7 +6,11 @@
   "engines": {
     "node": ">=10.12"
   },
+  "bin": {
+    "duck": "bin/duck.js"
+  },
   "files": [
+    "bin",
     "lib/src"
   ],
   "scripts": {
