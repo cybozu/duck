@@ -25,6 +25,8 @@ export interface EntryConfig {
   'language-out'?: string;
   level?: 'QUIET' | 'DEFAULT' | 'VERBOSE';
   debug?: boolean;
+  'pretty-print'?: boolean;
+  'print-input-delimiter'?: boolean;
 }
 
 export enum ProvrMode {

@@ -1,8 +1,8 @@
-import compiler from 'google-closure-compiler';
+import {compiler as ClosureCompiler} from 'google-closure-compiler';
 import {EntryConfig, ProvrMode} from './entryconfig';
-const ClosureCompiler = compiler.compiler;
 
 export interface CompilerOptions {
+  [idx: string]: any;
   dependency_mode?: string;
   entry_point?: string[];
   compilation_level?: string;
