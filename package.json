@@ -23,7 +23,7 @@
     "cors": "^2.8.5",
     "fastify": "^2.0.0",
     "google-closure-compiler": ">= 20190215.0.2",
-    "google-closure-deps": ">= 20190121.0.0",
+    "google-closure-deps": ">= 20190215.0.0",
     "pino-pretty": "^2.5.0",
     "recursive-readdir": "^2.2.2",
     "serve-static": "^1.13.2",
