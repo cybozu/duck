@@ -1,14 +1,14 @@
 import assert = require('assert');
 import {depGraph} from 'google-closure-deps';
 import path from 'path';
-import {addDependency, getClosureLibraryDependencies} from '../src/gendeps';
+import {addClosureDependency, getClosureLibraryDependencies} from '../src/gendeps';
 
 const closureLibraryDir = '/closure-library-test';
 
 describe('gendeps', () => {
   describe('addDependency()', () => {
     it('closure module', () => {
-      const dep = addDependency(
+      const dep = addClosureDependency(
         'async/animationdelay_test.js',
         ['goog.async.AnimationDelayTest'],
         ['goog.Promise', 'goog.Timer'],
@@ -24,7 +24,7 @@ describe('gendeps', () => {
       });
     });
     it('closure script', () => {
-      const dep = addDependency(
+      const dep = addClosureDependency(
         'dom/textrange.js',
         ['goog.dom.TextRange'],
         ['goog.array', 'goog.dom'],
@@ -40,7 +40,7 @@ describe('gendeps', () => {
       });
     });
     it('lang', () => {
-      const dep = addDependency(
+      const dep = addClosureDependency(
         'events/keys.js',
         ['goog.events.Keys'],
         [],
@@ -58,7 +58,7 @@ describe('gendeps', () => {
       });
     });
     it('third_party', () => {
-      const dep = addDependency(
+      const dep = addClosureDependency(
         '../../third_party/closure/goog/dojo/dom/query.js',
         ['goog.dom.query'],
         [],

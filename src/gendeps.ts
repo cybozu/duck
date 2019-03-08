@@ -83,7 +83,13 @@ export async function getClosureLibraryDependencies(
         requires: string[],
         opt_loadFlags: boolean | {module?: string; lang?: string}
       ) {
-        const dep = addDependency(relPath, provides, requires, opt_loadFlags, closureLibraryDir);
+        const dep = addClosureDependency(
+          relPath,
+          provides,
+          requires,
+          opt_loadFlags,
+          closureLibraryDir
+        );
         results.push(dep);
       },
     },
@@ -92,7 +98,8 @@ export async function getClosureLibraryDependencies(
 }
 
 /**
- * Adds a dependency from a file to the files it requires.
+ * Steal goog.addDependency() in the deps.js of Closure Library.
+ * Don't use this for deps.js other than Closure Library.
  *
  * @param relPath The path to the js file.
  * @param provides An array of strings with
@@ -103,9 +110,9 @@ export async function getClosureLibraryDependencies(
  *     how the file must be loaded.  The boolean 'true' is equivalent
  *     to {'module': 'goog'} for backwards-compatibility.  Valid properties
  *     and values include {'module': 'goog'} and {'lang': 'es6'}.
- * @param closureLibraryDir
+ * @param closureLibraryDir Additional param to generate absolute path
  */
-export function addDependency(
+export function addClosureDependency(
   relPath: string,
   provides: string[],
   requires: string[],
