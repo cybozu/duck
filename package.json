@@ -1,7 +1,7 @@
 {
   "name": "@teppeis/duck",
   "description": "Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to plovr.",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": "Teppei Sato <teppeis@gmail.com>",
   "engines": {
     "node": ">=10.12"
