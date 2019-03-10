@@ -12,10 +12,12 @@ const depFileTextCache: Map<string, string> = new Map();
 const dependenciesCache: Map<string, depGraph.Dependency[]> = new Map();
 
 /**
- * Generate deps.js source text for Closure Compiler RAW mode.
+ * Generate deps.js source text for RAW mode.
+ * The result excludes deps of Closure Library.
  *
  * @param entryConfig
  * @param closureLibraryDir "${closureLibraryDir}/closure/goog/base.js" exists.
+ * @param inputsRoot
  */
 export async function generateDepFileText(
   entryConfig: EntryConfig,
@@ -27,11 +29,11 @@ export async function generateDepFileText(
     return depFileTextCache.get(entryConfig.id)!;
   }
   const dependencies = await getDependencies(entryConfig, closureLibraryDir);
-  const googBaseDirUrlPath = path.dirname(googBaseUrlPath);
   dependencies.forEach(dep => {
     // convert to URL pathname
-    dep.path = `${String(inputsUrlPath)}/${path.relative(inputsRoot, dep.path)}`;
+    dep.path = `${inputsUrlPath}/${path.relative(inputsRoot, dep.path)}`;
   });
+  const googBaseDirUrlPath = path.dirname(googBaseUrlPath);
   const depFileText = depFile.getDepFileText(googBaseDirUrlPath, dependencies);
   depFileTextCache.set(entryConfig.id, depFileText);
   return depFileText;
