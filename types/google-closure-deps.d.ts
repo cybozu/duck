@@ -9,6 +9,7 @@ export namespace parser {
     errors: ParseError[];
     /** @const */
     hasFatalError: boolean;
+
     constructor(dependency: depGraph.Dependency, errors: ParseError[]);
   }
   export class ParseError {
@@ -22,6 +23,7 @@ export namespace parser {
     line: number;
     /** @const */
     lineOffset: number;
+
     constructor(
       fatal: boolean,
       message: string,
@@ -71,6 +73,7 @@ export namespace depGraph {
      * @const
      */
     language: string | null;
+
     constructor(
       type: DependencyType,
       filepath: string,
@@ -94,7 +97,9 @@ export namespace depGraph {
      * @const
      */
     symOrPath: string;
+
     constructor(symOrPath: string);
+
     /**
      * Asserts that this import edge is valid.
      */
