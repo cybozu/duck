@@ -1,0 +1,6 @@
+{
+  "id": "grandchild",
+  "mode": "RAW",
+  "inherits": "../child.json",
+  "inputs": ["../js/foo.js"]
+}

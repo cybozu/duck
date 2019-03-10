@@ -46,7 +46,7 @@ export enum PlovrMode {
 export async function loadEntryConfig(
   id: string,
   entryConfigDir: string,
-  {mode}: {mode?: PlovrMode}
+  {mode}: {mode?: PlovrMode} = {}
 ): Promise<EntryConfig> {
   const {json: entryConfig, basedir} = await loadInheritedJson(
     path.join(entryConfigDir, `${id}.json`)
@@ -55,6 +55,9 @@ export async function loadEntryConfig(
   entryConfig.paths = entryConfig.paths.map(p => path.resolve(basedir, p));
   if (entryConfig.inputs) {
     entryConfig.inputs = entryConfig.inputs.map(input => path.resolve(basedir, input));
+  }
+  if (entryConfig.externs) {
+    entryConfig.externs = entryConfig.externs.map(extern => path.resolve(basedir, extern));
   }
   if (entryConfig.modules) {
     Object.values(entryConfig.modules).forEach(mod => {

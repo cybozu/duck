@@ -1,0 +1,15 @@
+{
+  "id": "chunks",
+  "mode": "RAW",
+  "paths": ["../path1"],
+  "modules": {
+    "base": {
+      "inputs": ["../js/base.js"],
+      "deps": []
+    },
+    "chunk1": {
+      "inputs": ["js/chunk1.js"],
+      "deps": ["base"]
+    }
+  }
+}

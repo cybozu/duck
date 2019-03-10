@@ -1,0 +1,14 @@
+{
+  "id": "chunks-normalize",
+  "mode": "RAW",
+  "paths": ["../path1"],
+  "modules": {
+    "base": {
+      "inputs": "../js/base.js"
+    },
+    "chunk1": {
+      "inputs": ["js/chunk1.js"],
+      "deps": "base"
+    }
+  }
+}
