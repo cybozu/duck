@@ -8,7 +8,7 @@ import path from 'path';
 import serveStatic from 'serve-static';
 import {compile, toCompilerOptions} from './compiler';
 import {Dag, Node} from './dag';
-import {EntryConfig, ProvrMode, loadEntryConfig} from './entryconfig';
+import {EntryConfig, PlovrMode, loadEntryConfig} from './entryconfig';
 import {generateDepFileText, getDependencies, getClosureLibraryDependencies} from './gendeps';
 import {assertString, assertNonNullable} from './assert';
 
@@ -57,7 +57,7 @@ server.get('/', async (request, reply) => {
 
 interface CompileQuery {
   id: string;
-  mode?: ProvrMode;
+  mode?: PlovrMode;
   chunk?: string;
   parentRequest?: string;
 }

@@ -5,7 +5,7 @@ import stripJsonComments from 'strip-json-comments';
 
 export interface EntryConfig {
   id: string;
-  mode: ProvrMode;
+  mode: PlovrMode;
   paths: string[];
   inherits?: string;
   inputs?: string[];
@@ -29,7 +29,7 @@ export interface EntryConfig {
   'print-input-delimiter'?: boolean;
 }
 
-export enum ProvrMode {
+export enum PlovrMode {
   RAW = 'RAW',
   WHITESPACE = 'WHITESPACE',
   SIMPLE = 'SIMPLE',
@@ -46,7 +46,7 @@ export enum ProvrMode {
 export async function loadEntryConfig(
   id: string,
   entryConfigDir: string,
-  {mode}: {mode?: ProvrMode}
+  {mode}: {mode?: PlovrMode}
 ): Promise<EntryConfig> {
   const {json: entryConfig, basedir} = await loadInheritedJson(
     path.join(entryConfigDir, `${id}.json`)

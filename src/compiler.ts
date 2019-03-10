@@ -1,5 +1,5 @@
 import {compiler as ClosureCompiler} from 'google-closure-compiler';
-import {EntryConfig, ProvrMode} from './entryconfig';
+import {EntryConfig, PlovrMode} from './entryconfig';
 
 export interface CompilerOptions {
   [idx: string]: any;
@@ -41,7 +41,7 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
     // TODO: consider `global-scope-name`
     opts.isolation_mode = 'IIFE';
   }
-  if (entryConfig.mode !== ProvrMode.RAW) {
+  if (entryConfig.mode !== PlovrMode.RAW) {
     opts.compilation_level = entryConfig.mode;
   }
   copy('externs');
