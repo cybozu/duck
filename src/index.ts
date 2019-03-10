@@ -27,7 +27,14 @@ interface DuckConfig {
 }
 
 function loadConfig(): DuckConfig {
-  return require(path.join(process.cwd(), 'duck.config'));
+  const configDir = process.cwd();
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const config: DuckConfig = require(path.join(configDir, 'duck.config'));
+  // resolve relative path to absolute
+  config.closureLibraryDir = path.resolve(configDir, config.closureLibraryDir);
+  config.inputsRoot = path.resolve(configDir, config.inputsRoot);
+  config.entryConfigDir = path.resolve(configDir, config.entryConfigDir);
+  return config;
 }
 
 const server = fastify({logger: {prettyPrint: true}});
