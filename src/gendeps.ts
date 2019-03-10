@@ -6,6 +6,7 @@ import recursive from 'recursive-readdir';
 import util from 'util';
 import vm from 'vm';
 import {EntryConfig} from './entryconfig';
+import {inputsUrlPath, googBaseUrlPath} from './urls';
 
 const depFileTextCache: Map<string, string> = new Map();
 const dependenciesCache: Map<string, depGraph.Dependency[]> = new Map();
@@ -18,15 +19,20 @@ const dependenciesCache: Map<string, depGraph.Dependency[]> = new Map();
  */
 export async function generateDepFileText(
   entryConfig: EntryConfig,
-  closureLibraryDir: string
+  closureLibraryDir: string,
+  inputsRoot: string
 ): Promise<string> {
   // TODO: invalidate updated files
   if (depFileTextCache.has(entryConfig.id)) {
     return depFileTextCache.get(entryConfig.id)!;
   }
   const dependencies = await getDependencies(entryConfig, closureLibraryDir);
-  const closureBaseDir = path.join(closureLibraryDir, 'closure', 'goog');
-  const depFileText = depFile.getDepFileText(closureBaseDir, dependencies);
+  const googBaseDirUrlPath = path.dirname(googBaseUrlPath);
+  dependencies.forEach(dep => {
+    // convert to URL pathname
+    dep.path = `${String(inputsUrlPath)}/${path.relative(inputsRoot, dep.path)}`;
+  });
+  const depFileText = depFile.getDepFileText(googBaseDirUrlPath, dependencies);
   depFileTextCache.set(entryConfig.id, depFileText);
   return depFileText;
 }

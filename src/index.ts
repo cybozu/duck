@@ -11,14 +11,19 @@ import {Dag, Node} from './dag';
 import {EntryConfig, PlovrMode, loadEntryConfig} from './entryconfig';
 import {generateDepFileText, getDependencies, getClosureLibraryDependencies} from './gendeps';
 import {assertString, assertNonNullable} from './assert';
+import {
+  closureLibraryUrlPath,
+  inputsUrlPath,
+  compileUrlPath,
+  depsUrlPath,
+  googBaseUrlPath,
+} from './urls';
 
 const PORT = 9810;
 const HOST = 'localhost';
-const baseUri = new URL(`http://${HOST}:${PORT}/`);
-const inputsPath = '/inputs';
-const closurePath = `${inputsPath}/$$/closure-library`;
-const googBaseUri = new URL(`${closurePath}/closure/goog/base.js`, baseUri);
-const depsUriBase = new URL(`/deps`, baseUri);
+const baseUrl = new URL(`http://${HOST}:${PORT}/`);
+const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
+const depsUrlBase = new URL(depsUrlPath, baseUrl);
 
 interface DuckConfig {
   closureLibraryDir: string;
@@ -44,11 +49,11 @@ const config = loadConfig();
 server.use(cors());
 
 // static assets
-server.use(closurePath, serveStatic(config.closureLibraryDir, {
+server.use(closureLibraryUrlPath, serveStatic(config.closureLibraryDir, {
   maxAge: '1d',
   immutable: true,
 }) as any);
-server.use(inputsPath, serveStatic(config.inputsRoot) as any);
+server.use(inputsUrlPath, serveStatic(config.inputsRoot) as any);
 
 // route
 server.get('/', async (request, reply) => {
@@ -77,7 +82,7 @@ const opts = {
   },
 };
 
-server.get<CompileQuery>('/compile', opts, async (request, reply) => {
+server.get<CompileQuery>(compileUrlPath, opts, async (request, reply) => {
   const entryConfig = await loadEntryConfig(request.query.id, config.entryConfigDir, request.query);
   if (entryConfig.mode === 'RAW') {
     if (entryConfig.modules) {
@@ -103,7 +108,7 @@ server.get<CompileQuery>('/compile', opts, async (request, reply) => {
 function inputsToUrisForRaw(inputs: string[]): URL[] {
   return inputs
     .map(input => path.relative(config.inputsRoot, input))
-    .map(input => new URL(`${inputsPath}/${input}`, baseUri));
+    .map(input => new URL(`${inputsUrlPath}/${input}`, baseUrl));
 }
 
 function convertModuleInfos(
@@ -127,7 +132,7 @@ function convertModuleInfos(
       if (!requestId) {
         throw new Error(`requestId is not defined: ${requestId}`);
       }
-      const uri = new URL(url, baseUri);
+      const uri = new URL(url, baseUrl);
       const params = uri.searchParams;
       params.set('chunk', id);
       params.set('parentRequest', requestId);
@@ -161,11 +166,11 @@ function convertModuleInfos(
 function replyChunksRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
   const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig);
   const rootModuleUris = moduleUris[rootId];
-  const depsUri = new URL(depsUriBase.toString());
-  depsUri.search = `id=${entryConfig.id}`;
+  const depsUrl = new URL(depsUrlBase.toString());
+  depsUrl.search = `id=${entryConfig.id}`;
   reply.code(200).type('application/javascript').send(stripIndents`
-    document.write('<script src="${googBaseUri}"></script>');
-    document.write('<script src="${depsUri}"></script>');
+    document.write('<script src="${googBaseUrl}"></script>');
+    document.write('<script src="${depsUrl}"></script>');
     document.write('<script>goog.global.PLOVR_MODULE_INFO = ${JSON.stringify(
       moduleInfo
     )}</script>');
@@ -285,11 +290,11 @@ function replyPageRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: 
   // TODO: separate EntryConfigPage from EntryConfig
   entryConfig.inputs = assertNonNullable(entryConfig.inputs);
   const uris = inputsToUrisForRaw(entryConfig.inputs);
-  const depsUri = new URL(depsUriBase.toString());
-  depsUri.search = `id=${entryConfig.id}`;
+  const depsUrl = new URL(depsUrlBase.toString());
+  depsUrl.search = `id=${entryConfig.id}`;
   reply.code(200).type('application/javascript').send(stripIndents`
-    document.write('<script src="${googBaseUri}"></script>');
-    document.write('<script src="${depsUri}"></script>');
+    document.write('<script src="${googBaseUrl}"></script>');
+    document.write('<script src="${depsUrl}"></script>');
     ${uris.map(uri => `document.write('<script>goog.require("${uri}")</script>');`).join('\n')}
   `);
 }
@@ -306,9 +311,13 @@ async function replyPageCompile(
     .send(output);
 }
 
-server.get<CompileQuery>('/deps', opts, async (request, reply) => {
+server.get<CompileQuery>(depsUrlPath, opts, async (request, reply) => {
   const entryConfig = await loadEntryConfig(request.query.id, config.entryConfigDir, request.query);
-  const depsContent = await generateDepFileText(entryConfig, config.closureLibraryDir);
+  const depsContent = await generateDepFileText(
+    entryConfig,
+    config.closureLibraryDir,
+    config.inputsRoot
+  );
   reply
     .code(200)
     .type('application/javascript')

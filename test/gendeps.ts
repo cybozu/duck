@@ -1,11 +1,33 @@
 import assert = require('assert');
 import {depGraph} from 'google-closure-deps';
 import path from 'path';
-import {addClosureDependency, getClosureLibraryDependencies} from '../src/gendeps';
+import {
+  generateDepFileText,
+  addClosureDependency,
+  getClosureLibraryDependencies,
+} from '../src/gendeps';
+import {EntryConfig, PlovrMode} from '../src/entryconfig';
 
 const closureLibraryDir = '/closure-library-test';
 
 describe('gendeps', () => {
+  describe('generateDepFileText()', () => {
+    it('returns correct path', async () => {
+      const inputsRoot = path.join(__dirname, 'fixtures', 'js');
+      const closureDir = path.join(inputsRoot, 'closure');
+      const entryConfig: EntryConfig = {
+        id: 'foo',
+        mode: PlovrMode.RAW,
+        paths: [inputsRoot],
+        inputs: [path.join(inputsRoot, 'foo', 'init.js')],
+      };
+      const result = await generateDepFileText(entryConfig, closureDir, inputsRoot);
+      assert.equal(
+        result,
+        "goog.addDependency('../../../../foo/init.js', ['foo.init'], ['foo.bar', 'goog.array'], {});\n"
+      );
+    });
+  });
   describe('addDependency()', () => {
     it('closure module', () => {
       const dep = addClosureDependency(
