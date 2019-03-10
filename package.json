@@ -21,7 +21,7 @@
     "clean": "rimraf lib",
     "lint": "eslint --ext js,ts src test types",
     "start": "node lib/src/index.js",
-    "test": "run-s lint build unit",
+    "test": "run-s clean lint build unit",
     "unit": "mocha -r espower-typescript/guess --extension ts test"
   },
   "dependencies": {
