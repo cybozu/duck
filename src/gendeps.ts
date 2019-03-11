@@ -32,7 +32,18 @@ export async function generateDepFileText(
   const googBaseDirVirtualPath = path.dirname(
     path.resolve(inputsRoot, path.relative(inputsUrlPath, googBaseUrlPath))
   );
+  // `getDepFileText()` doesn't generate addDependency() for SCRIPT,
+  // so change the type to CLOSURE_PROVIDE temporally.
+  // TODO: remove in the future
+  const scriptDeps = dependencies.filter(dep => dep.type === depGraph.DependencyType.SCRIPT);
+  scriptDeps.forEach(dep => {
+    dep.type = depGraph.DependencyType.CLOSURE_PROVIDE;
+  });
   const depFileText = depFile.getDepFileText(googBaseDirVirtualPath, dependencies);
+  // restore the type
+  scriptDeps.forEach(dep => {
+    dep.type = depGraph.DependencyType.SCRIPT;
+  });
   depFileTextCache.set(entryConfig.id, depFileText);
   return depFileText;
 }
