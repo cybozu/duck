@@ -29,12 +29,10 @@ export async function generateDepFileText(
     return depFileTextCache.get(entryConfig.id)!;
   }
   const dependencies = await getDependencies(entryConfig, closureLibraryDir);
-  dependencies.forEach(dep => {
-    // convert to URL pathname
-    dep.path = `${inputsUrlPath}/${path.relative(inputsRoot, dep.path)}`;
-  });
-  const googBaseDirUrlPath = path.dirname(googBaseUrlPath);
-  const depFileText = depFile.getDepFileText(googBaseDirUrlPath, dependencies);
+  const googBaseDirVirtualPath = path.dirname(
+    path.resolve(inputsRoot, path.relative(inputsUrlPath, googBaseUrlPath))
+  );
+  const depFileText = depFile.getDepFileText(googBaseDirVirtualPath, dependencies);
   depFileTextCache.set(entryConfig.id, depFileText);
   return depFileText;
 }
