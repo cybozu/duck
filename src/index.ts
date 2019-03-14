@@ -10,7 +10,7 @@ import {compile, toCompilerOptions} from './compiler';
 import {Dag, Node} from './dag';
 import {EntryConfig, PlovrMode, loadEntryConfig} from './entryconfig';
 import {generateDepFileText, getDependencies, getClosureLibraryDependencies} from './gendeps';
-import {assertString, assertNonNullable} from './assert';
+import {assertString, assertNonNullable, assertNodeVersionGte} from './assert';
 import {
   closureLibraryUrlPath,
   inputsUrlPath,
@@ -18,6 +18,8 @@ import {
   depsUrlPath,
   googBaseUrlPath,
 } from './urls';
+
+assertNodeVersionGte(process.version, 10);
 
 const PORT = 9810;
 const HOST = 'localhost';
