@@ -21,8 +21,8 @@ import {
 
 assertNodeVersionGte(process.version, 10);
 
-const PORT = 9810;
-const HOST = 'localhost';
+const PORT = process.env.DUCK_PORT ? Number(process.env.DUCK_PORT) : 9810;
+const HOST = process.env.DUCK_HOST || 'localhost';
 const baseUrl = new URL(`http://${HOST}:${PORT}/`);
 const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
 const depsUrlBase = new URL(depsUrlPath, baseUrl);
