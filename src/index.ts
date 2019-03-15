@@ -18,6 +18,7 @@ import {
   depsUrlPath,
   googBaseUrlPath,
 } from './urls';
+import {loadConfig} from './duckconfig';
 
 assertNodeVersionGte(process.version, 10);
 
@@ -26,23 +27,6 @@ const HOST = process.env.DUCK_HOST || 'localhost';
 const baseUrl = new URL(`http://${HOST}:${PORT}/`);
 const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
 const depsUrlBase = new URL(depsUrlPath, baseUrl);
-
-interface DuckConfig {
-  closureLibraryDir: string;
-  inputsRoot: string;
-  entryConfigDir: string;
-}
-
-function loadConfig(): DuckConfig {
-  const configDir = process.cwd();
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const config: DuckConfig = require(path.join(configDir, 'duck.config'));
-  // resolve relative path to absolute
-  config.closureLibraryDir = path.resolve(configDir, config.closureLibraryDir);
-  config.inputsRoot = path.resolve(configDir, config.inputsRoot);
-  config.entryConfigDir = path.resolve(configDir, config.entryConfigDir);
-  return config;
-}
 
 const server = fastify({logger: {prettyPrint: true}});
 const config = loadConfig();
