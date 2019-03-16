@@ -28,7 +28,7 @@
     "array.prototype.flat": "^1.2.1",
     "common-tags": "^1.8.0",
     "cors": "^2.8.5",
-    "fastify": "^2.0.1",
+    "fastify": "^2.1.0",
     "google-closure-compiler": ">= 20190121.0.0",
     "google-closure-deps": ">= 20190121.0.0",
     "pino-pretty": "^2.5.0",
