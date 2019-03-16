@@ -27,6 +27,7 @@ export interface EntryConfig {
   debug?: boolean;
   'pretty-print'?: boolean;
   'print-input-delimiter'?: boolean;
+  'test-excludes'?: string[];
 }
 
 export enum PlovrMode {
@@ -64,6 +65,9 @@ export async function loadEntryConfig(
       mod.inputs = mod.inputs.map(input => path.resolve(basedir, input));
     });
   }
+  if (entryConfig['test-excludes']) {
+    entryConfig['test-excludes'] = entryConfig['test-excludes'].map(p => path.resolve(basedir, p));
+  }
   if (mode) {
     entryConfig.mode = mode;
   }
@@ -71,11 +75,11 @@ export async function loadEntryConfig(
 }
 
 /*
- * Load JSON file including comments
+ * Load and normalize an EntryConfig JSON file including comments
  */
-async function loadJson(jsonPath: string): Promise<any> {
+async function loadJson(jsonPath: string): Promise<EntryConfig> {
   const content = await util.promisify(fs.readFile)(path.join(jsonPath), 'utf8');
-  return JSON.parse(stripJsonComments(content));
+  return normalize(JSON.parse(stripJsonComments(content)));
 }
 
 /**
@@ -86,7 +90,7 @@ async function loadInheritedJson(
   json: EntryConfig | null = null
 ): Promise<{json: EntryConfig; basedir: string}> {
   if (!json) {
-    json = normalize(await loadJson(jsonPath));
+    json = await loadJson(jsonPath);
   }
   if (!json.inherits) {
     return {json, basedir: path.dirname(jsonPath)};
@@ -113,6 +117,9 @@ function normalize(json: any): EntryConfig {
         module.deps = [module.deps];
       }
     }
+  }
+  if (json['test-excludes'] && !Array.isArray(json['test-excludes'])) {
+    json['test-excludes'] = [json['test-excludes']];
   }
   return json;
 }

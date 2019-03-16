@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="125px" preserveAspectRatio="none" style="width:379px;height:125px;" version="1.1" viewBox="0 0 379 125" width="379px" zoomAndPan="magnify"><defs/><g><ellipse cx="257.6274" cy="43.242" fill="#F8F8F8" rx="25.6274" ry="13.242" style="stroke: #383838; stroke-width: 0.6;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="32" x="241.6274" y="46.9842">assert</text><!--entity _compiler--><rect fill="#F8F8F8" height="34.4844" rx="2" ry="2" style="stroke: #000000; stroke-width: 0.6;" width="65" x="303" y="26"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="45" x="313" y="48.0059">compiler</text><!--entity _dag--><rect fill="#F8F8F8" height="34.4844" rx="2" ry="2" style="stroke: #000000; stroke-width: 0.6;" width="40" x="171.5" y="26"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="20" x="181.5" y="48.0059">dag</text><!--entity _entryconfig--><rect fill="#F8F8F8" height="34.4844" rx="2" ry="2" style="stroke: #000000; stroke-width: 0.6;" width="82" x="74.5" y="80"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="62" x="84.5" y="102.0059">entryconfig</text><ellipse cx="115.734" cy="43.242" fill="#F8F8F8" rx="36.234" ry="13.242" style="stroke: #383838; stroke-width: 0.6;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="47" x="92.234" y="46.9842">gendeps</text><ellipse cx="32.3345" cy="43.242" fill="#F8F8F8" rx="26.3345" ry="13.242" style="stroke: #383838; stroke-width: 0.6;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="33" x="15.8345" y="46.9842">index</text><ellipse cx="35.2653" cy="97.2122" fill="#F8F8F8" rx="15.7653" ry="13.2122" style="stroke: #383838; stroke-width: 0.6;"/><text fill="#000000" font-family="Tahoma, sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="18" x="26.2653" y="100.9544">urls</text><!--link _compiler to _entryconfig--><path d="M302.6861,56.9322 C299.6061,58.0423 296.5108,59.0859 293.5,60 C249.601,73.3287 198.1694,83.4497 161.9108,89.7087 " fill="none" id="_compiler-_entryconfig" style="stroke: #383838; stroke-width: 0.6;"/><polygon fill="#383838" points="156.674,90.604,166.2194,93.0299,161.6025,89.7613,164.8711,85.1443,156.674,90.604" style="stroke: #383838; stroke-width: 0.6;"/><!--link gendeps to _entryconfig--><path d="M115.5,56.0719 C115.5,61.6318 115.5,68.2769 115.5,74.5791 " fill="none" id="gendeps-_entryconfig" style="stroke: #383838; stroke-width: 0.6;"/><polygon fill="#383838" points="115.5,79.7609,119.5,70.7609,115.5,74.7609,111.5,70.7609,115.5,79.7609" style="stroke: #383838; stroke-width: 0.6;"/><!--link gendeps to urls--><path d="M98.1412,54.7172 C84.599,63.8582 65.8943,76.4838 52.456,85.5547 " fill="none" id="gendeps-urls" style="stroke: #383838; stroke-width: 0.6;"/><polygon fill="#383838" points="48.1156,88.4845,57.8131,86.7646,52.2598,85.6871,53.3373,80.1338,48.1156,88.4845" style="stroke: #383838; stroke-width: 0.6;"/><!--link <b>index</b> to assert--><path d="M47.2714,31.8287 C56.1119,25.8549 67.8619,19.1049 79.5,16 C107.842,8.4386 183.1936,8.3064 211.5,16 C221.3016,18.6641 231.1488,24.002 239.203,29.2333 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-assert" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="243.4815,32.111,238.246,23.7689,239.3327,29.3204,233.7812,30.4071,243.4815,32.111" style="stroke: #383838; stroke-width: 1.0;"/><!--link <b>index</b> to _compiler--><path d="M47.2714,31.8287 C56.1119,25.8549 67.8619,19.1049 79.5,16 C123.3013,4.3143 239.4602,5.2481 283.5,16 C290.4853,17.7054 297.5777,20.5276 304.1854,23.7198 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-_compiler" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="308.6753,25.9797,302.4348,18.3602,304.2092,23.7316,298.8378,25.506,308.6753,25.9797" style="stroke: #383838; stroke-width: 1.0;"/><!--link <b>index</b> to _dag--><path d="M47.2714,31.8287 C56.1119,25.8549 67.8619,19.1049 79.5,16 C110.4186,7.7512 120.8998,6.6389 151.5,16 C156.7753,17.6138 161.9831,20.1836 166.8092,23.1108 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-_dag" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="171.1249,25.8825,165.7135,17.6535,166.9178,23.1806,161.3906,24.3849,171.1249,25.8825" style="stroke: #383838; stroke-width: 1.0;"/><!--link <b>index</b> to _entryconfig--><path d="M48.5032,53.4117 C58.7402,60.0719 72.3566,68.9308 84.6395,76.9221 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-_entryconfig" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="89.0957,79.8213,83.7332,71.5603,84.9047,77.0946,79.3704,78.266,89.0957,79.8213" style="stroke: #383838; stroke-width: 1.0;"/><!--link <b>index</b> to gendeps--><path d="M59.0859,43 C64.1544,43 69.2228,43 74.2913,43 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-gendeps" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="79.3597,43,70.3597,39,74.3597,43,70.3597,47,79.3597,43" style="stroke: #383838; stroke-width: 1.0;"/><!--link <b>index</b> to urls--><path d="M33.2262,56.0719 C33.5966,62.738 34.0535,70.9639 34.4605,78.2886 " fill="none" id="&lt;b&gt;index&lt;/b&gt;-urls" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="34.7596,83.6733,38.2541,74.4652,34.4822,78.681,30.2664,74.9091,34.7596,83.6733" style="stroke: #383838; stroke-width: 1.0;"/><script type="text/plantuml"><![CDATA[
+@startuml
+
+scale max 1920 width
+top to bottom direction
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam nodesep 20
+skinparam ranksep 20
+skinparam defaultFontName Tahoma
+skinparam defaultFontSize 12
+skinparam roundCorner 4
+skinparam dpi 150
+skinparam arrowThickness 0.6
+skinparam packageTitleAlignment left
+
+skinparam usecase {
+  borderThickness 0.6
+}
+
+skinparam rectangle {
+  borderThickness 0.6
+}
+
+skinparam component {
+  borderThickness 1
+}
+
+
+(assert)
+rectangle "compiler" as _compiler
+rectangle "dag" as _dag
+rectangle "entryconfig" as _entryconfig
+(gendeps)
+(<b>index</b>)
+(urls)
+
+
+_compiler --> _entryconfig
+(gendeps) --> _entryconfig
+(gendeps) --> (urls)
+(<b>index</b>) -[thickness=1]> (assert)
+(<b>index</b>) -[thickness=1]> _compiler
+(<b>index</b>) -[thickness=1]> _dag
+(<b>index</b>) -[thickness=1]> _entryconfig
+(<b>index</b>) -[thickness=1]> (gendeps)
+(<b>index</b>) -[thickness=1]> (urls)
+
+@enduml
+
+
+' View and edit on https://arkit.herokuapp.com
+]]></script></g></svg>

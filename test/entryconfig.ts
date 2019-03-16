@@ -47,6 +47,8 @@ describe('entryconfig', () => {
       assert.deepEqual(config, {
         id: 'chunks-normalize',
         mode: 'RAW',
+        paths: [path.join(fixturesBaseDir, 'path1')],
+        'test-excludes': [fixturesBaseDir],
         modules: {
           base: {
             inputs: [path.join(fixturesBaseDir, 'js', 'base.js')],
@@ -57,7 +59,6 @@ describe('entryconfig', () => {
             deps: ['base'],
           },
         },
-        paths: [path.join(fixturesBaseDir, 'path1')],
       });
     });
     it('inherits parent configs', async () => {
@@ -73,6 +74,8 @@ describe('entryconfig', () => {
         externs: [path.join(fixturesBaseDir, 'ext', 'foo.js')],
         paths: [path.join(fixturesBaseDir, 'path1')],
         debug: true,
+        // resolve relative path and normalize in base.json
+        'test-excludes': [fixturesBaseDir],
       });
     });
   });
