@@ -1,5 +1,7 @@
+import path from 'path';
 import yargs from 'yargs';
 import {serve} from './serve';
+import {loadConfig} from './duckconfig';
 
 export function run(processArgv: string[]): void {
   yargs
@@ -7,49 +9,83 @@ export function run(processArgv: string[]): void {
       'serve [entryConfigDir]',
       'Start dev server',
       {
+        entryConfigDir: {
+          type: 'string',
+          // only for typing, the value is loaded from args
+          hidden: true,
+          coerce: path.resolve,
+        },
+        inputsRoot: {
+          desc: 'A root directory to serve',
+          type: 'string',
+          coerce: path.resolve,
+        },
+        closureLibraryDir: {
+          desc: 'Closure Library directory',
+          type: 'string',
+          coerce: path.resolve,
+        },
         port: {
           desc: 'A port number to listen',
           alias: 'p',
           type: 'number',
           default: 9810,
         },
-        entryConfigDir: {
+        host: {
+          desc: 'A host to listen',
           type: 'string',
-          // only for typing, the value is loaded from args
-          hidden: true,
+          default: 'localhost',
+        },
+        config: {
+          desc: 'A path to duck.config.js, the extension can be ommited',
+          alias: 'c',
+          type: 'string',
+          coerce: path.resolve,
         },
       },
       argv => {
-        serve(argv);
+        const config = loadConfig(argv);
+        serve(config);
       }
     )
     .command(
       'build [entryConfigDir|entryConfig]',
       'Compile the inputs',
       {
+        entryConfigDir: {
+          type: 'string',
+          // only for typing, the value is loaded from args
+          hidden: true,
+          coerce: path.resolve,
+        },
+        closureLibraryDir: {
+          desc: 'Closure Library directory',
+          type: 'string',
+          coerce: path.resolve,
+        },
+        config: {
+          desc: 'A path to duck.config.js, the extension can be ommited',
+          alias: 'c',
+          type: 'string',
+          coerce: path.resolve,
+        },
         printConfig: {
           desc: 'Print all config of the compiler to stderr',
           type: 'boolean',
           default: false,
         },
-        entryConfigDir: {
-          type: 'string',
-          // only for typing, the value is loaded from args
-          hidden: true,
-        },
-        entryConfig: {
-          type: 'string',
-          // only for typing, the value is loaded from args
-          hidden: true,
-        },
       },
       argv => {
         // TODO: not yet implemented
         console.log(argv);
+        const config = loadConfig(argv);
+        console.log({config});
+        // console.log({...config, ...argv});
       }
     )
     .demandCommand(1, 1)
     .scriptName('duck')
+    .epilog('CLI options overwrite config file')
     // default 80 is too short for command usage lines
     .wrap(90)
     .strict()

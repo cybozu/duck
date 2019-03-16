@@ -18,22 +18,18 @@ import {
   depsUrlPath,
   googBaseUrlPath,
 } from './urls';
-import {loadConfig} from './duckconfig';
+import {DuckConfig} from './duckconfig';
 
 assertNodeVersionGte(process.version, 10);
 
-/**
- * @param {port} TODO
- */
-export function serve({port}: {port?: number} = {}) {
-  const PORT = process.env.DUCK_PORT ? Number(process.env.DUCK_PORT) : 9810;
-  const HOST = process.env.DUCK_HOST || 'localhost';
+export function serve(config: DuckConfig) {
+  const PORT = config.port;
+  const HOST = config.host;
   const baseUrl = new URL(`http://${HOST}:${PORT}/`);
   const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
   const depsUrlBase = new URL(depsUrlPath, baseUrl);
 
   const server = fastify({logger: {prettyPrint: true}});
-  const config = loadConfig();
 
   // enable CORS at first
   server.use(cors());
