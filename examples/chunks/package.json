@@ -8,7 +8,7 @@
   "scripts": {
     "deps": "closure-make-deps --root js --closure-path node_modules/google-closure-library/closure/goog --no-validate > deps.js",
     "deps:validate": "closure-make-deps --root js --closure-path node_modules/google-closure-library/closure/goog",
-    "start": "node ../../lib/src/index.js duck.config.js"
+    "start": "node ../../bin/duck.js serve"
   },
   "devDependencies": {
     "google-closure-deps": "^20190121.0.0",
