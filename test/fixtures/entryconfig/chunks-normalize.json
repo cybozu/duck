@@ -2,6 +2,7 @@
   "id": "chunks-normalize",
   "mode": "RAW",
   "paths": ["../path1"],
+  "test-excludes": "../",
   "modules": {
     "base": {
       "inputs": "../js/base.js"

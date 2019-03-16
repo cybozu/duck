@@ -65,8 +65,22 @@ export async function getDependencies(
     if (ignoreDir) {
       ignoreDirs.push(path.join(ignoreDir, '*'));
     }
+    let testExcludes: string[] | null = null;
+    if (entryConfig['test-excludes']) {
+      testExcludes = entryConfig['test-excludes'];
+    }
     const files = await recursive(p, ignoreDirs);
-    return Promise.all(files.filter(file => /\.js$/.test(file)).map(parser.parseFileAsync));
+    return Promise.all(
+      files
+        .filter(file => /\.js$/.test(file))
+        .filter(file => {
+          if (testExcludes && testExcludes.some(exclude => file.startsWith(exclude))) {
+            return !/_test\.js$/.test(file);
+          }
+          return true;
+        })
+        .map(parser.parseFileAsync)
+    );
   });
   const results = flat(await Promise.all(parseResultPromises));
   const errors = flat(results.map(r => r.errors));

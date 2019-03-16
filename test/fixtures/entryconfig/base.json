@@ -1,4 +1,5 @@
 {
   "debug": false,
-  "paths": ["../path1"]
+  "paths": ["../path1"],
+  "test-excludes": "../"
 }
