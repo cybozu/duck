@@ -1,7 +1,8 @@
 import path from 'path';
 import yargs from 'yargs';
-import {serve} from './serve';
+import {build} from './build';
 import {loadConfig} from './duckconfig';
+import {serve} from './serve';
 
 export function run(processArgv: string[]): void {
   yargs
@@ -76,11 +77,8 @@ export function run(processArgv: string[]): void {
         },
       },
       argv => {
-        // TODO: not yet implemented
-        console.log(argv);
         const config = loadConfig(argv);
-        console.log({config});
-        // console.log({...config, ...argv});
+        build(config);
       }
     )
     .demandCommand(1, 1)

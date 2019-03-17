@@ -8,7 +8,7 @@ import path from 'path';
 import serveStatic from 'serve-static';
 import {compile, toCompilerOptions} from './compiler';
 import {Dag, Node} from './dag';
-import {EntryConfig, PlovrMode, loadEntryConfig} from './entryconfig';
+import {EntryConfig, PlovrMode, loadEntryConfigById} from './entryconfig';
 import {generateDepFileText, getDependencies, getClosureLibraryDependencies} from './gendeps';
 import {assertString, assertNonNullable, assertNodeVersionGte} from './assert';
 import {
@@ -69,7 +69,7 @@ export function serve(config: DuckConfig) {
   };
 
   server.get<CompileQuery>(compileUrlPath, opts, async (request, reply) => {
-    const entryConfig = await loadEntryConfig(
+    const entryConfig = await loadEntryConfigById(
       request.query.id,
       config.entryConfigDir,
       request.query
@@ -302,7 +302,7 @@ export function serve(config: DuckConfig) {
   }
 
   server.get<CompileQuery>(depsUrlPath, opts, async (request, reply) => {
-    const entryConfig = await loadEntryConfig(
+    const entryConfig = await loadEntryConfigById(
       request.query.id,
       config.entryConfigDir,
       request.query
