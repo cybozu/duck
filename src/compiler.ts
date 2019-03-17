@@ -5,8 +5,9 @@ export interface CompilerOptions {
   [idx: string]: any;
   dependency_mode?: string;
   entry_point?: string[];
-  compilation_level?: string;
+  compilation_level?: 'BUNDLE' | 'WHITESPACE' | 'WHITESPACE_ONLY' | 'SIMPLE' | 'ADVANCED';
   js?: string[];
+  js_output_file?: string;
   // chunk or module: `name:num-js-files[:[dep,...][:]]` ex) chunk1:3:app
   chunk?: string[];
   language_in?: string;
@@ -29,6 +30,19 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
       opts[closureKey] = entryConfig[entryKey];
     }
   }
+  copy('language-in');
+  copy('language-out');
+  copy('externs');
+  copy('level', 'warning_level');
+  copy('debug');
+  copy('output-file', 'js_output_file');
+
+  if (entryConfig.mode === PlovrMode.RAW) {
+    opts.compilation_level = 'WHITESPACE';
+  } else {
+    opts.compilation_level = entryConfig.mode;
+  }
+
   if (entryConfig.modules) {
     // for chunks
     opts.dependency_mode = 'NONE';
@@ -41,14 +55,6 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
     // TODO: consider `global-scope-name`
     opts.isolation_mode = 'IIFE';
   }
-  if (entryConfig.mode !== PlovrMode.RAW) {
-    opts.compilation_level = entryConfig.mode;
-  }
-  copy('externs');
-  copy('language-in');
-  copy('language-out');
-  copy('level', 'warning_level');
-  copy('debug');
 
   const formatting: string[] = [];
   if (entryConfig['pretty-print']) {

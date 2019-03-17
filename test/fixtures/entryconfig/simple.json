@@ -4,5 +4,6 @@
   // you can comment here
   "inputs": ["../js/foo.js"],
   "externs": ["../ext/foo.js", "ext/bar.js"],
-  "paths": ["../path1"]
+  "paths": ["../path1"],
+  "output-file": "out.js"
 }

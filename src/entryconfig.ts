@@ -28,6 +28,7 @@ export interface EntryConfig {
   'pretty-print'?: boolean;
   'print-input-delimiter'?: boolean;
   'test-excludes'?: string[];
+  'output-file'?: string;
 }
 
 export enum PlovrMode {
@@ -35,6 +36,20 @@ export enum PlovrMode {
   WHITESPACE = 'WHITESPACE',
   SIMPLE = 'SIMPLE',
   ADVANCED = 'ADVANCED',
+}
+/**
+ * Load entry config JSON
+ *
+ * - strip comments
+ * - extend `inherits` recursively
+ * - convert relative paths to absolute paths
+ */
+export async function loadEntryConfigById(
+  id: string,
+  entryConfigDir: string,
+  {mode}: {mode?: PlovrMode} = {}
+): Promise<EntryConfig> {
+  return loadEntryConfig(path.join(entryConfigDir, `${id}.json`), {mode});
 }
 
 /**
@@ -45,13 +60,10 @@ export enum PlovrMode {
  * - convert relative paths to absolute paths
  */
 export async function loadEntryConfig(
-  id: string,
-  entryConfigDir: string,
+  entryConfigPath: string,
   {mode}: {mode?: PlovrMode} = {}
 ): Promise<EntryConfig> {
-  const {json: entryConfig, basedir} = await loadInheritedJson(
-    path.join(entryConfigDir, `${id}.json`)
-  );
+  const {json: entryConfig, basedir} = await loadInheritedJson(entryConfigPath);
   // change relative paths to abs paths
   entryConfig.paths = entryConfig.paths.map(p => path.resolve(basedir, p));
   if (entryConfig.inputs) {
@@ -59,6 +71,9 @@ export async function loadEntryConfig(
   }
   if (entryConfig.externs) {
     entryConfig.externs = entryConfig.externs.map(extern => path.resolve(basedir, extern));
+  }
+  if (entryConfig['output-file']) {
+    entryConfig['output-file'] = path.resolve(basedir, entryConfig['output-file']);
   }
   if (entryConfig.modules) {
     Object.values(entryConfig.modules).forEach(mod => {

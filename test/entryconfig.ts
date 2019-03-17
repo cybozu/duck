@@ -1,6 +1,6 @@
 import assert = require('assert');
 import path from 'path';
-import {loadEntryConfig, PlovrMode} from '../src/entryconfig';
+import {loadEntryConfigById, PlovrMode} from '../src/entryconfig';
 
 const fixturesBaseDir = path.join(__dirname, 'fixtures');
 const fixturesDir = path.join(fixturesBaseDir, 'entryconfig');
@@ -8,7 +8,7 @@ const fixturesDir = path.join(fixturesBaseDir, 'entryconfig');
 describe('entryconfig', () => {
   describe('loadEntryConfig', () => {
     it('loads simple config', async () => {
-      const config = await loadEntryConfig('simple', fixturesDir);
+      const config = await loadEntryConfigById('simple', fixturesDir);
       assert.deepEqual(config, {
         id: 'simple',
         mode: 'RAW',
@@ -18,14 +18,15 @@ describe('entryconfig', () => {
           path.join(fixturesDir, 'ext', 'bar.js'),
         ],
         paths: [path.join(fixturesBaseDir, 'path1')],
+        'output-file': path.join(fixturesDir, 'out.js'),
       });
     });
     it('overrides `mode`', async () => {
-      const config = await loadEntryConfig('simple', fixturesDir, {mode: PlovrMode.ADVANCED});
+      const config = await loadEntryConfigById('simple', fixturesDir, {mode: PlovrMode.ADVANCED});
       assert(config.mode === PlovrMode.ADVANCED);
     });
     it('load chunks config', async () => {
-      const config = await loadEntryConfig('chunks', fixturesDir);
+      const config = await loadEntryConfigById('chunks', fixturesDir);
       assert.deepEqual(config, {
         id: 'chunks',
         mode: 'RAW',
@@ -43,7 +44,7 @@ describe('entryconfig', () => {
       });
     });
     it('normalizes chunks config', async () => {
-      const config = await loadEntryConfig('chunks-normalize', fixturesDir);
+      const config = await loadEntryConfigById('chunks-normalize', fixturesDir);
       assert.deepEqual(config, {
         id: 'chunks-normalize',
         mode: 'RAW',
@@ -62,7 +63,7 @@ describe('entryconfig', () => {
       });
     });
     it('inherits parent configs', async () => {
-      const config = await loadEntryConfig(
+      const config = await loadEntryConfigById(
         'grandchild',
         path.join(fixturesDir, 'child', 'grandchild')
       );
