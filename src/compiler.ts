@@ -46,7 +46,9 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
   if (entryConfig.modules) {
     // for chunks
     opts.dependency_mode = 'NONE';
-    opts.json_streams = 'OUT';
+    if (entryConfig.mode === PlovrMode.RAW) {
+      opts.json_streams = 'OUT';
+    }
   } else {
     // for pages
     opts.dependency_mode = 'PRUNE';
@@ -76,14 +78,17 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
     opts.define = defines;
   }
 
-  // TODO
-  // * experimental-compiler-options: Object<string, any>
-  // * global-scope-name: `__CBZ__`
-  // * soy-function-plugins: string[]
-  // * checks: Object<string, string>
-  // * output-file: string
-  // * module-output-path: string
-  // * module-production-uri: string
+  if (entryConfig['module-output-path']) {
+    const outputPath = entryConfig['module-output-path'];
+    const suffix = '%s.js';
+    if (!outputPath.endsWith(suffix)) {
+      throw new TypeError(
+        `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
+      );
+    }
+    opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
+  }
+
   return opts;
 }
 

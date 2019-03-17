@@ -1,6 +1,8 @@
 {
   "id": "chunks",
   "inherits": "../base.json",
+  "module-output-path": "../build/chunks/%s.js",
+  "module-production-uri": "/build/chunks/%s.js",
   "modules": {
     "chunks": {
       "inputs": ["../js/chunks_init.js", "../js/chunks.js"],

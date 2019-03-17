@@ -11,5 +11,7 @@
       "inputs": ["js/chunk1.js"],
       "deps": ["base"]
     }
-  }
+  },
+  "module-output-path": "../chunks/%s.js",
+  "module-production-uri": "../output/%s.js"
 }
