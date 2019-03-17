@@ -1,5 +1,12 @@
+import flat from 'array.prototype.flat';
+import {stripIndents} from 'common-tags';
 import {compiler as ClosureCompiler} from 'google-closure-compiler';
-import {EntryConfig, PlovrMode} from './entryconfig';
+import {depGraph} from 'google-closure-deps';
+import {assertNonNullable} from './assert';
+import {DuckConfig} from './duckconfig';
+import {createDag, EntryConfig, PlovrMode} from './entryconfig';
+import {getClosureLibraryDependencies, getDependencies} from './gendeps';
+import {Dag} from './dag';
 
 export interface CompilerOptions {
   [idx: string]: any;
@@ -30,12 +37,17 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
       opts[closureKey] = entryConfig[entryKey];
     }
   }
+  // TODO: load from args
+  const isServeCommand = process.argv.includes('serve');
+
   copy('language-in');
   copy('language-out');
   copy('externs');
   copy('level', 'warning_level');
   copy('debug');
-  copy('output-file', 'js_output_file');
+  if (!isServeCommand) {
+    copy('output-file', 'js_output_file');
+  }
 
   if (entryConfig.mode === PlovrMode.RAW) {
     opts.compilation_level = 'WHITESPACE';
@@ -46,7 +58,7 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
   if (entryConfig.modules) {
     // for chunks
     opts.dependency_mode = 'NONE';
-    if (entryConfig.mode === PlovrMode.RAW) {
+    if (isServeCommand) {
       opts.json_streams = 'OUT';
     }
   } else {
@@ -111,4 +123,108 @@ class CompilerError extends Error {
     this.name = 'CompilerError';
     this.exitCode = exitCode;
   }
+}
+
+export async function createComiplerOptionsForChunks(
+  entryConfig: EntryConfig,
+  config: DuckConfig,
+  createModuleUris: (chunkId: string) => string[]
+): Promise<{options: CompilerOptions; sortedChunkIds: string[]; rootChunkId: string}> {
+  // TODO: separate EntryConfigChunks from EntryConfig
+  const modules = assertNonNullable(entryConfig.modules);
+  const dependencies = flat(
+    await Promise.all([
+      getDependencies(entryConfig, config.closureLibraryDir),
+      getClosureLibraryDependencies(config.closureLibraryDir),
+    ])
+  );
+  const dag = createDag(entryConfig);
+  const sortedChunkIds = dag.getSortedIds();
+  const chunkToTransitiveDepPathSet = findTransitiveDeps(sortedChunkIds, dependencies, modules);
+  const chunkToInputPathSet = splitDepsIntoChunks(sortedChunkIds, chunkToTransitiveDepPathSet, dag);
+  const opts = toCompilerOptions(entryConfig);
+  opts.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
+  opts.chunk = sortedChunkIds.map(id => {
+    const numOfInputs = chunkToInputPathSet.get(id)!.size;
+    return `${id}:${numOfInputs}:${modules[id].deps.join(',')}`;
+  });
+  const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, createModuleUris);
+  const wrapper = stripIndents`var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};
+var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};
+%output%`;
+  opts.chunk_wrapper = [`${rootId}:${wrapper}`];
+  return {options: opts, sortedChunkIds, rootChunkId: rootId};
+}
+
+function findTransitiveDeps(
+  sortedChunkIds: string[],
+  dependencies: depGraph.Dependency[],
+  modules: {[id: string]: {inputs: string[]; deps: string[]}}
+): Map<string, Set<string>> {
+  const pathToDep = new Map(
+    dependencies.map(dep => [dep.path, dep] as [string, depGraph.Dependency])
+  );
+  const graph = new depGraph.Graph(dependencies);
+  const chunkToTransitiveDepPathSet: Map<string, Set<string>> = new Map();
+  sortedChunkIds.forEach(chunkId => {
+    const chunkConfig = modules[chunkId];
+    const entryPoints = chunkConfig.inputs.map(input =>
+      assertNonNullable(
+        pathToDep.get(input),
+        `entryConfig.paths does not include the inputs: ${input}`
+      )
+    );
+    const depPaths = graph.order(...entryPoints).map(dep => dep.path);
+    chunkToTransitiveDepPathSet.set(chunkId, new Set(depPaths));
+  });
+  return chunkToTransitiveDepPathSet;
+}
+
+function splitDepsIntoChunks(
+  sortedChunkIds: string[],
+  chunkToTransitiveDepPathSet: Map<string, Set<string>>,
+  dag: Dag
+) {
+  const chunkToInputPathSet: Map<string, Set<string>> = new Map();
+  sortedChunkIds.forEach(chunk => {
+    chunkToInputPathSet.set(chunk, new Set());
+  });
+  for (const targetDepPathSet of chunkToTransitiveDepPathSet.values()) {
+    for (const targetDepPath of targetDepPathSet) {
+      const chunkIdsWithDep: string[] = [];
+      chunkToTransitiveDepPathSet.forEach((depPathSet, chunkId) => {
+        if (depPathSet.has(targetDepPath)) {
+          chunkIdsWithDep.push(chunkId);
+        }
+      });
+      const targetChunk = dag.getLcaNode(...chunkIdsWithDep);
+      assertNonNullable(chunkToInputPathSet.get(targetChunk.id)).add(targetDepPath);
+    }
+  }
+  return chunkToInputPathSet;
+}
+
+export function convertModuleInfos(
+  entryConfig: EntryConfig,
+  createModuleUris: (id: string) => string[]
+): {moduleInfo: {[id: string]: string[]}; moduleUris: {[id: string]: string[]}; rootId: string} {
+  let rootId: string | null = null;
+  const modules = assertNonNullable(entryConfig.modules);
+  const moduleInfo: {[id: string]: string[]} = {};
+  const moduleUris: {[id: string]: string[]} = {};
+  for (const id in modules) {
+    const module = modules[id];
+    moduleInfo[id] = module.deps;
+    moduleUris[id] = createModuleUris(id);
+    if (module.deps.length === 0) {
+      if (rootId) {
+        throw new Error('Many root modules');
+      }
+      rootId = id;
+    }
+  }
+  if (!rootId) {
+    throw new Error('No root module');
+  }
+  return {moduleInfo, moduleUris, rootId};
 }

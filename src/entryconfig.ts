@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import stripJsonComments from 'strip-json-comments';
 import util from 'util';
+import {Dag, Node} from './dag';
 
 export interface EntryConfig {
   id: string;
@@ -150,4 +151,13 @@ function normalize(json: any): EntryConfig {
     json['test-excludes'] = [json['test-excludes']];
   }
   return json;
+}
+
+export function createDag(entryConfig: EntryConfig): Dag {
+  const chunkNodes: Node[] = [];
+  for (const id in entryConfig.modules) {
+    const chunk = entryConfig.modules[id];
+    chunkNodes.push(new Node(id, chunk.deps));
+  }
+  return new Dag(chunkNodes);
 }

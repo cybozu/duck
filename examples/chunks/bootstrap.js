@@ -2,7 +2,7 @@
   const [, basename] = /([^/]*).html$/.exec(location.pathname);
   const mode = new URLSearchParams(location.search).get('mode');
   let url;
-  if (mode.toLowerCase() === 'compiled') {
+  if (mode && mode.toLowerCase() === 'compiled') {
     url = new URL(location.origin);
     if (basename === 'chunks') {
       url.pathname = '/build/chunks/chunks.js';

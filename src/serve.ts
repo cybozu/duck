@@ -2,23 +2,26 @@ import flat from 'array.prototype.flat';
 import {stripIndents} from 'common-tags';
 import cors from 'cors';
 import fastify from 'fastify';
-import {depGraph} from 'google-closure-deps';
 import {ServerResponse} from 'http';
 import path from 'path';
 import serveStatic from 'serve-static';
-import {compile, toCompilerOptions} from './compiler';
-import {Dag, Node} from './dag';
-import {EntryConfig, PlovrMode, loadEntryConfigById} from './entryconfig';
-import {generateDepFileText, getDependencies, getClosureLibraryDependencies} from './gendeps';
-import {assertString, assertNonNullable, assertNodeVersionGte} from './assert';
+import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
+import {
+  compile,
+  createComiplerOptionsForChunks,
+  toCompilerOptions,
+  convertModuleInfos,
+} from './compiler';
+import {DuckConfig} from './duckconfig';
+import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from './entryconfig';
+import {generateDepFileText} from './gendeps';
 import {
   closureLibraryUrlPath,
-  inputsUrlPath,
   compileUrlPath,
   depsUrlPath,
   googBaseUrlPath,
+  inputsUrlPath,
 } from './urls';
-import {DuckConfig} from './duckconfig';
 
 assertNodeVersionGte(process.version, 10);
 
@@ -86,6 +89,7 @@ export function serve(config: DuckConfig) {
           reply,
           entryConfig,
           assertString(request.raw.url),
+          // convert number to string
           String(request.id),
           request.query
         );
@@ -95,66 +99,25 @@ export function serve(config: DuckConfig) {
     }
   });
 
-  function inputsToUrisForRaw(inputs: string[]): URL[] {
+  function inputsToUrisForRaw(inputs: string[]): string[] {
     return inputs
       .map(input => path.relative(config.inputsRoot, input))
-      .map(input => new URL(`${inputsUrlPath}/${input}`, baseUrl));
-  }
-
-  function convertModuleInfos(
-    entryConfig: EntryConfig,
-    url?: string,
-    requestId?: string
-  ): {moduleInfo: {[id: string]: string[]}; moduleUris: {[id: string]: URL[]}; rootId: string} {
-    let rootId: string | null = null;
-    const {modules} = entryConfig;
-    const moduleInfo: {[id: string]: string[]} = {};
-    const moduleUris: {[id: string]: URL[]} = {};
-    for (const id in modules) {
-      const module = modules[id];
-      moduleInfo[id] = module.deps;
-      if (entryConfig.mode === 'RAW') {
-        moduleUris[id] = inputsToUrisForRaw(module.inputs);
-      } else {
-        if (!url) {
-          throw new Error(`url is not defined: ${url}`);
-        }
-        if (!requestId) {
-          throw new Error(`requestId is not defined: ${requestId}`);
-        }
-        const uri = new URL(url, baseUrl);
-        const params = uri.searchParams;
-        params.set('chunk', id);
-        params.set('parentRequest', requestId);
-        uri.search = params.toString();
-        moduleUris[id] = [uri];
-      }
-      if (module.deps.length === 0) {
-        if (rootId) {
-          throw new Error('Many root modules');
-        }
-        rootId = id;
-      }
-    }
-    if (!rootId) {
-      throw new Error('No root module');
-    }
-    if (entryConfig.mode === 'RAW') {
-      // The root chunk loads all chunks in RAW mode
-      const chunkNodes: Node[] = [];
-      for (const id in entryConfig.modules) {
-        const chunk = entryConfig.modules[id];
-        chunkNodes.push(new Node(id, chunk.deps));
-      }
-      const dag = new Dag(chunkNodes);
-      const sortedChunkIds = dag.getSortedNodes().map(node => node.id);
-      moduleUris[rootId] = flat(sortedChunkIds.map(id => moduleUris[id]));
-    }
-    return {moduleInfo, moduleUris, rootId};
+      .map(input => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
   }
 
   function replyChunksRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
-    const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig);
+    const modules = assertNonNullable(entryConfig.modules);
+    const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, id => {
+      return inputsToUrisForRaw(modules[id].inputs);
+    });
+    // The root chunk loads all chunks in RAW mode
+    const sortedChunkIds = createDag(entryConfig).getSortedIds();
+    moduleUris[rootId] = flat(sortedChunkIds.map(id => moduleUris[id]));
+    for (const id in moduleUris) {
+      if (id !== rootId) {
+        moduleUris[id] = [];
+      }
+    }
     const rootModuleUris = moduleUris[rootId];
     const depsUrl = new URL(depsUrlBase.toString());
     depsUrl.search = `id=${entryConfig.id}`;
@@ -186,10 +149,7 @@ export function serve(config: DuckConfig) {
     requestId: string,
     query: CompileQuery
   ) {
-    let requestedChunkId: string | undefined = query.chunk;
-    const {parentRequest} = query;
-    // TODO: separate EntryConfigChunks from EntryConfig
-    entryConfig.modules = assertNonNullable(entryConfig.modules);
+    const {parentRequest, chunk: requestedChunkId} = query;
     if (!entryIdToChunkCache.has(entryConfig.id)) {
       entryIdToChunkCache.set(entryConfig.id, new Map());
     }
@@ -199,70 +159,24 @@ export function serve(config: DuckConfig) {
       if (!parentChunkCache[requestedChunkId]) {
         throw new Error(`Unexpected requested chunk: ${requestedChunkId}`);
       }
-      return chunkCache.get(parentRequest)![requestedChunkId].src;
+      return parentChunkCache[requestedChunkId].src;
     }
-    const dependencies = flat(
-      await Promise.all([
-        getDependencies(entryConfig, config.closureLibraryDir),
-        getClosureLibraryDependencies(config.closureLibraryDir),
-      ])
+
+    function createModuleUris(chunkId: string): string[] {
+      const uri = new URL(url, baseUrl);
+      const params = uri.searchParams;
+      params.set('chunk', chunkId);
+      params.set('parentRequest', requestId);
+      uri.search = params.toString();
+      return [uri.toString()];
+    }
+
+    const {options, sortedChunkIds, rootChunkId} = await createComiplerOptionsForChunks(
+      entryConfig,
+      config,
+      createModuleUris
     );
-    const pathToDep: Map<string, depGraph.Dependency> = new Map(
-      dependencies.map(dep => [dep.path, dep] as [string, depGraph.Dependency])
-    );
-    const chunkNodes: Node[] = [];
-    for (const id in entryConfig.modules) {
-      const chunk = entryConfig.modules[id];
-      chunkNodes.push(new Node(id, chunk.deps));
-    }
-    const dag = new Dag(chunkNodes);
-    const sortedChunkIds = dag.getSortedNodes().map(node => node.id);
-    const graph = new depGraph.Graph(dependencies);
-    const chunkToTransitiveDepPath: Map<string, Set<string>> = new Map();
-    const allInputPathSet: Set<string> = new Set();
-    sortedChunkIds.forEach(chunkId => {
-      const chunkConfig = entryConfig.modules![chunkId];
-      const entryPoints = chunkConfig.inputs.map(input =>
-        assertNonNullable(
-          pathToDep.get(input),
-          `entryConfig.paths does not include the inputs: ${input}`
-        )
-      );
-      const inputPaths = graph.order(...entryPoints).map(dep => dep.path);
-      chunkToTransitiveDepPath.set(chunkId, new Set(inputPaths));
-      inputPaths.forEach(input => allInputPathSet.add(input));
-      chunkConfig.inputs.forEach(input => allInputPathSet.add(input));
-    });
-    const chunkToInputPath: Map<string, Set<string>> = new Map();
-    sortedChunkIds.forEach(chunk => {
-      chunkToInputPath.set(chunk, new Set());
-    });
-    for (const inputPath of allInputPathSet) {
-      const chunksWithInput: string[] = [];
-      chunkToTransitiveDepPath.forEach((inputs, chunk) => {
-        if (inputs.has(inputPath)) {
-          chunksWithInput.push(chunk);
-        }
-      });
-      const targetChunk = dag.getLcaNode(...chunksWithInput);
-      assertNonNullable(chunkToInputPath.get(targetChunk.id)).add(inputPath);
-    }
-    const opts = toCompilerOptions(entryConfig);
-    opts.js = flat([...chunkToInputPath.values()].map(inputs => [...inputs]));
-    opts.chunk = sortedChunkIds.map(id => {
-      const {deps} = entryConfig.modules![id];
-      const numOfInputs = chunkToInputPath.get(id)!.size;
-      return `${id}:${numOfInputs}:${deps.join(',')}`;
-    });
-    const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, url, requestId);
-    if (!requestedChunkId) {
-      requestedChunkId = rootId;
-    }
-    const wrapper = stripIndents`var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};
-  var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};
-  %output%`;
-    opts.chunk_wrapper = [`${rootId}:${wrapper}`];
-    const chunkOutputs: ChunkOutput[] = JSON.parse(await compile(opts));
+    const chunkOutputs: ChunkOutput[] = JSON.parse(await compile(options));
     const chunkIdToOutput: {[id: string]: ChunkOutput} = {};
     sortedChunkIds.forEach((id, index) => {
       chunkIdToOutput[id] = chunkOutputs[index];
@@ -271,15 +185,15 @@ export function serve(config: DuckConfig) {
     reply
       .code(200)
       .type('application/javascript')
-      .send(chunkIdToOutput[requestedChunkId].src);
+      .send(chunkIdToOutput[requestedChunkId || rootChunkId].src);
   }
 
   const entryIdToChunkCache: Map<string, Map<string, {[id: string]: ChunkOutput}>> = new Map();
 
   function replyPageRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
     // TODO: separate EntryConfigPage from EntryConfig
-    entryConfig.inputs = assertNonNullable(entryConfig.inputs);
-    const uris = inputsToUrisForRaw(entryConfig.inputs);
+    const inputs = assertNonNullable(entryConfig.inputs);
+    const uris = inputsToUrisForRaw(inputs);
     const depsUrl = new URL(depsUrlBase.toString());
     depsUrl.search = `id=${entryConfig.id}`;
     reply.code(200).type('application/javascript').send(stripIndents`
