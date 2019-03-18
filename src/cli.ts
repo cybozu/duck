@@ -82,7 +82,7 @@ export function run(processArgv: string[]): void {
       async argv => {
         const config = loadConfig(argv);
         try {
-          await build(config);
+          await build(config, argv.printConfig);
         } catch (e) {
           if (e instanceof Error) {
             console.error(e.message);
