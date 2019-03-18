@@ -5,7 +5,7 @@ import fastify from 'fastify';
 import {ServerResponse} from 'http';
 import path from 'path';
 import serveStatic from 'serve-static';
-import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
+import {assertNonNullable, assertString} from './assert';
 import {
   CompilerOutput,
   compileToJson,
@@ -23,8 +23,6 @@ import {
   googBaseUrlPath,
   inputsUrlPath,
 } from './urls';
-
-assertNodeVersionGte(process.version, 10);
 
 export function serve(config: DuckConfig) {
   const PORT = config.port;

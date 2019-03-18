@@ -3,6 +3,9 @@ import yargs from 'yargs';
 import {build} from './build';
 import {loadConfig} from './duckconfig';
 import {serve} from './serve';
+import {assertNodeVersionGte} from './assert';
+
+assertNodeVersionGte(process.version, 10);
 
 export function run(processArgv: string[]): void {
   yargs
