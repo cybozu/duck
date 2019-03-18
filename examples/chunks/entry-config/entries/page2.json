@@ -1,6 +1,7 @@
 {
   "id": "page2",
   "mode": "SIMPLE",
+  "output-file": "../build/page2.js",
   "inherits": "../base.json",
   "inputs": ["../js/page2.js"]
 }

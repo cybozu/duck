@@ -1,5 +1,12 @@
+import flat from 'array.prototype.flat';
+import {stripIndents} from 'common-tags';
 import {compiler as ClosureCompiler} from 'google-closure-compiler';
-import {EntryConfig, PlovrMode} from './entryconfig';
+import {depGraph} from 'google-closure-deps';
+import {assertNonNullable} from './assert';
+import {Dag} from './dag';
+import {DuckConfig} from './duckconfig';
+import {createDag, EntryConfig, PlovrMode} from './entryconfig';
+import {getClosureLibraryDependencies, getDependencies} from './gendeps';
 
 export interface CompilerOptions {
   [idx: string]: any;
@@ -8,7 +15,7 @@ export interface CompilerOptions {
   compilation_level?: 'BUNDLE' | 'WHITESPACE' | 'WHITESPACE_ONLY' | 'SIMPLE' | 'ADVANCED';
   js?: string[];
   js_output_file?: string;
-  // chunk or module: `name:num-js-files[:[dep,...][:]]` ex) chunk1:3:app
+  // chunk (module): `name:num-js-files[:[dep,...][:]]`, ex) "chunk1:3:app"
   chunk?: string[];
   language_in?: string;
   language_out?: string;
@@ -23,19 +30,21 @@ export interface CompilerOptions {
   isolation_mode?: 'NONE' | 'IIFE';
 }
 
-export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
-  const opts: CompilerOptions = {};
+function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
+  const opts: CompilerOptions = {
+    json_streams: 'OUT',
+  };
   function copy(entryKey: keyof EntryConfig, closureKey = entryKey.replace(/-/g, '_')) {
     if (entryKey in entryConfig) {
       opts[closureKey] = entryConfig[entryKey];
     }
   }
+
   copy('language-in');
   copy('language-out');
   copy('externs');
   copy('level', 'warning_level');
   copy('debug');
-  copy('output-file', 'js_output_file');
 
   if (entryConfig.mode === PlovrMode.RAW) {
     opts.compilation_level = 'WHITESPACE';
@@ -46,7 +55,19 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
   if (entryConfig.modules) {
     // for chunks
     opts.dependency_mode = 'NONE';
-    opts.json_streams = 'OUT';
+    if (outputToFile) {
+      if (!entryConfig['module-output-path']) {
+        throw new Error('entryConfig["module-output-path"] must be specified');
+      }
+      const outputPath = entryConfig['module-output-path'];
+      const suffix = '%s.js';
+      if (!outputPath.endsWith(suffix)) {
+        throw new TypeError(
+          `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
+        );
+      }
+      opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
+    }
   } else {
     // for pages
     opts.dependency_mode = 'PRUNE';
@@ -54,6 +75,12 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
     opts.entry_point = entryConfig.inputs;
     // TODO: consider `global-scope-name`
     opts.isolation_mode = 'IIFE';
+    if (outputToFile) {
+      if (!entryConfig['output-file']) {
+        throw new Error('entryConfig["output-file"] must be specified');
+      }
+      copy('output-file', 'js_output_file');
+    }
   }
 
   const formatting: string[] = [];
@@ -76,15 +103,24 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
     opts.define = defines;
   }
 
-  // TODO
-  // * experimental-compiler-options: Object<string, any>
-  // * global-scope-name: `__CBZ__`
-  // * soy-function-plugins: string[]
-  // * checks: Object<string, string>
-  // * output-file: string
-  // * module-output-path: string
-  // * module-production-uri: string
   return opts;
+}
+
+export interface CompilerOutput {
+  path: string;
+  src: string;
+  source_map: string;
+}
+
+/**
+ * @throws If compiler throws errors
+ */
+export async function compileToJson(opts: CompilerOptions): Promise<CompilerOutput[]> {
+  if (opts.json_streams !== 'OUT') {
+    throw new Error(`json_streams must be "OUT", but actual "${opts.json_streams}"`);
+  }
+  const output = await compile(opts);
+  return JSON.parse(output);
 }
 
 export async function compile(opts: CompilerOptions): Promise<string> {
@@ -106,4 +142,116 @@ class CompilerError extends Error {
     this.name = 'CompilerError';
     this.exitCode = exitCode;
   }
+}
+
+export function createComiplerOptionsForPage(
+  entryConfig: EntryConfig,
+  outputToFile: boolean
+): CompilerOptions {
+  return createBaseOptions(entryConfig, outputToFile);
+}
+
+export async function createComiplerOptionsForChunks(
+  entryConfig: EntryConfig,
+  config: DuckConfig,
+  outputToFile: boolean,
+  createModuleUris: (chunkId: string) => string[]
+): Promise<{options: CompilerOptions; sortedChunkIds: string[]; rootChunkId: string}> {
+  // TODO: separate EntryConfigChunks from EntryConfig
+  const modules = assertNonNullable(entryConfig.modules);
+  const dependencies = flat(
+    await Promise.all([
+      getDependencies(entryConfig, config.closureLibraryDir),
+      getClosureLibraryDependencies(config.closureLibraryDir),
+    ])
+  );
+  const dag = createDag(entryConfig);
+  const sortedChunkIds = dag.getSortedIds();
+  const chunkToTransitiveDepPathSet = findTransitiveDeps(sortedChunkIds, dependencies, modules);
+  const chunkToInputPathSet = splitDepsIntoChunks(sortedChunkIds, chunkToTransitiveDepPathSet, dag);
+  const opts = createBaseOptions(entryConfig, outputToFile);
+  opts.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
+  opts.chunk = sortedChunkIds.map(id => {
+    const numOfInputs = chunkToInputPathSet.get(id)!.size;
+    return `${id}:${numOfInputs}:${modules[id].deps.join(',')}`;
+  });
+  const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, createModuleUris);
+  const wrapper = stripIndents`var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};
+var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};
+%output%`;
+  opts.chunk_wrapper = [`${rootId}:${wrapper}`];
+  return {options: opts, sortedChunkIds, rootChunkId: rootId};
+}
+
+function findTransitiveDeps(
+  sortedChunkIds: string[],
+  dependencies: depGraph.Dependency[],
+  modules: {[id: string]: {inputs: string[]; deps: string[]}}
+): Map<string, Set<string>> {
+  const pathToDep = new Map(
+    dependencies.map(dep => [dep.path, dep] as [string, depGraph.Dependency])
+  );
+  const graph = new depGraph.Graph(dependencies);
+  const chunkToTransitiveDepPathSet: Map<string, Set<string>> = new Map();
+  sortedChunkIds.forEach(chunkId => {
+    const chunkConfig = modules[chunkId];
+    const entryPoints = chunkConfig.inputs.map(input =>
+      assertNonNullable(
+        pathToDep.get(input),
+        `entryConfig.paths does not include the inputs: ${input}`
+      )
+    );
+    const depPaths = graph.order(...entryPoints).map(dep => dep.path);
+    chunkToTransitiveDepPathSet.set(chunkId, new Set(depPaths));
+  });
+  return chunkToTransitiveDepPathSet;
+}
+
+function splitDepsIntoChunks(
+  sortedChunkIds: string[],
+  chunkToTransitiveDepPathSet: Map<string, Set<string>>,
+  dag: Dag
+) {
+  const chunkToInputPathSet: Map<string, Set<string>> = new Map();
+  sortedChunkIds.forEach(chunk => {
+    chunkToInputPathSet.set(chunk, new Set());
+  });
+  for (const targetDepPathSet of chunkToTransitiveDepPathSet.values()) {
+    for (const targetDepPath of targetDepPathSet) {
+      const chunkIdsWithDep: string[] = [];
+      chunkToTransitiveDepPathSet.forEach((depPathSet, chunkId) => {
+        if (depPathSet.has(targetDepPath)) {
+          chunkIdsWithDep.push(chunkId);
+        }
+      });
+      const targetChunk = dag.getLcaNode(...chunkIdsWithDep);
+      assertNonNullable(chunkToInputPathSet.get(targetChunk.id)).add(targetDepPath);
+    }
+  }
+  return chunkToInputPathSet;
+}
+
+export function convertModuleInfos(
+  entryConfig: EntryConfig,
+  createModuleUris: (id: string) => string[]
+): {moduleInfo: {[id: string]: string[]}; moduleUris: {[id: string]: string[]}; rootId: string} {
+  let rootId: string | null = null;
+  const modules = assertNonNullable(entryConfig.modules);
+  const moduleInfo: {[id: string]: string[]} = {};
+  const moduleUris: {[id: string]: string[]} = {};
+  for (const id in modules) {
+    const module = modules[id];
+    moduleInfo[id] = module.deps;
+    moduleUris[id] = createModuleUris(id);
+    if (module.deps.length === 0) {
+      if (rootId) {
+        throw new Error('Many root modules');
+      }
+      rootId = id;
+    }
+  }
+  if (!rootId) {
+    throw new Error('No root module');
+  }
+  return {moduleInfo, moduleUris, rootId};
 }

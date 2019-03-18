@@ -1,7 +1,6 @@
 {
   "id": "page1",
-  "mode": "RAW",
-  "output-file": "../build/page1.bundle.js",
+  "output-file": "../build/page1.js",
   "inherits": "../base.json",
   // you can comment here
   "inputs": ["../js/page1.js"]

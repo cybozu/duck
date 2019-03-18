@@ -30,6 +30,7 @@ describe('entryconfig', () => {
       assert.deepEqual(config, {
         id: 'chunks',
         mode: 'RAW',
+        paths: [path.join(fixturesBaseDir, 'path1')],
         modules: {
           base: {
             inputs: [path.join(fixturesBaseDir, 'js', 'base.js')],
@@ -40,7 +41,8 @@ describe('entryconfig', () => {
             deps: ['base'],
           },
         },
-        paths: [path.join(fixturesBaseDir, 'path1')],
+        'module-output-path': path.join(fixturesBaseDir, 'chunks', '%s.js'),
+        'module-production-uri': '../output/%s.js',
       });
     });
     it('normalizes chunks config', async () => {

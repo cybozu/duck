@@ -1,7 +1,8 @@
-import path from 'path';
 import fs from 'fs';
-import util from 'util';
+import path from 'path';
 import stripJsonComments from 'strip-json-comments';
+import util from 'util';
+import {Dag, Node} from './dag';
 
 export interface EntryConfig {
   id: string;
@@ -17,6 +18,10 @@ export interface EntryConfig {
       deps: string[];
     };
   };
+  // like "../compiled/modules/%s.js",
+  'module-output-path'?: string;
+  // like "/js/compiled/modules/%s.js"
+  'module-production-uri'?: string;
   define?: {
     [key: string]: string;
   };
@@ -29,6 +34,12 @@ export interface EntryConfig {
   'print-input-delimiter'?: boolean;
   'test-excludes'?: string[];
   'output-file'?: string;
+
+  // TODO
+  // * experimental-compiler-options: Object<string, any>
+  // * global-scope-name: `__CBZ__`
+  // * soy-function-plugins: string[]
+  // * checks: Object<string, string>
 }
 
 export enum PlovrMode {
@@ -82,6 +93,9 @@ export async function loadEntryConfig(
   }
   if (entryConfig['test-excludes']) {
     entryConfig['test-excludes'] = entryConfig['test-excludes'].map(p => path.resolve(basedir, p));
+  }
+  if (entryConfig['module-output-path']) {
+    entryConfig['module-output-path'] = path.resolve(basedir, entryConfig['module-output-path']);
   }
   if (mode) {
     entryConfig.mode = mode;
@@ -137,4 +151,13 @@ function normalize(json: any): EntryConfig {
     json['test-excludes'] = [json['test-excludes']];
   }
   return json;
+}
+
+export function createDag(entryConfig: EntryConfig): Dag {
+  const chunkNodes: Node[] = [];
+  for (const id in entryConfig.modules) {
+    const chunk = entryConfig.modules[id];
+    chunkNodes.push(new Node(id, chunk.deps));
+  }
+  return new Dag(chunkNodes);
 }

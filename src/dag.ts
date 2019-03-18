@@ -63,8 +63,8 @@ export class Dag {
   }
 
   private populateDepth() {
-    this.getSortedNodes().forEach((node, depth) => {
-      this.idToDepth.set(node.id, depth);
+    this.getSortedIds().forEach((id, depth) => {
+      this.idToDepth.set(id, depth);
     });
   }
 
@@ -180,5 +180,13 @@ export class Dag {
     };
     visit(this.root);
     return this.sortedNodes;
+  }
+
+  /**
+   * @return Topological ordred id list.
+   * The result is cached and returned from the second time.
+   */
+  getSortedIds(): string[] {
+    return this.getSortedNodes().map(node => node.id);
   }
 }
