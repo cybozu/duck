@@ -24,6 +24,7 @@ export interface CompilerOptions {
   debug?: boolean;
   formatting?: string[];
   define?: string[];
+  externs?: string[];
   // chunkname:wrappercode
   chunk_wrapper?: string[];
   chunk_output_path_prefix?: string;
@@ -34,6 +35,7 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   const opts: CompilerOptions = {
     json_streams: 'OUT',
   };
+
   function copy(entryKey: keyof EntryConfig, closureKey = entryKey.replace(/-/g, '_')) {
     if (entryKey in entryConfig) {
       opts[closureKey] = entryConfig[entryKey];
@@ -42,7 +44,6 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
 
   copy('language-in');
   copy('language-out');
-  copy('externs');
   copy('level', 'warning_level');
   copy('debug');
 
@@ -71,8 +72,11 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   } else {
     // for pages
     opts.dependency_mode = 'PRUNE';
-    opts.js = entryConfig.paths;
-    opts.entry_point = entryConfig.inputs;
+    opts.js = entryConfig.paths.slice();
+    if (entryConfig.externs) {
+      opts.js.push(...entryConfig.externs.map(extern => `!${extern}`));
+    }
+    opts.entry_point = assertNonNullable(entryConfig.inputs).slice();
     // TODO: consider `global-scope-name`
     opts.isolation_mode = 'IIFE';
     if (outputToFile) {
@@ -81,6 +85,10 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
       }
       copy('output-file', 'js_output_file');
     }
+  }
+
+  if (entryConfig.externs) {
+    opts.externs = entryConfig.externs.slice();
   }
 
   const formatting: string[] = [];
