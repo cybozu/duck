@@ -7,10 +7,11 @@ import path from 'path';
 import serveStatic from 'serve-static';
 import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
 import {
-  compile,
-  createComiplerOptionsForChunks,
-  toCompilerOptions,
+  CompilerOutput,
+  compileToJson,
   convertModuleInfos,
+  createComiplerOptionsForChunks,
+  createComiplerOptionsForPage,
 } from './compiler';
 import {DuckConfig} from './duckconfig';
 import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from './entryconfig';
@@ -136,12 +137,6 @@ export function serve(config: DuckConfig) {
     `);
   }
 
-  interface ChunkOutput {
-    path: string;
-    src: string;
-    source_map: string;
-  }
-
   async function replyChunksCompile(
     reply: fastify.FastifyReply<ServerResponse>,
     entryConfig: EntryConfig,
@@ -174,10 +169,11 @@ export function serve(config: DuckConfig) {
     const {options, sortedChunkIds, rootChunkId} = await createComiplerOptionsForChunks(
       entryConfig,
       config,
+      false,
       createModuleUris
     );
-    const chunkOutputs: ChunkOutput[] = JSON.parse(await compile(options));
-    const chunkIdToOutput: {[id: string]: ChunkOutput} = {};
+    const chunkOutputs = await compileToJson(options);
+    const chunkIdToOutput: {[id: string]: CompilerOutput} = {};
     sortedChunkIds.forEach((id, index) => {
       chunkIdToOutput[id] = chunkOutputs[index];
     });
@@ -188,7 +184,7 @@ export function serve(config: DuckConfig) {
       .send(chunkIdToOutput[requestedChunkId || rootChunkId].src);
   }
 
-  const entryIdToChunkCache: Map<string, Map<string, {[id: string]: ChunkOutput}>> = new Map();
+  const entryIdToChunkCache: Map<string, Map<string, {[id: string]: CompilerOutput}>> = new Map();
 
   function replyPageRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
     // TODO: separate EntryConfigPage from EntryConfig
@@ -207,12 +203,17 @@ export function serve(config: DuckConfig) {
     reply: fastify.FastifyReply<ServerResponse>,
     entryConfig: EntryConfig
   ) {
-    const opts = toCompilerOptions(entryConfig);
-    const output = await compile(opts);
+    const options = createComiplerOptionsForPage(entryConfig, false);
+    const chunkOutputs = await compileToJson(options);
+    if (chunkOutputs.length !== 1) {
+      throw new Error(
+        `Unexpectedly chunkOutputs.length must be 1, but actual ${chunkOutputs.length}`
+      );
+    }
     reply
       .code(200)
       .type('application/javascript')
-      .send(output);
+      .send(chunkOutputs[0].src);
   }
 
   server.get<CompileQuery>(depsUrlPath, opts, async (request, reply) => {

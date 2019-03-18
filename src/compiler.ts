@@ -3,10 +3,10 @@ import {stripIndents} from 'common-tags';
 import {compiler as ClosureCompiler} from 'google-closure-compiler';
 import {depGraph} from 'google-closure-deps';
 import {assertNonNullable} from './assert';
+import {Dag} from './dag';
 import {DuckConfig} from './duckconfig';
 import {createDag, EntryConfig, PlovrMode} from './entryconfig';
 import {getClosureLibraryDependencies, getDependencies} from './gendeps';
-import {Dag} from './dag';
 
 export interface CompilerOptions {
   [idx: string]: any;
@@ -15,7 +15,7 @@ export interface CompilerOptions {
   compilation_level?: 'BUNDLE' | 'WHITESPACE' | 'WHITESPACE_ONLY' | 'SIMPLE' | 'ADVANCED';
   js?: string[];
   js_output_file?: string;
-  // chunk or module: `name:num-js-files[:[dep,...][:]]` ex) chunk1:3:app
+  // chunk (module): `name:num-js-files[:[dep,...][:]]`, ex) "chunk1:3:app"
   chunk?: string[];
   language_in?: string;
   language_out?: string;
@@ -30,24 +30,21 @@ export interface CompilerOptions {
   isolation_mode?: 'NONE' | 'IIFE';
 }
 
-export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
-  const opts: CompilerOptions = {};
+function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
+  const opts: CompilerOptions = {
+    json_streams: 'OUT',
+  };
   function copy(entryKey: keyof EntryConfig, closureKey = entryKey.replace(/-/g, '_')) {
     if (entryKey in entryConfig) {
       opts[closureKey] = entryConfig[entryKey];
     }
   }
-  // TODO: load from args
-  const isServeCommand = process.argv.includes('serve');
 
   copy('language-in');
   copy('language-out');
   copy('externs');
   copy('level', 'warning_level');
   copy('debug');
-  if (!isServeCommand) {
-    copy('output-file', 'js_output_file');
-  }
 
   if (entryConfig.mode === PlovrMode.RAW) {
     opts.compilation_level = 'WHITESPACE';
@@ -58,8 +55,18 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
   if (entryConfig.modules) {
     // for chunks
     opts.dependency_mode = 'NONE';
-    if (isServeCommand) {
-      opts.json_streams = 'OUT';
+    if (outputToFile) {
+      if (!entryConfig['module-output-path']) {
+        throw new Error('entryConfig["module-output-path"] must be specified');
+      }
+      const outputPath = entryConfig['module-output-path'];
+      const suffix = '%s.js';
+      if (!outputPath.endsWith(suffix)) {
+        throw new TypeError(
+          `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
+        );
+      }
+      opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
     }
   } else {
     // for pages
@@ -68,6 +75,12 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
     opts.entry_point = entryConfig.inputs;
     // TODO: consider `global-scope-name`
     opts.isolation_mode = 'IIFE';
+    if (outputToFile) {
+      if (!entryConfig['output-file']) {
+        throw new Error('entryConfig["output-file"] must be specified');
+      }
+      copy('output-file', 'js_output_file');
+    }
   }
 
   const formatting: string[] = [];
@@ -90,18 +103,24 @@ export function toCompilerOptions(entryConfig: EntryConfig): CompilerOptions {
     opts.define = defines;
   }
 
-  if (entryConfig['module-output-path']) {
-    const outputPath = entryConfig['module-output-path'];
-    const suffix = '%s.js';
-    if (!outputPath.endsWith(suffix)) {
-      throw new TypeError(
-        `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
-      );
-    }
-    opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
-  }
-
   return opts;
+}
+
+export interface CompilerOutput {
+  path: string;
+  src: string;
+  source_map: string;
+}
+
+/**
+ * @throws If compiler throws errors
+ */
+export async function compileToJson(opts: CompilerOptions): Promise<CompilerOutput[]> {
+  if (opts.json_streams !== 'OUT') {
+    throw new Error(`json_streams must be "OUT", but actual "${opts.json_streams}"`);
+  }
+  const output = await compile(opts);
+  return JSON.parse(output);
 }
 
 export async function compile(opts: CompilerOptions): Promise<string> {
@@ -125,9 +144,17 @@ class CompilerError extends Error {
   }
 }
 
+export function createComiplerOptionsForPage(
+  entryConfig: EntryConfig,
+  outputToFile: boolean
+): CompilerOptions {
+  return createBaseOptions(entryConfig, outputToFile);
+}
+
 export async function createComiplerOptionsForChunks(
   entryConfig: EntryConfig,
   config: DuckConfig,
+  outputToFile: boolean,
   createModuleUris: (chunkId: string) => string[]
 ): Promise<{options: CompilerOptions; sortedChunkIds: string[]; rootChunkId: string}> {
   // TODO: separate EntryConfigChunks from EntryConfig
@@ -142,7 +169,7 @@ export async function createComiplerOptionsForChunks(
   const sortedChunkIds = dag.getSortedIds();
   const chunkToTransitiveDepPathSet = findTransitiveDeps(sortedChunkIds, dependencies, modules);
   const chunkToInputPathSet = splitDepsIntoChunks(sortedChunkIds, chunkToTransitiveDepPathSet, dag);
-  const opts = toCompilerOptions(entryConfig);
+  const opts = createBaseOptions(entryConfig, outputToFile);
   opts.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
   opts.chunk = sortedChunkIds.map(id => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;

@@ -76,9 +76,18 @@ export function run(processArgv: string[]): void {
           default: false,
         },
       },
-      argv => {
+      async argv => {
         const config = loadConfig(argv);
-        build(config);
+        try {
+          await build(config);
+        } catch (e) {
+          if (e instanceof Error) {
+            console.error(e.message);
+          } else {
+            console.error(e);
+          }
+          process.exit(1);
+        }
       }
     )
     .demandCommand(1, 1)
