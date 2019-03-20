@@ -23,7 +23,7 @@ export interface EntryConfig {
   // like "/js/compiled/modules/%s.js"
   'module-production-uri'?: string;
   define?: {
-    [key: string]: string;
+    [key: string]: boolean | number | string;
   };
   externs?: string[];
   'language-in'?: string;
@@ -34,12 +34,14 @@ export interface EntryConfig {
   'print-input-delimiter'?: boolean;
   'test-excludes'?: string[];
   'output-file'?: string;
+  checks?: {
+    [error: string]: 'OFF' | 'WARNING' | 'ERROR';
+  };
 
   // TODO
   // * experimental-compiler-options: Object<string, any>
   // * global-scope-name: `__CBZ__`
   // * soy-function-plugins: string[]
-  // * checks: Object<string, string>
 }
 
 export enum PlovrMode {

@@ -10,7 +10,8 @@ import {getClosureLibraryDependencies, getDependencies} from './gendeps';
 
 export interface CompilerOptions {
   [idx: string]: any;
-  dependency_mode?: string;
+  // 'LOOSE' and 'STRICT' are deprecated. Use 'PRUNE_LEGACY' and 'PRUNE' respectedly.
+  dependency_mode?: 'NONE' | 'SORT_ONLY' | 'PRUNE_LEGACY' | 'PRUNE';
   entry_point?: string[];
   compilation_level?: 'BUNDLE' | 'WHITESPACE' | 'WHITESPACE_ONLY' | 'SIMPLE' | 'ADVANCED';
   js?: string[];
@@ -20,16 +21,21 @@ export interface CompilerOptions {
   language_in?: string;
   language_out?: string;
   json_streams?: 'IN' | 'OUT' | 'BOTH';
-  warning_level?: string;
+  warning_level?: 'QUIET' | 'DEFAULT' | 'VERBOSE';
   debug?: boolean;
-  formatting?: string[];
+  formatting?: CompilerOptionsFormattingType[];
   define?: string[];
   externs?: string[];
   // chunkname:wrappercode
   chunk_wrapper?: string[];
   chunk_output_path_prefix?: string;
   isolation_mode?: 'NONE' | 'IIFE';
+  jscomp_error?: string[];
+  jscomp_warning?: string[];
+  jscomp_off?: string[];
 }
+
+type CompilerOptionsFormattingType = 'PRETTY_PRINT' | 'PRINT_INPUT_DELIMITER' | 'SINGLE_QUOTES';
 
 function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
   const opts: CompilerOptions = {
@@ -91,7 +97,7 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
     opts.externs = entryConfig.externs.slice();
   }
 
-  const formatting: string[] = [];
+  const formatting: CompilerOptionsFormattingType[] = [];
   if (entryConfig['pretty-print']) {
     formatting.push('PRETTY_PRINT');
   }
@@ -103,12 +109,45 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   }
 
   if (entryConfig.define) {
-    const defines: string[] = [];
-    for (const key in entryConfig.define) {
-      const value = entryConfig.define[key];
-      defines.push(`${key}=${value}`);
+    opts.define = Object.entries(entryConfig.define).map(([key, value]) => {
+      if (typeof value === 'string') {
+        if (value.includes("'")) {
+          throw new Error(`define value should not include single-quote: "${key}: ${value}"`);
+        }
+        value = `'${value}'`;
+      }
+      return `${key}=${value}`;
+    });
+  }
+
+  if (entryConfig.checks) {
+    const jscompError: string[] = [];
+    const jscompWarning: string[] = [];
+    const jscompOff: string[] = [];
+    Object.entries(entryConfig.checks).forEach(([name, value]) => {
+      switch (value) {
+        case 'ERROR':
+          jscompError.push(name);
+          break;
+        case 'WARNING':
+          jscompWarning.push(name);
+          break;
+        case 'OFF':
+          jscompOff.push(name);
+          break;
+        default:
+          throw new Error(`Unexpected value: "${name}: ${value}"`);
+      }
+    });
+    if (jscompError.length > 0) {
+      opts.jscomp_error = jscompError;
     }
-    opts.define = defines;
+    if (jscompWarning.length > 0) {
+      opts.jscomp_warning = jscompWarning;
+    }
+    if (jscompOff.length > 0) {
+      opts.jscomp_off = jscompOff;
+    }
   }
 
   return opts;

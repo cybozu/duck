@@ -5,5 +5,11 @@
   "inputs": ["../js/foo.js"],
   "externs": ["../ext/foo.js", "ext/bar.js"],
   "paths": ["../path1"],
-  "output-file": "out.js"
+  "output-file": "out.js",
+  "checks": {
+    "checkRegExp": "ERROR",
+    "checkTypes": "ERROR",
+    "checkVars": "WARNING",
+    "deprecated": "OFF"
+  }
 }
