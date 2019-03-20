@@ -19,6 +19,12 @@ describe('entryconfig', () => {
         ],
         paths: [path.join(fixturesBaseDir, 'path1')],
         'output-file': path.join(fixturesDir, 'out.js'),
+        checks: {
+          checkRegExp: 'ERROR',
+          checkTypes: 'ERROR',
+          checkVars: 'WARNING',
+          deprecated: 'OFF',
+        },
       });
     });
     it('overrides `mode`', async () => {
