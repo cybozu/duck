@@ -41,7 +41,7 @@
   "devDependencies": {
     "@types/common-tags": "^1.8.0",
     "@types/mocha": "^5.2.6",
-    "@types/node": "^10.14.1",
+    "@types/node": "^10.14.3",
     "@types/recursive-readdir": "^2.2.0",
     "@types/serve-static": "^1.13.2",
     "@types/strip-json-comments": "0.0.30",
