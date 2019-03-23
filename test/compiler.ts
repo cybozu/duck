@@ -1,11 +1,11 @@
 import assert = require('assert');
-import {createComiplerOptionsForPage, CompilerOptions} from '../src/compiler';
+import {createCompilerOptionsForPage, CompilerOptions} from '../src/compiler';
 import {PlovrMode} from '../src/entryconfig';
 
 describe('compiler', () => {
   describe('createComiplerOptionsForPage()', () => {
     it('minimum', async () => {
-      const actual = createComiplerOptionsForPage(
+      const actual = createCompilerOptionsForPage(
         {
           id: 'simple',
           mode: PlovrMode.RAW,
@@ -25,7 +25,7 @@ describe('compiler', () => {
       assert.deepEqual(actual, expected);
     });
     it('full', async () => {
-      const actual = createComiplerOptionsForPage(
+      const actual = createCompilerOptionsForPage(
         {
           id: 'simple',
           mode: PlovrMode.SIMPLE,

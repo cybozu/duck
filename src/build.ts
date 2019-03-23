@@ -1,7 +1,7 @@
 import fs from 'fs';
 import util from 'util';
 import {assertString} from './assert';
-import {compile, createComiplerOptionsForChunks, createComiplerOptionsForPage} from './compiler';
+import {compile, createCompilerOptionsForChunks, createCompilerOptionsForPage} from './compiler';
 import {DuckConfig} from './duckconfig';
 import {EntryConfig, loadEntryConfig} from './entryconfig';
 
@@ -25,7 +25,7 @@ export async function build(config: DuckConfig, printConfig = false) {
  * @throws If compiler throws errors
  */
 async function compilePage(entryConfig: EntryConfig, printConfig = false): Promise<any> {
-  const opts = createComiplerOptionsForPage(entryConfig, true);
+  const opts = createCompilerOptionsForPage(entryConfig, true);
   if (printConfig) {
     console.log(opts);
     return;
@@ -45,7 +45,7 @@ async function compileChunk(
     const moduleProductionUri = assertString(entryConfig['module-production-uri']);
     return [moduleProductionUri.replace(/%s/g, chunkId)];
   }
-  const {options} = await createComiplerOptionsForChunks(
+  const {options} = await createCompilerOptionsForChunks(
     entryConfig,
     config,
     true,

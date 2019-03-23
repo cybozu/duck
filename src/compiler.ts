@@ -191,14 +191,14 @@ class CompilerError extends Error {
   }
 }
 
-export function createComiplerOptionsForPage(
+export function createCompilerOptionsForPage(
   entryConfig: EntryConfig,
   outputToFile: boolean
 ): CompilerOptions {
   return createBaseOptions(entryConfig, outputToFile);
 }
 
-export async function createComiplerOptionsForChunks(
+export async function createCompilerOptionsForChunks(
   entryConfig: EntryConfig,
   config: DuckConfig,
   outputToFile: boolean,

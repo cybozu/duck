@@ -10,8 +10,8 @@ import {
   CompilerOutput,
   compileToJson,
   convertModuleInfos,
-  createComiplerOptionsForChunks,
-  createComiplerOptionsForPage,
+  createCompilerOptionsForChunks,
+  createCompilerOptionsForPage,
 } from './compiler';
 import {DuckConfig} from './duckconfig';
 import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from './entryconfig';
@@ -164,7 +164,7 @@ export function serve(config: DuckConfig) {
       return [uri.toString()];
     }
 
-    const {options, sortedChunkIds, rootChunkId} = await createComiplerOptionsForChunks(
+    const {options, sortedChunkIds, rootChunkId} = await createCompilerOptionsForChunks(
       entryConfig,
       config,
       false,
@@ -201,7 +201,7 @@ export function serve(config: DuckConfig) {
     reply: fastify.FastifyReply<ServerResponse>,
     entryConfig: EntryConfig
   ) {
-    const options = createComiplerOptionsForPage(entryConfig, false);
+    const options = createCompilerOptionsForPage(entryConfig, false);
     const chunkOutputs = await compileToJson(options);
     if (chunkOutputs.length !== 1) {
       throw new Error(
