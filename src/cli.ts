@@ -4,6 +4,7 @@ import {build} from './build';
 import {loadConfig} from './duckconfig';
 import {serve} from './serve';
 import {assertNodeVersionGte} from './assert';
+import {buildSoy} from './soy';
 
 assertNodeVersionGte(process.version, 10);
 
@@ -81,7 +82,10 @@ export function run(processArgv: string[]): void {
       },
       async argv => {
         const config = loadConfig(argv);
+        console.log('Compiling Soy...');
+        await buildSoy(config, argv.printConfig);
         try {
+          console.log('Compiling JS...');
           await build(config, argv.printConfig);
         } catch (e) {
           if (e instanceof Error) {

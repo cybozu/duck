@@ -5,6 +5,9 @@ export interface DuckConfig {
   closureLibraryDir: string;
   inputsRoot: string;
   entryConfigDir: string;
+  soyJarPath: string;
+  soyOptions: any;
+  soyFileRoots: string[];
   host: string;
   port: number;
 }

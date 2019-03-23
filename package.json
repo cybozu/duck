@@ -24,9 +24,11 @@
     "unit": "mocha -r espower-typescript/guess --extension ts test"
   },
   "dependencies": {
+    "@types/execa": "^0.9.0",
     "array.prototype.flat": "^1.2.1",
     "common-tags": "^1.8.0",
     "cors": "^2.8.5",
+    "execa": "^1.0.0",
     "fastify": "^2.1.0",
     "google-closure-compiler": ">=20190121.0.0 || ^20190319.0.0-nightly",
     "google-closure-deps": "^20190215.0.0",
