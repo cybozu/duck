@@ -1,6 +1,8 @@
 import assert = require('assert');
-import {createCompilerOptionsForPage, CompilerOptions} from '../src/compiler';
+import {createCompilerOptionsForPage, CompilerOptions, convertToFlagfile} from '../src/compiler';
 import {PlovrMode} from '../src/entryconfig';
+import {readFileSync} from 'fs';
+import {stripIndents} from 'common-tags';
 
 describe('compiler', () => {
   describe('createComiplerOptionsForPage()', () => {
@@ -74,6 +76,37 @@ describe('compiler', () => {
         jscomp_off: ['checkTypes'],
       };
       assert.deepEqual(actual, expected);
+    });
+  });
+  describe('convertToFlagfile()', () => {
+    let debugOrig: any;
+    beforeEach(() => {
+      debugOrig = console.debug;
+      console.debug = () => {};
+    });
+    afterEach(() => {
+      console.debug = debugOrig;
+    });
+    it('converts empty options', () => {
+      const {flagfile} = convertToFlagfile({});
+      const content = readFileSync(flagfile, 'utf8');
+      assert(content === ``);
+    });
+    it('escape and quote', () => {
+      const {flagfile} = convertToFlagfile({
+        compilation_level: 'ADVANCED',
+        js_output_file: '/a b".js',
+        js: ['/a b".js', '/c d".js'],
+      });
+      const content = readFileSync(flagfile, 'utf8');
+      assert.equal(
+        content,
+        stripIndents`
+          --compilation_level "ADVANCED"
+          --js_output_file "/a b\\".js"
+          --js "/a b\\".js"
+          --js "/c d\\".js"`
+      );
     });
   });
 });

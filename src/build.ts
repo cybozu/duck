@@ -1,7 +1,12 @@
 import fs from 'fs';
 import util from 'util';
 import {assertString} from './assert';
-import {compile, createCompilerOptionsForChunks, createCompilerOptionsForPage} from './compiler';
+import {
+  compile,
+  convertToFlagfile,
+  createCompilerOptionsForChunks,
+  createCompilerOptionsForPage,
+} from './compiler';
 import {DuckConfig} from './duckconfig';
 import {EntryConfig, loadEntryConfig} from './entryconfig';
 
@@ -55,5 +60,5 @@ async function compileChunk(
     console.log(options);
     return;
   }
-  return compile(options);
+  return compile(convertToFlagfile(options));
 }

@@ -1,7 +1,9 @@
 import flat from 'array.prototype.flat';
 import {stripIndents} from 'common-tags';
+import fs from 'fs';
 import {compiler as ClosureCompiler} from 'google-closure-compiler';
 import {depGraph} from 'google-closure-deps';
+import * as tempy from 'tempy';
 import {assertNonNullable} from './assert';
 import {Dag} from './dag';
 import {DuckConfig} from './duckconfig';
@@ -33,6 +35,7 @@ export interface CompilerOptions {
   jscomp_error?: string[];
   jscomp_warning?: string[];
   jscomp_off?: string[];
+  flagfile?: string;
 }
 
 type CompilerOptionsFormattingType = 'PRETTY_PRINT' | 'PRINT_INPUT_DELIMITER' | 'SINGLE_QUOTES';
@@ -225,7 +228,7 @@ export async function createCompilerOptionsForChunks(
   const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, createModuleUris);
   const wrapper = stripIndents`var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};
 var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};
-%output%`;
+%output%`.replace(/\n/g, '%n');
   opts.chunk_wrapper = [`${rootId}:${wrapper}`];
   return {options: opts, sortedChunkIds, rootChunkId: rootId};
 }
@@ -301,4 +304,38 @@ export function convertModuleInfos(
     throw new Error('No root module');
   }
   return {moduleInfo, moduleUris, rootId};
+}
+
+/**
+ * To avoid "spawn E2BIG" errors on a large scale project,
+ * transfer compiler options via a flagfile instead of CLI arguments.
+ */
+export function convertToFlagfile(opts: CompilerOptions): {flagfile: string} {
+  const flagfile = tempy.file({
+    name: `${new Date().toISOString().replace(/[^\w]/g, '')}.closure.conf`,
+  });
+  const lines: string[] = [];
+  Object.entries(opts).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      lines.push(...value.map(v => createKeyValue(key, v)));
+    } else {
+      lines.push(createKeyValue(key, value));
+    }
+  });
+  fs.writeFileSync(flagfile, lines.join('\n'), 'utf8');
+  console.debug({flagfile});
+  return {flagfile};
+
+  function createKeyValue(key: string, value: any): string {
+    return `--${key} "${escape(String(value))}"`;
+  }
+}
+
+/**
+ * Escape for Closure Compiler flag files.
+ * It handles only double-qotes, not single.
+ * @see https://github.com/google/closure-compiler/blob/v20190301/src/com/google/javascript/jscomp/CommandLineRunner.java#L1500
+ */
+function escape(str: string): string {
+  return str.replace(/"/g, '\\"');
 }

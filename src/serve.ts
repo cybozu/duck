@@ -12,6 +12,7 @@ import {
   convertModuleInfos,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
+  convertToFlagfile,
 } from './compiler';
 import {DuckConfig} from './duckconfig';
 import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from './entryconfig';
@@ -170,7 +171,7 @@ export function serve(config: DuckConfig) {
       false,
       createModuleUris
     );
-    const chunkOutputs = await compileToJson(options);
+    const chunkOutputs = await compileToJson(convertToFlagfile(options));
     const chunkIdToOutput: {[id: string]: CompilerOutput} = {};
     sortedChunkIds.forEach((id, index) => {
       chunkIdToOutput[id] = chunkOutputs[index];

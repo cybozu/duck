@@ -34,6 +34,7 @@
     "recursive-readdir": "^2.2.2",
     "serve-static": "^1.13.2",
     "strip-json-comments": "^2.0.1",
+    "tempy": "^0.2.1",
     "yargs": "^13.2.2",
     "zet": "^1.0.5"
   },
@@ -44,6 +45,7 @@
     "@types/recursive-readdir": "^2.2.0",
     "@types/serve-static": "^1.13.2",
     "@types/strip-json-comments": "0.0.30",
+    "@types/tempy": "^0.2.0",
     "@types/yargs": "^12.0.10",
     "eslint": "^5.15.3",
     "eslint-config-teppeis": "^9.5.1",
