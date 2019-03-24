@@ -1,14 +1,14 @@
 import fs from 'fs';
 import util from 'util';
-import {assertString} from './assert';
+import {assertString} from '../assert';
 import {
   compile,
   convertToFlagfile,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
-} from './compiler';
-import {DuckConfig} from './duckconfig';
-import {EntryConfig, loadEntryConfig} from './entryconfig';
+} from '../compiler';
+import {DuckConfig} from '../duckconfig';
+import {EntryConfig, loadEntryConfig} from '../entryconfig';
 
 /**
  * @throws If compiler throws errors
