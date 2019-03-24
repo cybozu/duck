@@ -1,9 +1,9 @@
 import path from 'path';
 import yargs from 'yargs';
-import {assertNodeVersionGte} from './assert';
+import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
 import {buildJs} from './commands/buildJs';
-import {buildSoy} from './commands/buildSoy';
-import {cleanSoy} from './commands/cleanSoy';
+import {buildSoy, BuildSoyConfig} from './commands/buildSoy';
+import {cleanSoy, CleanSoyConfig} from './commands/cleanSoy';
 import {serve} from './commands/serve';
 import {loadConfig} from './duckconfig';
 
@@ -92,16 +92,11 @@ export function run(processArgv: string[]): void {
       }
     )
     .command(
-      'build [entryConfigDir|entryConfig..]',
+      'build [entryConfigDir]',
       'Compile Soy and JS files',
       {
         ...buildJsOptions,
         ...buildSoyOptoins,
-        skipSoy: {
-          desc: 'Skip compiling Soy files before compiling JS',
-          type: 'boolean',
-          default: false,
-        },
         printConfig: {
           desc: 'Print effective configs for compilers',
           type: 'boolean',
@@ -110,12 +105,14 @@ export function run(processArgv: string[]): void {
       },
       async argv => {
         const config = loadConfig(argv);
-        if (!argv.skipSoy) {
-          console.log('Compiling Soy...');
-          await buildSoy(config, argv.printConfig);
+        if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
+          console.log('Compiling Soy templates...');
+          await buildSoy(config as BuildSoyConfig, argv.printConfig);
+        } else {
+          console.log('Skip compiling Soy templates. (missing config)');
         }
         try {
-          console.log('Compiling JS...');
+          console.log('Compiling JS files...');
           await buildJs(config, argv.printConfig);
         } catch (e) {
           if (e instanceof Error) {
@@ -127,34 +124,33 @@ export function run(processArgv: string[]): void {
         }
       }
     )
-    .command(
-      'build:js [entryConfigDir|entryConfig..]',
-      'Compile JS files',
-      buildJsOptions,
-      async argv => {
-        const config = loadConfig(argv);
-        try {
-          console.log('Compiling JS...');
-          await buildJs(config, argv.printConfig);
-        } catch (e) {
-          if (e instanceof Error) {
-            console.error(e.message);
-          } else {
-            console.error(e);
-          }
-          process.exit(1);
+    .command('build:js [entryConfigDir]', 'Compile JS files', buildJsOptions, async argv => {
+      const config = loadConfig(argv);
+      try {
+        console.log('Compiling JS files...');
+        await buildJs(config, argv.printConfig);
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error(e.message);
+        } else {
+          console.error(e);
         }
+        process.exit(1);
       }
-    )
+    })
     .command('build:soy', 'Compile Soy templates', buildSoyOptoins, async argv => {
       const config = loadConfig(argv);
-      console.log('Compiling Soy...');
-      await buildSoy(config, argv.printConfig);
+      console.log('Compiling Soy templates...');
+      assertString(config.soyJarPath);
+      assertNonNullable(config.soyFileRoots);
+      assertNonNullable(config.soyOptions);
+      await buildSoy(config as BuildSoyConfig, argv.printConfig);
     })
     .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptoins, async argv => {
       const config = loadConfig(argv);
       console.log('Cleaning up soy.js...');
-      await cleanSoy(config);
+      assertNonNullable(config.soyOptions);
+      await cleanSoy(config as CleanSoyConfig);
     })
     .demandCommand(1, 1)
     .scriptName('duck')

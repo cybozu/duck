@@ -12,7 +12,7 @@ export interface SoyToJsOptions {
   pluginModules?: string[];
 }
 
-type SoyConfig = Pick<DuckConfig, 'soyJarPath' | 'soyOptions'>;
+type SoyConfig = Required<Pick<DuckConfig, 'soyJarPath' | 'soyOptions'>>;
 
 export async function compileSoy(
   soyFiles: string[],

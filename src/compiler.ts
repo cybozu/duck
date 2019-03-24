@@ -41,9 +41,10 @@ export interface CompilerOptions {
 type CompilerOptionsFormattingType = 'PRETTY_PRINT' | 'PRINT_INPUT_DELIMITER' | 'SINGLE_QUOTES';
 
 function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
-  const opts: CompilerOptions = {
-    json_streams: 'OUT',
-  };
+  const opts: CompilerOptions = {};
+  if (!outputToFile) {
+    opts.json_streams = 'OUT';
+  }
 
   function copy(entryKey: keyof EntryConfig, closureKey = entryKey.replace(/-/g, '_')) {
     if (entryKey in entryConfig) {
@@ -173,7 +174,7 @@ export async function compileToJson(opts: CompilerOptions): Promise<CompilerOutp
   return JSON.parse(output);
 }
 
-export async function compile(opts: CompilerOptions): Promise<string> {
+export function compile(opts: CompilerOptions): Promise<string> {
   const compiler = new ClosureCompiler(opts as any);
   return new Promise((resolve, reject) => {
     compiler.run((exitCode: number, stdout: string, stderr?: string) => {
@@ -227,9 +228,9 @@ export async function createCompilerOptionsForChunks(
   });
   const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, createModuleUris);
   const wrapper = stripIndents`
-    var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};
-    var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};
-    %output%`.replace(/\n/g, '%n');
+    var PLOVR_MODULE_INFO=${JSON.stringify(moduleInfo)};
+    var PLOVR_MODULE_URIS=${JSON.stringify(moduleUris)};
+    %output%`.replace(/\n/g, '%n%');
   options.chunk_wrapper = [`${rootId}:${wrapper}`];
   return {options, sortedChunkIds, rootChunkId: rootId};
 }

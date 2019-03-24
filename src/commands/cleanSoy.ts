@@ -2,7 +2,7 @@ import rimraf from 'rimraf';
 import util from 'util';
 import {DuckConfig} from '../duckconfig';
 
-type CleanSoyConfig = Pick<DuckConfig, 'soyOptions'>;
+export type CleanSoyConfig = Required<Pick<DuckConfig, 'soyOptions'>>;
 
 export async function cleanSoy(config: CleanSoyConfig): Promise<void> {
   const {outputPathFormat, inputPrefix} = config.soyOptions;
