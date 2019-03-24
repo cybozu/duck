@@ -219,18 +219,19 @@ export async function createCompilerOptionsForChunks(
   const sortedChunkIds = dag.getSortedIds();
   const chunkToTransitiveDepPathSet = findTransitiveDeps(sortedChunkIds, dependencies, modules);
   const chunkToInputPathSet = splitDepsIntoChunks(sortedChunkIds, chunkToTransitiveDepPathSet, dag);
-  const opts = createBaseOptions(entryConfig, outputToFile);
-  opts.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
-  opts.chunk = sortedChunkIds.map(id => {
+  const options = createBaseOptions(entryConfig, outputToFile);
+  options.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
+  options.chunk = sortedChunkIds.map(id => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(',')}`;
   });
   const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, createModuleUris);
-  const wrapper = stripIndents`var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};
-var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};
-%output%`.replace(/\n/g, '%n');
-  opts.chunk_wrapper = [`${rootId}:${wrapper}`];
-  return {options: opts, sortedChunkIds, rootChunkId: rootId};
+  const wrapper = stripIndents`
+    var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};
+    var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};
+    %output%`.replace(/\n/g, '%n');
+  options.chunk_wrapper = [`${rootId}:${wrapper}`];
+  return {options, sortedChunkIds, rootChunkId: rootId};
 }
 
 function findTransitiveDeps(
