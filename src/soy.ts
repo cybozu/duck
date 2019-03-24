@@ -1,13 +1,24 @@
-import {DuckConfig} from './duckconfig';
-import recursive from 'recursive-readdir';
-import flat from 'array.prototype.flat';
-import execa = require('execa');
 import path from 'path';
+import {DuckConfig} from './duckconfig';
+import execa = require('execa');
 
-type SoyConfig = Pick<DuckConfig, 'soyFileRoots' | 'soyJarPath' | 'soyOptions'>;
+export interface SoyToJsOptions {
+  outputPathFormat: string;
+  inputPrefix?: string;
+  shouldGenerateGoogMsgDefs?: boolean;
+  shouldGenerateJsdoc?: boolean;
+  shouldProvideRequireSoyNamespaces?: boolean;
+  bidiGlobalDir?: 1 | -1;
+  pluginModules?: string[];
+}
 
-export async function buildSoy(config: SoyConfig, printConfig = false) {
-  const soyFiles = await findSoyFiles(config);
+type SoyConfig = Pick<DuckConfig, 'soyJarPath' | 'soyOptions'>;
+
+export async function compileSoy(
+  soyFiles: string[],
+  config: SoyConfig,
+  printConfig = false
+): Promise<void> {
   const soyArgs = toSoyArgs(soyFiles, config);
   if (printConfig) {
     console.log(soyArgs);
@@ -16,9 +27,9 @@ export async function buildSoy(config: SoyConfig, printConfig = false) {
   await execa('java', soyArgs);
 }
 
-export function toSoyArgs(soyFiles: string[], config: SoyConfig): string[] {
-  const args = ['-classpath', config.soyJarPath, 'com.google.template.soy.SoyToJsSrcCompiler'];
-  Object.entries(config.soyOptions).forEach(([key, value]) => {
+export function toSoyArgs(soyFiles: string[], {soyJarPath, soyOptions}: SoyConfig): string[] {
+  const args = ['-classpath', soyJarPath, 'com.google.template.soy.SoyToJsSrcCompiler'];
+  Object.entries(soyOptions).forEach(([key, value]) => {
     if (typeof value === 'boolean' && value) {
       args.push(`--${key}`);
     } else if (typeof value === 'string' || typeof value === 'number') {
@@ -29,19 +40,10 @@ export function toSoyArgs(soyFiles: string[], config: SoyConfig): string[] {
       throw new TypeError(`Unsupported soy config value: "${key}: ${value}"`);
     }
   });
-  if (config.soyOptions.inputPrefix) {
-    const {inputPrefix} = config.soyOptions;
+  if (soyOptions.inputPrefix) {
+    const {inputPrefix} = soyOptions;
     soyFiles = soyFiles.map(filepath => path.relative(inputPrefix, filepath));
   }
   args.push('--srcs', soyFiles.join(','));
   return args;
-}
-
-async function findSoyFiles(config: SoyConfig) {
-  const soyFilePromises = config.soyFileRoots.map(async p => {
-    const files = await recursive(p);
-    return files.filter(file => /\.soy$/.test(file));
-  });
-  const soyFiles = flat(await Promise.all(soyFilePromises));
-  return soyFiles;
 }

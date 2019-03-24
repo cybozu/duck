@@ -1,10 +1,11 @@
 import path from 'path';
 import yargs from 'yargs';
-import {buildJs} from './build';
-import {loadConfig} from './duckconfig';
-import {serve} from './serve';
 import {assertNodeVersionGte} from './assert';
-import {buildSoy} from './soy';
+import {buildJs} from './commands/buildJs';
+import {buildSoy} from './commands/buildSoy';
+import {cleanSoy} from './commands/cleanSoy';
+import {serve} from './commands/serve';
+import {loadConfig} from './duckconfig';
 
 assertNodeVersionGte(process.version, 10);
 
@@ -21,13 +22,15 @@ const config = {
   coerce: path.resolve,
 } as const;
 
+const entryConfigDir = {
+  type: 'string',
+  // only for typing, the value is loaded from args
+  hidden: true,
+  coerce: path.resolve,
+} as const;
+
 const buildJsOptions = {
-  entryConfigDir: {
-    type: 'string',
-    // only for typing, the value is loaded from args
-    hidden: true,
-    coerce: path.resolve,
-  },
+  entryConfigDir,
   closureLibraryDir,
   config,
   printConfig: {
@@ -62,12 +65,7 @@ export function run(processArgv: string[]): void {
       'serve [entryConfigDir]',
       'Start dev server',
       {
-        entryConfigDir: {
-          type: 'string',
-          // only for typing, the value is loaded from args
-          hidden: true,
-          coerce: path.resolve,
-        },
+        entryConfigDir,
         inputsRoot: {
           desc: 'A root directory to serve',
           type: 'string',
@@ -152,6 +150,11 @@ export function run(processArgv: string[]): void {
       const config = loadConfig(argv);
       console.log('Compiling Soy...');
       await buildSoy(config, argv.printConfig);
+    })
+    .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptoins, async argv => {
+      const config = loadConfig(argv);
+      console.log('Cleaning up soy.js...');
+      await cleanSoy(config);
     })
     .demandCommand(1, 1)
     .scriptName('duck')

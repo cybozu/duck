@@ -5,25 +5,25 @@ import fastify from 'fastify';
 import {ServerResponse} from 'http';
 import path from 'path';
 import serveStatic from 'serve-static';
-import {assertNonNullable, assertString} from './assert';
+import {assertNonNullable, assertString} from '../assert';
 import {
   CompilerOutput,
   compileToJson,
   convertModuleInfos,
+  convertToFlagfile,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
-  convertToFlagfile,
-} from './compiler';
-import {DuckConfig} from './duckconfig';
-import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from './entryconfig';
-import {generateDepFileText} from './gendeps';
+} from '../compiler';
+import {DuckConfig} from '../duckconfig';
+import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from '../entryconfig';
+import {generateDepFileText} from '../gendeps';
 import {
   closureLibraryUrlPath,
   compileUrlPath,
   depsUrlPath,
   googBaseUrlPath,
   inputsUrlPath,
-} from './urls';
+} from '../urls';
 
 export function serve(config: DuckConfig) {
   const PORT = config.port;

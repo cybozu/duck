@@ -10,7 +10,7 @@ describe('soy', () => {
         soyOptions: {
           outputPathFormat: '{INPUT_DIRECTORY}/{INPUT_FILE_NAME_NO_EXT}.soy.js',
           shouldProvideRequireSoyNamespaces: true,
-          bidiGlobalDir: 1,
+          bidiGlobalDir: 1 as const,
           pluginModules: ['com.example.Foo', 'com.example.Bar'],
         },
       };
@@ -34,6 +34,7 @@ describe('soy', () => {
         soyFileRoots: [],
         soyJarPath: '/soy.jar',
         soyOptions: {
+          outputPathFormat: '/out',
           inputPrefix: '/path/to/js/',
         },
       };
@@ -41,6 +42,8 @@ describe('soy', () => {
         '-classpath',
         '/soy.jar',
         'com.google.template.soy.SoyToJsSrcCompiler',
+        '--outputPathFormat',
+        '/out',
         '--inputPrefix',
         '/path/to/js/',
         '--srcs',

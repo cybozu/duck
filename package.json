@@ -24,7 +24,6 @@
     "unit": "mocha -r espower-typescript/guess --extension ts test"
   },
   "dependencies": {
-    "@types/execa": "^0.9.0",
     "array.prototype.flat": "^1.2.1",
     "common-tags": "^1.8.0",
     "cors": "^2.8.5",
@@ -42,9 +41,11 @@
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.0",
+    "@types/execa": "^0.9.0",
     "@types/mocha": "^5.2.6",
     "@types/node": "^10.14.3",
     "@types/recursive-readdir": "^2.2.0",
+    "@types/rimraf": "^2.0.2",
     "@types/serve-static": "^1.13.2",
     "@types/strip-json-comments": "0.0.30",
     "@types/tempy": "^0.2.0",

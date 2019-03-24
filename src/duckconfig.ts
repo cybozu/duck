@@ -1,12 +1,13 @@
 import path from 'path';
 import {assertString} from './assert';
+import {SoyToJsOptions} from './soy';
 
 export interface DuckConfig {
   closureLibraryDir: string;
   inputsRoot: string;
   entryConfigDir: string;
   soyJarPath: string;
-  soyOptions: any;
+  soyOptions: SoyToJsOptions;
   soyFileRoots: string[];
   host: string;
   port: number;
@@ -26,9 +27,24 @@ export function loadConfig(opts: any = {}): DuckConfig {
     const config: DuckConfig = require(configPath);
     const configDir = path.dirname(configPath);
     // resolve relative path to absolute
-    config.closureLibraryDir = path.resolve(configDir, config.closureLibraryDir);
-    config.inputsRoot = path.resolve(configDir, config.inputsRoot);
-    config.entryConfigDir = path.resolve(configDir, config.entryConfigDir);
+    toAbsPath(config, configDir, 'closureLibraryDir');
+    toAbsPath(config, configDir, 'inputsRoot');
+    toAbsPath(config, configDir, 'entryConfigDir');
+    toAbsPath(config, configDir, 'soyJarPath');
+    if (config.soyFileRoots) {
+      config.soyFileRoots = config.soyFileRoots.map(root => path.resolve(configDir, root));
+    }
+    if (config.soyOptions) {
+      const {inputPrefix} = config.soyOptions;
+      if (inputPrefix) {
+        toAbsPath(config.soyOptions, configDir, 'inputPrefix');
+        // path.resolve() removes a trailing separator,
+        // but it's important for `inputPrefix`.
+        if (inputPrefix.endsWith(path.sep)) {
+          config.soyOptions.inputPrefix += path.sep;
+        }
+      }
+    }
     result = {...config, ...opts};
   } catch {
     if (opts.config) {
@@ -38,3 +54,21 @@ export function loadConfig(opts: any = {}): DuckConfig {
 
   return result;
 }
+
+function toAbsPath<T>(config: T, baseDir: string, key: PickKeysByValue<Required<T>, string>) {
+  const value = config[key];
+  if (typeof value === 'string') {
+    // "as any": TypeScript can not handle conditional type
+    config[key] = path.resolve(baseDir, value) as any;
+  }
+}
+
+/**
+ * @example
+ * type Props = {name: string; age: number; visible: boolean};
+ * // Keys: 'name' | 'age'
+ * type Keys = PickKeysByValue<Props, string | number>;
+ */
+type PickKeysByValue<T, ValueType> = {
+  [Key in keyof T]: T[Key] extends ValueType ? Key : never
+}[keyof T];
