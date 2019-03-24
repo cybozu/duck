@@ -31,10 +31,17 @@ const entryConfigDir = {
 
 const buildJsOptions = {
   entryConfigDir,
+  entryConfigs: {
+    desc: 'Entry config files (this option ignores entryConfigDir)',
+    alias: 'e',
+    type: 'array',
+    coerce: (arr: any[]) => arr.map(item => path.resolve(String(item))),
+  },
   closureLibraryDir,
   config,
   printConfig: {
     desc: 'Print effective config for Closure Compiler',
+    alias: 'p',
     type: 'boolean',
     default: false,
   },
@@ -54,6 +61,7 @@ const buildSoyOptoins = {
   config,
   printConfig: {
     desc: 'Print effective config for SoyToJs compiler',
+    alias: 'p',
     type: 'boolean',
     default: false,
   },
@@ -99,6 +107,7 @@ export function run(processArgv: string[]): void {
         ...buildSoyOptoins,
         printConfig: {
           desc: 'Print effective configs for compilers',
+          alias: 'p',
           type: 'boolean',
           default: false,
         },
@@ -113,7 +122,7 @@ export function run(processArgv: string[]): void {
         }
         try {
           console.log('Compiling JS files...');
-          await buildJs(config, argv.printConfig);
+          await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
         } catch (e) {
           if (e instanceof Error) {
             console.error(e.message);
@@ -128,7 +137,7 @@ export function run(processArgv: string[]): void {
       const config = loadConfig(argv);
       try {
         console.log('Compiling JS files...');
-        await buildJs(config, argv.printConfig);
+        await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
       } catch (e) {
         if (e instanceof Error) {
           console.error(e.message);

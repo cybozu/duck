@@ -1,5 +1,4 @@
-import fs from 'fs';
-import util from 'util';
+import recursive from 'recursive-readdir';
 import {assertString} from '../assert';
 import {
   compile,
@@ -13,17 +12,23 @@ import {EntryConfig, loadEntryConfig} from '../entryconfig';
 /**
  * @throws If compiler throws errors
  */
-export async function buildJs(config: DuckConfig, printConfig = false) {
-  const stat = await util.promisify(fs.stat)(config.entryConfigDir);
-  if (stat.isDirectory()) {
-    throw new Error('Compiling all files in a directory is not yet implemented');
+export async function buildJs(config: DuckConfig, entryConfigs?: string[], printConfig = false) {
+  const entryConfigPaths = entryConfigs
+    ? entryConfigs
+    : await findEntryConfigs(assertString(config.entryConfigDir));
+  for (const entryConfigPath of entryConfigPaths) {
+    const entryConfig = await loadEntryConfig(entryConfigPath);
+    if (entryConfig.modules) {
+      await compileChunk(entryConfig, config, printConfig);
+    } else {
+      await compilePage(entryConfig, printConfig);
+    }
   }
-  const entryConfig = await loadEntryConfig(config.entryConfigDir);
-  if (entryConfig.modules) {
-    return compileChunk(entryConfig, config, printConfig);
-  } else {
-    return compilePage(entryConfig, printConfig);
-  }
+}
+
+async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
+  const files = await recursive(entryConfigDir);
+  return files.filter(file => /\.json$/.test(file));
 }
 
 /**
