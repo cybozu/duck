@@ -13,7 +13,7 @@ import {EntryConfig, loadEntryConfig} from './entryconfig';
 /**
  * @throws If compiler throws errors
  */
-export async function build(config: DuckConfig, printConfig = false) {
+export async function buildJs(config: DuckConfig, printConfig = false) {
   const stat = await util.promisify(fs.stat)(config.entryConfigDir);
   if (stat.isDirectory()) {
     throw new Error('Compiling all files in a directory is not yet implemented');

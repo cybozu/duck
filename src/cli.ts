@@ -1,12 +1,60 @@
 import path from 'path';
 import yargs from 'yargs';
-import {build} from './build';
+import {buildJs} from './build';
 import {loadConfig} from './duckconfig';
 import {serve} from './serve';
 import {assertNodeVersionGte} from './assert';
 import {buildSoy} from './soy';
 
 assertNodeVersionGte(process.version, 10);
+
+const closureLibraryDir = {
+  desc: 'Closure Library directory',
+  type: 'string',
+  coerce: path.resolve,
+} as const;
+
+const config = {
+  desc: 'A path to duck.config.js, the extension can be ommited',
+  alias: 'c',
+  type: 'string',
+  coerce: path.resolve,
+} as const;
+
+const buildJsOptions = {
+  entryConfigDir: {
+    type: 'string',
+    // only for typing, the value is loaded from args
+    hidden: true,
+    coerce: path.resolve,
+  },
+  closureLibraryDir,
+  config,
+  printConfig: {
+    desc: 'Print effective config for Closure Compiler',
+    type: 'boolean',
+    default: false,
+  },
+} as const;
+
+const buildSoyOptoins = {
+  soyJarPath: {
+    desc: 'A path to Soy.jar',
+    type: 'string',
+    coerce: path.resolve,
+  },
+  soyFileRoots: {
+    desc: 'Root directories of soy files',
+    type: 'array',
+    coerce: path.resolve,
+  },
+  config,
+  printConfig: {
+    desc: 'Print effective config for SoyToJs compiler',
+    type: 'boolean',
+    default: false,
+  },
+} as const;
 
 export function run(processArgv: string[]): void {
   yargs
@@ -25,11 +73,7 @@ export function run(processArgv: string[]): void {
           type: 'string',
           coerce: path.resolve,
         },
-        closureLibraryDir: {
-          desc: 'Closure Library directory',
-          type: 'string',
-          coerce: path.resolve,
-        },
+        closureLibraryDir,
         port: {
           desc: 'A port number to listen',
           alias: 'p',
@@ -41,52 +85,40 @@ export function run(processArgv: string[]): void {
           type: 'string',
           default: 'localhost',
         },
-        config: {
-          desc: 'A path to duck.config.js, the extension can be ommited',
-          alias: 'c',
-          type: 'string',
-          coerce: path.resolve,
-        },
+        config,
       },
       argv => {
         const config = loadConfig(argv);
+        console.log('Starging dev server...');
         serve(config);
       }
     )
     .command(
-      'build [entryConfigDir|entryConfig]',
-      'Compile the inputs',
+      'build [entryConfigDir|entryConfig..]',
+      'Compile Soy and JS files',
       {
-        entryConfigDir: {
-          type: 'string',
-          // only for typing, the value is loaded from args
-          hidden: true,
-          coerce: path.resolve,
-        },
-        closureLibraryDir: {
-          desc: 'Closure Library directory',
-          type: 'string',
-          coerce: path.resolve,
-        },
-        config: {
-          desc: 'A path to duck.config.js, the extension can be ommited',
-          alias: 'c',
-          type: 'string',
-          coerce: path.resolve,
+        ...buildJsOptions,
+        ...buildSoyOptoins,
+        skipSoy: {
+          desc: 'Skip compiling Soy files before compiling JS',
+          type: 'boolean',
+          default: false,
         },
         printConfig: {
-          desc: 'Print all config of the compiler to stderr',
+          desc: 'Print effective configs for compilers',
           type: 'boolean',
           default: false,
         },
       },
       async argv => {
         const config = loadConfig(argv);
-        console.log('Compiling Soy...');
-        await buildSoy(config, argv.printConfig);
+        if (!argv.skipSoy) {
+          console.log('Compiling Soy...');
+          await buildSoy(config, argv.printConfig);
+        }
         try {
           console.log('Compiling JS...');
-          await build(config, argv.printConfig);
+          await buildJs(config, argv.printConfig);
         } catch (e) {
           if (e instanceof Error) {
             console.error(e.message);
@@ -97,6 +129,30 @@ export function run(processArgv: string[]): void {
         }
       }
     )
+    .command(
+      'build:js [entryConfigDir|entryConfig..]',
+      'Compile JS files',
+      buildJsOptions,
+      async argv => {
+        const config = loadConfig(argv);
+        try {
+          console.log('Compiling JS...');
+          await buildJs(config, argv.printConfig);
+        } catch (e) {
+          if (e instanceof Error) {
+            console.error(e.message);
+          } else {
+            console.error(e);
+          }
+          process.exit(1);
+        }
+      }
+    )
+    .command('build:soy', 'Compile Soy templates', buildSoyOptoins, async argv => {
+      const config = loadConfig(argv);
+      console.log('Compiling Soy...');
+      await buildSoy(config, argv.printConfig);
+    })
     .demandCommand(1, 1)
     .scriptName('duck')
     .epilog('CLI options overwrite config file')
