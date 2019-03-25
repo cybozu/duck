@@ -12,9 +12,68 @@ Status: **_WIP_**
 
 <a title="Berkaycagdas [CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Yellow_Duck.jpg"><img width="256" alt="Yellow Duck" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Yellow_Duck.jpg/256px-Yellow_Duck.jpg"></a>
 
+## Install
+
+```console
+$ npm i -D @teppeis/duck
+```
+
 ## Usage
 
-See [`examples/chunks`](examples/chunks).
+```
+duck <command>
+
+Commands:
+  duck serve [entryConfigDir]     Start dev server
+  duck build [entryConfigDir]     Compile Soy and JS files
+  duck build:js [entryConfigDir]  Compile JS files
+  duck build:soy                  Compile Soy templates
+  duck clean:soy                  Remove all compiled .soy.js
+
+Options:
+  --version  Show version number                                                 [boolean]
+  --help     Show help                                                           [boolean]
+
+CLI options overwrite config file
+```
+
+### `duck serve`
+
+```
+duck serve [entryConfigDir]
+
+Start dev server
+
+Options:
+  --version            Show version number                                       [boolean]
+  --help               Show help                                                 [boolean]
+  --inputsRoot         A root directory to serve                                  [string]
+  --closureLibraryDir  Closure Library directory                                  [string]
+  --port, -p           A port number to listen                    [number] [default: 9810]
+  --host               A host to listen                    [string] [default: "localhost"]
+  --config, -c         A path to duck.config.js, the extension can be ommited     [string]
+```
+
+### `duck build`
+
+```
+duck build [entryConfigDir]
+
+Compile Soy and JS files
+
+Options:
+  --version            Show version number                                       [boolean]
+  --help               Show help                                                 [boolean]
+  --entryConfigs, -e   Entry config files (this option ignores entryConfigDir)     [array]
+  --closureLibraryDir  Closure Library directory                                  [string]
+  --config, -c         A path to duck.config.js, the extension can be ommited     [string]
+  --concurrency        Concurrency limit for compiler                [number] [default: 1]
+  --printConfig, -p    Print effective configs for compilers    [boolean] [default: false]
+  --soyJarPath         A path to Soy.jar                                          [string]
+  --soyFileRoots       Root directories of soy files                               [array]
+```
+
+Also see [`examples/chunks`](examples/chunks).
 
 ## License
 
