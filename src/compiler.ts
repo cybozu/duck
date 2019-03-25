@@ -230,7 +230,8 @@ export async function createCompilerOptionsForChunks(
   const wrapper = stripIndents`
     var PLOVR_MODULE_INFO=${JSON.stringify(moduleInfo)};
     var PLOVR_MODULE_URIS=${JSON.stringify(moduleUris)};
-    %output%`.replace(/\n/g, '%n%');
+    ${entryConfig.debug ? 'var PLOVR_MODULE_USE_DEBUG_MODE=true;' : ''}
+    %output%`.replace(/\n+/g, '%n%');
   options.chunk_wrapper = [`${rootId}:${wrapper}`];
   return {options, sortedChunkIds, rootChunkId: rootId};
 }

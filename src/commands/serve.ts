@@ -124,12 +124,9 @@ export function serve(config: DuckConfig) {
     reply.code(200).type('application/javascript').send(stripIndents`
     document.write('<script src="${googBaseUrl}"></script>');
     document.write('<script src="${depsUrl}"></script>');
-    document.write('<script>goog.global.PLOVR_MODULE_INFO = ${JSON.stringify(
-      moduleInfo
-    )}</script>');
-    document.write('<script>goog.global.PLOVR_MODULE_URIS = ${JSON.stringify(
-      moduleUris
-    )}</script>');
+    document.write('<script>var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};</script>');
+    document.write('<script>var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};</script>');
+    document.write('<script>var PLOVR_MODULE_USE_DEBUG_MODE = ${!!entryConfig.debug};</script>');
     ${rootModuleUris
       .map(uri => `document.write('<script>goog.require("${uri}")</script>');`)
       .join('\n')}
