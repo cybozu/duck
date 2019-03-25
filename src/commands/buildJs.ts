@@ -1,3 +1,4 @@
+import pLimit from 'p-limit';
 import recursive from 'recursive-readdir';
 import {assertString} from '../assert';
 import {
@@ -16,14 +17,20 @@ export async function buildJs(config: DuckConfig, entryConfigs?: string[], print
   const entryConfigPaths = entryConfigs
     ? entryConfigs
     : await findEntryConfigs(assertString(config.entryConfigDir));
-  for (const entryConfigPath of entryConfigPaths) {
-    const entryConfig = await loadEntryConfig(entryConfigPath);
-    if (entryConfig.modules) {
-      await compileChunk(entryConfig, config, printConfig);
-    } else {
-      await compilePage(entryConfig, printConfig);
-    }
-  }
+  const limit = pLimit(config.concurrency);
+  entryConfigPaths.map(entryConfigPath =>
+    limit(async () => {
+      const entryConfig = await loadEntryConfig(entryConfigPath);
+      if (entryConfig.modules) {
+        await compileChunk(entryConfig, config, printConfig);
+      } else {
+        await compilePage(entryConfig, printConfig);
+      }
+    }).catch(e => {
+      console.error(`Error: ${entryConfigPath}`);
+      console.error(e);
+    })
+  );
 }
 
 async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {

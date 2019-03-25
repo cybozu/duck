@@ -39,6 +39,11 @@ const buildJsOptions = {
   },
   closureLibraryDir,
   config,
+  concurrency: {
+    desc: 'Concurrency limit for compiler',
+    type: 'number',
+    default: 1,
+  },
   printConfig: {
     desc: 'Print effective config for Closure Compiler',
     alias: 'p',

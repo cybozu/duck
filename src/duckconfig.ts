@@ -9,6 +9,7 @@ export interface DuckConfig {
   soyJarPath?: string;
   soyOptions?: SoyToJsOptions;
   soyFileRoots?: string[];
+  concurrency: number;
   host: string;
   port: number;
 }
