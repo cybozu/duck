@@ -59,7 +59,6 @@ describe('compiler', () => {
       const expected: CompilerOptions = {
         dependency_mode: 'PRUNE',
         isolation_mode: 'IIFE',
-        json_streams: 'OUT',
         compilation_level: 'SIMPLE',
         js: ['/path/to/path1', '!/extern1.js'],
         entry_point: ['/input1.js'],
