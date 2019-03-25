@@ -98,8 +98,14 @@ export function run(processArgv: string[]): void {
         },
         config,
       },
-      argv => {
+      async argv => {
         const config = loadConfig(argv);
+        if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
+          console.log('Compiling Soy templates...');
+          await buildSoy(config as BuildSoyConfig);
+        } else {
+          console.log('Skip compiling Soy templates. (missing config)');
+        }
         console.log('Starging dev server...');
         serve(config);
       }
@@ -121,13 +127,15 @@ export function run(processArgv: string[]): void {
         const config = loadConfig(argv);
         if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
           console.log('Compiling Soy templates...');
-          await buildSoy(config as BuildSoyConfig, argv.printConfig);
+          const templates = await buildSoy(config as BuildSoyConfig, argv.printConfig);
+          console.log(`${templates.length} templates compiled!`);
         } else {
           console.log('Skip compiling Soy templates. (missing config)');
         }
         try {
           console.log('Compiling JS files...');
           await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
+          console.log('JS compiled!');
         } catch (e) {
           if (e instanceof Error) {
             console.error(e.message);
@@ -143,6 +151,7 @@ export function run(processArgv: string[]): void {
       try {
         console.log('Compiling JS files...');
         await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
+        console.log('JS compiled!');
       } catch (e) {
         if (e instanceof Error) {
           console.error(e.message);
@@ -158,7 +167,8 @@ export function run(processArgv: string[]): void {
       assertString(config.soyJarPath);
       assertNonNullable(config.soyFileRoots);
       assertNonNullable(config.soyOptions);
-      await buildSoy(config as BuildSoyConfig, argv.printConfig);
+      const templates = await buildSoy(config as BuildSoyConfig, argv.printConfig);
+      console.log(`${templates.length} templates compiled!`);
     })
     .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptoins, async argv => {
       const config = loadConfig(argv);

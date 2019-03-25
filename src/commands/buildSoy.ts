@@ -7,9 +7,15 @@ export type BuildSoyConfig = Required<
   Pick<DuckConfig, 'soyFileRoots' | 'soyJarPath' | 'soyOptions'>
 >;
 
-export async function buildSoy(config: BuildSoyConfig, printConfig = false): Promise<void> {
+/**
+ * @param config
+ * @param printConfig Print only
+ * @return An array of input Soy template filepaths
+ */
+export async function buildSoy(config: BuildSoyConfig, printConfig = false): Promise<string[]> {
   const soyFiles = await findSoyFiles(config);
-  return compileSoy(soyFiles, config, printConfig);
+  await compileSoy(soyFiles, config, printConfig);
+  return soyFiles;
 }
 
 async function findSoyFiles(config: BuildSoyConfig): Promise<string[]> {
