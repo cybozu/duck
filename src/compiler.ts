@@ -167,11 +167,8 @@ export interface CompilerOutput {
  * @throws If compiler throws errors
  */
 export async function compileToJson(opts: CompilerOptions): Promise<CompilerOutput[]> {
-  if (opts.json_streams !== 'OUT') {
-    throw new Error(`json_streams must be "OUT", but actual "${opts.json_streams}"`);
-  }
-  const output = await compile(opts);
-  return JSON.parse(output);
+  opts = {...opts, json_streams: 'OUT'};
+  return JSON.parse(await compile(opts));
 }
 
 export function compile(opts: CompilerOptions): Promise<string> {
