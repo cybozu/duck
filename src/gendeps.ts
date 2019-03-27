@@ -89,7 +89,7 @@ export async function getDependencies(
     // TODO: create an custom error and send `errors`
     throw new Error('Fatal parse error');
   }
-  const deps = results.map(r => r.dependency);
+  const deps = flat(results.map(r => r.dependencies));
   dependenciesCache.set(entryConfig.id, deps);
   return deps;
 }
