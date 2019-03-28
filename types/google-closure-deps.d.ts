@@ -112,6 +112,16 @@ export namespace depGraph {
       imports: Import[],
       language?: string
     );
+
+    /**
+     * Updates the path to Closure Library for this file. This is useful for
+     * ParsedDependency, which cannot know the full path of a file on until it
+     * knows the path to Closure Library, as the path in the goog.addDependency
+     * call is relative from Closure Library.
+     */
+    setClosurePath(path: string): void;
+
+    isParsedFromDepsFile(): boolean;
   }
 
   /**

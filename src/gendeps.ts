@@ -4,9 +4,8 @@ import {depFile, depGraph, parser} from 'google-closure-deps';
 import path from 'path';
 import recursive from 'recursive-readdir';
 import util from 'util';
-import vm from 'vm';
 import {EntryConfig} from './entryconfig';
-import {inputsUrlPath, googBaseUrlPath} from './urls';
+import {googBaseUrlPath, inputsUrlPath} from './urls';
 
 const depFileTextCache: Map<string, string> = new Map();
 const dependenciesCache: Map<string, depGraph.Dependency[]> = new Map();
@@ -83,9 +82,7 @@ export async function getDependencies(
     );
   });
   const results = flat(await Promise.all(parseResultPromises));
-  const errors = flat(results.map(r => r.errors));
-  const hasFatalError = errors.some(err => !!err.fatal);
-  if (hasFatalError) {
+  if (results.some(result => result.hasFatalError)) {
     // TODO: create an custom error and send `errors`
     throw new Error('Fatal parse error');
   }
@@ -100,32 +97,15 @@ export async function getDependencies(
 export async function getClosureLibraryDependencies(
   closureLibraryDir: string
 ): Promise<depGraph.Dependency[]> {
-  const depsContent = await util.promisify(fs.readFile)(
-    path.join(closureLibraryDir, 'closure', 'goog', 'deps.js'),
-    'utf8'
-  );
-  const results: depGraph.Dependency[] = [];
-
-  vm.runInNewContext(depsContent, {
-    goog: {
-      addDependency(
-        relPath: string,
-        provides: string[],
-        requires: string[],
-        opt_loadFlags: boolean | {module?: string; lang?: string}
-      ) {
-        const dep = addClosureDependency(
-          relPath,
-          provides,
-          requires,
-          opt_loadFlags,
-          closureLibraryDir
-        );
-        results.push(dep);
-      },
-    },
-  });
-  return results;
+  const googBasePath = path.join(closureLibraryDir, 'closure', 'goog', 'deps.js');
+  const depsContent = await util.promisify(fs.readFile)(googBasePath, 'utf8');
+  const result = parser.parseDependencyFile(depsContent, googBasePath);
+  if (result.errors.length > 0) {
+    throw new Error(`Fail to parse deps.js of Closure Library: ${result.errors.join(', ')}`);
+  }
+  const googBaseDir = path.dirname(googBasePath);
+  result.dependencies.forEach(dep => dep.setClosurePath(googBaseDir));
+  return result.dependencies;
 }
 
 /**
