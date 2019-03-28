@@ -29,7 +29,7 @@
     "cors": "^2.8.5",
     "execa": "^1.0.0",
     "fastify": "^2.1.0",
-    "google-closure-compiler": ">=20190121.0.0",
+    "google-closure-compiler": ">=20190325.0.0",
     "google-closure-deps": ">=20190325.0.0",
     "p-limit": "^2.2.0",
     "pino-pretty": "^2.5.0",
