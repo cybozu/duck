@@ -32,11 +32,21 @@ export interface CompilerOptions {
   chunk_wrapper?: string[];
   chunk_output_path_prefix?: string;
   isolation_mode?: 'NONE' | 'IIFE';
+  rename_prefix_namespace?: string;
   jscomp_error?: string[];
   jscomp_warning?: string[];
   jscomp_off?: string[];
   flagfile?: string;
+
+  // TODO:
+  // - output_wrapper?: string;
 }
+
+/**
+ * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.
+ * @see https://github.com/bolinfest/plovr/blob/v8.0.0/src/org/plovr/Config.java#L81-L93
+ */
+const GLOBAL_NAMESPACE = 'z';
 
 type CompilerOptionsFormattingType = 'PRETTY_PRINT' | 'PRINT_INPUT_DELIMITER' | 'SINGLE_QUOTES';
 
@@ -56,6 +66,10 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   copy('language-out');
   copy('level', 'warning_level');
   copy('debug');
+
+  if (entryConfig['global-scope-name']) {
+    opts.rename_prefix_namespace = GLOBAL_NAMESPACE;
+  }
 
   if (entryConfig.mode === PlovrMode.RAW) {
     opts.compilation_level = 'WHITESPACE';
@@ -223,14 +237,36 @@ export async function createCompilerOptionsForChunks(
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(',')}`;
   });
-  const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, createModuleUris);
-  const wrapper = stripIndents`
-    var PLOVR_MODULE_INFO=${JSON.stringify(moduleInfo)};
-    var PLOVR_MODULE_URIS=${JSON.stringify(moduleUris)};
-    ${entryConfig.debug ? 'var PLOVR_MODULE_USE_DEBUG_MODE=true;' : ''}
-    %output%`.replace(/\n+/g, '%n%');
-  options.chunk_wrapper = [`${rootId}:${wrapper}`];
-  return {options, sortedChunkIds, rootChunkId: rootId};
+  options.chunk_wrapper = createChunkWrapper(entryConfig, sortedChunkIds, createModuleUris);
+  return {options, sortedChunkIds, rootChunkId: sortedChunkIds[0]};
+}
+
+function createChunkWrapper(
+  entryConfig: EntryConfig,
+  sortedChunkIds: string[],
+  createModuleUris: (id: string) => string[]
+): string[] {
+  const {moduleInfo, moduleUris} = convertModuleInfos(entryConfig, createModuleUris);
+  return sortedChunkIds.map((chunkId, index) => {
+    const isRootChunk = index === 0;
+    let wrapper = '%output%';
+    if (entryConfig['global-scope-name']) {
+      const globalScope = entryConfig['global-scope-name'];
+      wrapper = stripIndents`
+        ${isRootChunk ? `var ${globalScope}={};` : ''}
+        (function(${GLOBAL_NAMESPACE}){
+        ${wrapper}
+        }).call(this,${globalScope});`;
+    }
+    if (isRootChunk) {
+      wrapper = stripIndents`
+      var PLOVR_MODULE_INFO=${JSON.stringify(moduleInfo)};
+      var PLOVR_MODULE_URIS=${JSON.stringify(moduleUris)};
+      ${entryConfig.debug ? 'var PLOVR_MODULE_USE_DEBUG_MODE=true;' : ''}
+      ${wrapper}`;
+    }
+    return `${chunkId}:${wrapper.replace(/\n+/g, '%n%')}`;
+  });
 }
 
 function findTransitiveDeps(
@@ -284,8 +320,7 @@ function splitDepsIntoChunks(
 export function convertModuleInfos(
   entryConfig: EntryConfig,
   createModuleUris: (id: string) => string[]
-): {moduleInfo: {[id: string]: string[]}; moduleUris: {[id: string]: string[]}; rootId: string} {
-  let rootId: string | null = null;
+): {moduleInfo: {[id: string]: string[]}; moduleUris: {[id: string]: string[]}} {
   const modules = assertNonNullable(entryConfig.modules);
   const moduleInfo: {[id: string]: string[]} = {};
   const moduleUris: {[id: string]: string[]} = {};
@@ -293,17 +328,8 @@ export function convertModuleInfos(
     const module = modules[id];
     moduleInfo[id] = module.deps;
     moduleUris[id] = createModuleUris(id);
-    if (module.deps.length === 0) {
-      if (rootId) {
-        throw new Error('Many root modules');
-      }
-      rootId = id;
-    }
   }
-  if (!rootId) {
-    throw new Error('No root module');
-  }
-  return {moduleInfo, moduleUris, rootId};
+  return {moduleInfo, moduleUris};
 }
 
 /**

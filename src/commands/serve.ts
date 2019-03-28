@@ -107,11 +107,12 @@ export function serve(config: DuckConfig) {
 
   function replyChunksRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
     const modules = assertNonNullable(entryConfig.modules);
-    const {moduleInfo, moduleUris, rootId} = convertModuleInfos(entryConfig, id => {
+    const {moduleInfo, moduleUris} = convertModuleInfos(entryConfig, id => {
       return inputsToUrisForRaw(modules[id].inputs);
     });
     // The root chunk loads all chunks in RAW mode
     const sortedChunkIds = createDag(entryConfig).getSortedIds();
+    const rootId = sortedChunkIds[0];
     moduleUris[rootId] = flat(sortedChunkIds.map(id => moduleUris[id]));
     for (const id in moduleUris) {
       if (id !== rootId) {
