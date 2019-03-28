@@ -42,6 +42,7 @@ describe('compiler', () => {
           'pretty-print': true,
           'print-input-delimiter': true,
           'test-excludes': ['/ignored'],
+          'global-scope-name': 'GSN',
           define: {
             'goog.BOOLEAN': false,
             'goog.NUMBER': 100,
@@ -68,6 +69,7 @@ describe('compiler', () => {
         warning_level: 'VERBOSE',
         debug: true,
         formatting: ['PRETTY_PRINT', 'PRINT_INPUT_DELIMITER'],
+        rename_prefix_namespace: 'z', // "z" is hard coded
         define: ['goog.BOOLEAN=false', 'goog.NUMBER=100', "goog.STRING='single-quoted'"],
         js_output_file: '/out.js',
         jscomp_error: ['checkRegExp', 'deprecated'],

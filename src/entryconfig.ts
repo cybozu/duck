@@ -37,11 +37,11 @@ export interface EntryConfig {
   checks?: {
     [error: string]: 'OFF' | 'WARNING' | 'ERROR';
   };
+  'global-scope-name'?: string;
 
   // TODO
   // * experimental-compiler-options: Object<string, any>
-  // * global-scope-name: `__CBZ__`
-  // * soy-function-plugins: string[]
+  // * output-wrapper
 }
 
 export enum PlovrMode {
