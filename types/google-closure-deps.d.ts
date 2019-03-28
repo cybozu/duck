@@ -4,14 +4,38 @@
 export namespace parser {
   export class ParseResult {
     /** @const */
-    dependency: depGraph.Dependency;
+    dependencies: depGraph.Dependency[];
     /** @const */
     errors: ParseError[];
     /** @const */
     hasFatalError: boolean;
-
-    constructor(dependency: depGraph.Dependency, errors: ParseError[]);
+    /** @const */
+    source: ParseResult.Source;
+    /** @const */
+    isFromDepsFile: boolean;
+    constructor(
+      dependencies: depGraph.Dependency[],
+      errors: ParseError[],
+      source: ParseResult.Source
+    );
   }
+
+  namespace ParseResult {
+    // TODO: workaround for a bug of @typescript-eslint
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    enum Source {
+      /**
+       * Scanned from an actual source file.
+       */
+      SOURCE_FILE = 'f',
+
+      /**
+       * A goog.addDependency statement.
+       */
+      GOOG_ADD_DEPENDENCY = 'd',
+    }
+  }
+
   export class ParseError {
     /** @const */
     fatal: boolean;
@@ -32,7 +56,14 @@ export namespace parser {
       lineOffset: number
     );
   }
+
   export function parseFileAsync(path: string): Promise<ParseResult>;
+
+  /**
+   * Parses a file that contains only goog.addDependency statements. This is regex
+   * based to be lightweight and avoid addtional dependencies.
+   */
+  export function parseDependencyFile(text: string, filePath: string): ParseResult;
 }
 
 export namespace depGraph {

@@ -29,8 +29,8 @@
     "cors": "^2.8.5",
     "execa": "^1.0.0",
     "fastify": "^2.1.0",
-    "google-closure-compiler": ">=20190121.0.0 || ^20190319.0.0-nightly",
-    "google-closure-deps": "^20190215.0.0",
+    "google-closure-compiler": ">=20190121.0.0",
+    "google-closure-deps": ">=20190325.0.0",
     "p-limit": "^2.2.0",
     "pino-pretty": "^2.5.0",
     "recursive-readdir": "^2.2.2",
@@ -60,7 +60,7 @@
     "power-assert": "^1.6.1",
     "prettier": "^1.16.4",
     "rimraf": "^2.6.3",
-    "typescript": "^3.4.0-dev.20190323"
+    "typescript": "^3.4.0-dev.20190327"
   },
   "homepage": "https://github.com/teppeis/duck",
   "repository": {
