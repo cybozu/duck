@@ -13,12 +13,16 @@ import {EntryConfig, loadEntryConfig} from '../entryconfig';
 /**
  * @throws If compiler throws errors
  */
-export async function buildJs(config: DuckConfig, entryConfigs?: string[], printConfig = false) {
+export async function buildJs(
+  config: DuckConfig,
+  entryConfigs?: string[],
+  printConfig = false
+): Promise<any> {
   const entryConfigPaths = entryConfigs
     ? entryConfigs
     : await findEntryConfigs(assertString(config.entryConfigDir));
   const limit = pLimit(config.concurrency);
-  entryConfigPaths.map(entryConfigPath =>
+  const promises = entryConfigPaths.map(entryConfigPath =>
     limit(async () => {
       const entryConfig = await loadEntryConfig(entryConfigPath);
       if (entryConfig.modules) {
@@ -31,6 +35,7 @@ export async function buildJs(config: DuckConfig, entryConfigs?: string[], print
       console.error(e);
     })
   );
+  return Promise.all(promises);
 }
 
 async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
