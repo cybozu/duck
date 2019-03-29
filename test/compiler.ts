@@ -1,8 +1,8 @@
 import assert = require('assert');
-import {createCompilerOptionsForPage, CompilerOptions, convertToFlagfile} from '../src/compiler';
-import {PlovrMode} from '../src/entryconfig';
-import {readFileSync} from 'fs';
 import {stripIndents} from 'common-tags';
+import {readFileSync} from 'fs';
+import {CompilerOptions, convertToFlagfile, createCompilerOptionsForPage} from '../src/compiler';
+import {PlovrMode} from '../src/entryconfig';
 
 describe('compiler', () => {
   describe('createComiplerOptionsForPage()', () => {
@@ -70,6 +70,7 @@ describe('compiler', () => {
         debug: true,
         formatting: ['PRETTY_PRINT', 'PRINT_INPUT_DELIMITER'],
         rename_prefix_namespace: 'z', // "z" is hard coded
+        output_wrapper: 'var GSN={};%n%(function(z){%n%%output%%n%}).call(this,GSN);',
         define: ['goog.BOOLEAN=false', 'goog.NUMBER=100', "goog.STRING='single-quoted'"],
         js_output_file: '/out.js',
         jscomp_error: ['checkRegExp', 'deprecated'],

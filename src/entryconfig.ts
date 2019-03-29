@@ -38,10 +38,10 @@ export interface EntryConfig {
     [error: string]: 'OFF' | 'WARNING' | 'ERROR';
   };
   'global-scope-name'?: string;
+  'output-wrapper'?: string;
 
   // TODO
   // * experimental-compiler-options: Object<string, any>
-  // * output-wrapper
 }
 
 export enum PlovrMode {

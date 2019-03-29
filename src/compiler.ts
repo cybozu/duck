@@ -15,7 +15,7 @@ export interface CompilerOptions {
   // 'LOOSE' and 'STRICT' are deprecated. Use 'PRUNE_LEGACY' and 'PRUNE' respectedly.
   dependency_mode?: 'NONE' | 'SORT_ONLY' | 'PRUNE_LEGACY' | 'PRUNE';
   entry_point?: string[];
-  compilation_level?: 'BUNDLE' | 'WHITESPACE' | 'WHITESPACE_ONLY' | 'SIMPLE' | 'ADVANCED';
+  compilation_level?: CompilationLevel;
   js?: string[];
   js_output_file?: string;
   // chunk (module): `name:num-js-files[:[dep,...][:]]`, ex) "chunk1:3:app"
@@ -32,23 +32,22 @@ export interface CompilerOptions {
   chunk_wrapper?: string[];
   chunk_output_path_prefix?: string;
   isolation_mode?: 'NONE' | 'IIFE';
+  output_wrapper?: string;
   rename_prefix_namespace?: string;
   jscomp_error?: string[];
   jscomp_warning?: string[];
   jscomp_off?: string[];
   flagfile?: string;
-
-  // TODO:
-  // - output_wrapper?: string;
 }
+
+type CompilationLevel = 'BUNDLE' | 'WHITESPACE' | 'SIMPLE' | 'ADVANCED';
+type CompilerOptionsFormattingType = 'PRETTY_PRINT' | 'PRINT_INPUT_DELIMITER' | 'SINGLE_QUOTES';
 
 /**
  * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.
  * @see https://github.com/bolinfest/plovr/blob/v8.0.0/src/org/plovr/Config.java#L81-L93
  */
 const GLOBAL_NAMESPACE = 'z';
-
-type CompilerOptionsFormattingType = 'PRETTY_PRINT' | 'PRINT_INPUT_DELIMITER' | 'SINGLE_QUOTES';
 
 function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
   const opts: CompilerOptions = {};
@@ -101,8 +100,6 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
       opts.js.push(...entryConfig.externs.map(extern => `!${extern}`));
     }
     opts.entry_point = assertNonNullable(entryConfig.inputs).slice();
-    // TODO: consider `global-scope-name`
-    opts.isolation_mode = 'IIFE';
     if (outputToFile) {
       if (!entryConfig['output-file']) {
         throw new Error('entryConfig["output-file"] must be specified');
@@ -210,7 +207,12 @@ export function createCompilerOptionsForPage(
   entryConfig: EntryConfig,
   outputToFile: boolean
 ): CompilerOptions {
-  return createBaseOptions(entryConfig, outputToFile);
+  const opts = createBaseOptions(entryConfig, outputToFile);
+  const wrapper = createOutputWrapper(entryConfig, assertNonNullable(opts.compilation_level));
+  if (wrapper && wrapper !== wrapperMarker) {
+    opts.output_wrapper = wrapper;
+  }
+  return opts;
 }
 
 export async function createCompilerOptionsForChunks(
@@ -237,27 +239,32 @@ export async function createCompilerOptionsForChunks(
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(',')}`;
   });
-  options.chunk_wrapper = createChunkWrapper(entryConfig, sortedChunkIds, createModuleUris);
+  options.chunk_wrapper = createChunkWrapper(
+    entryConfig,
+    sortedChunkIds,
+    assertNonNullable(options.compilation_level),
+    createModuleUris
+  );
   return {options, sortedChunkIds, rootChunkId: sortedChunkIds[0]};
+}
+
+const wrapperMarker = '%output%';
+
+function createOutputWrapper(entryConfig: EntryConfig, level: CompilationLevel): string {
+  // output_wrapper doesn't support "%n%"
+  return createBaseOutputWrapper(entryConfig, level, true).replace(/\n+/g, '');
 }
 
 function createChunkWrapper(
   entryConfig: EntryConfig,
   sortedChunkIds: string[],
+  compilationLevel: CompilationLevel,
   createModuleUris: (id: string) => string[]
 ): string[] {
   const {moduleInfo, moduleUris} = convertModuleInfos(entryConfig, createModuleUris);
   return sortedChunkIds.map((chunkId, index) => {
     const isRootChunk = index === 0;
-    let wrapper = '%output%';
-    if (entryConfig['global-scope-name']) {
-      const globalScope = entryConfig['global-scope-name'];
-      wrapper = stripIndents`
-        ${isRootChunk ? `var ${globalScope}={};` : ''}
-        (function(${GLOBAL_NAMESPACE}){
-        ${wrapper}
-        }).call(this,${globalScope});`;
-    }
+    let wrapper = createBaseOutputWrapper(entryConfig, compilationLevel, isRootChunk);
     if (isRootChunk) {
       wrapper = stripIndents`
       var PLOVR_MODULE_INFO=${JSON.stringify(moduleInfo)};
@@ -265,8 +272,33 @@ function createChunkWrapper(
       ${entryConfig.debug ? 'var PLOVR_MODULE_USE_DEBUG_MODE=true;' : ''}
       ${wrapper}`;
     }
+    // chunk_wrapper supports "%n%"
     return `${chunkId}:${wrapper.replace(/\n+/g, '%n%')}`;
   });
+}
+
+/**
+ * @return A base wrapper including "\n". Replace them before use.
+ */
+function createBaseOutputWrapper(
+  entryConfig: EntryConfig,
+  level: CompilationLevel,
+  isRoot: boolean
+): string {
+  let wrapper = wrapperMarker;
+  if (entryConfig['output-wrapper']) {
+    wrapper = entryConfig['output-wrapper'];
+  }
+  if (entryConfig['global-scope-name'] && level !== 'WHITESPACE') {
+    const globalScope = entryConfig['global-scope-name'];
+    const globalScopeWrapper = stripIndents`
+        ${isRoot ? `var ${globalScope}={};` : ''}
+        (function(${GLOBAL_NAMESPACE}){
+        ${wrapperMarker}
+        }).call(this,${globalScope});`;
+    wrapper = wrapper.replace(wrapperMarker, globalScopeWrapper);
+  }
+  return wrapper;
 }
 
 function findTransitiveDeps(
