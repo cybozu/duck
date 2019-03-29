@@ -18,7 +18,6 @@ describe('compiler', () => {
       );
       const expected: CompilerOptions = {
         dependency_mode: 'PRUNE',
-        isolation_mode: 'IIFE',
         json_streams: 'OUT',
         compilation_level: 'WHITESPACE',
         js: ['/path/to/path1'],
@@ -59,7 +58,6 @@ describe('compiler', () => {
       );
       const expected: CompilerOptions = {
         dependency_mode: 'PRUNE',
-        isolation_mode: 'IIFE',
         compilation_level: 'SIMPLE',
         js: ['/path/to/path1', '!/extern1.js'],
         entry_point: ['/input1.js'],
@@ -70,7 +68,7 @@ describe('compiler', () => {
         debug: true,
         formatting: ['PRETTY_PRINT', 'PRINT_INPUT_DELIMITER'],
         rename_prefix_namespace: 'z', // "z" is hard coded
-        output_wrapper: 'var GSN={};%n%(function(z){%n%%output%%n%}).call(this,GSN);',
+        output_wrapper: 'var GSN={};(function(z){%output%}).call(this,GSN);',
         define: ['goog.BOOLEAN=false', 'goog.NUMBER=100', "goog.STRING='single-quoted'"],
         js_output_file: '/out.js',
         jscomp_error: ['checkRegExp', 'deprecated'],
