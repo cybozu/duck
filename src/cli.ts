@@ -161,15 +161,28 @@ export function run(processArgv: string[]): void {
         process.exit(1);
       }
     })
-    .command('build:soy', 'Compile Soy templates', buildSoyOptoins, async argv => {
-      const config = loadConfig(argv);
-      console.log('Compiling Soy templates...');
-      assertString(config.soyJarPath);
-      assertNonNullable(config.soyFileRoots);
-      assertNonNullable(config.soyOptions);
-      const templates = await buildSoy(config as BuildSoyConfig, argv.printConfig);
-      console.log(`${templates.length} templates compiled!`);
-    })
+    .command(
+      'build:soy',
+      'Compile Soy templates',
+      {
+        ...buildSoyOptoins,
+        watch: {
+          desc: 'Watch and compile updated files',
+          alias: 'w',
+          type: 'boolean',
+          default: false,
+        },
+      },
+      async argv => {
+        const config = loadConfig(argv);
+        console.log('Compiling Soy templates...');
+        assertString(config.soyJarPath);
+        assertNonNullable(config.soyFileRoots);
+        assertNonNullable(config.soyOptions);
+        const templates = await buildSoy(config as BuildSoyConfig, argv.printConfig);
+        console.log(`${templates.length} templates compiled!`);
+      }
+    )
     .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptoins, async argv => {
       const config = loadConfig(argv);
       console.log('Cleaning up soy.js...');
