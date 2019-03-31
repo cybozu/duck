@@ -252,7 +252,7 @@ function watch(config: DuckConfig) {
   const watcher = chokidar.watch(`${config.inputsRoot}/**/*.js`, {
     ignoreInitial: true,
   });
-  watcher.on('ready', () => console.log('Ready for watching JS...'));
+  watcher.on('ready', () => console.log('Ready for watching JS files...'));
   watcher.on('error', console.error);
   watcher.on('add', handleJsUpdated.bind(null, config));
   watcher.on('change', handleJsUpdated.bind(null, config));

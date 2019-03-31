@@ -17,7 +17,6 @@ const closureLibraryDir = {
 
 const config = {
   desc: 'A path to duck.config.js, the extension can be ommited',
-  alias: 'c',
   type: 'string',
   coerce: path.resolve,
 } as const;
@@ -55,6 +54,7 @@ const buildJsOptions = {
   config,
   concurrency: {
     desc: 'Concurrency limit for compiler',
+    alias: 'c',
     type: 'number',
     default: 1,
   },
