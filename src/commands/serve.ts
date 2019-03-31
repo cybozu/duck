@@ -1,4 +1,5 @@
 import flat from 'array.prototype.flat';
+import chokidar from 'chokidar';
 import {stripIndents} from 'common-tags';
 import cors from 'cors';
 import fastify from 'fastify';
@@ -16,7 +17,7 @@ import {
 } from '../compiler';
 import {DuckConfig} from '../duckconfig';
 import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from '../entryconfig';
-import {generateDepFileText} from '../gendeps';
+import {generateDepFileText, removeFromDepCache} from '../gendeps';
 import {
   closureLibraryUrlPath,
   compileUrlPath,
@@ -25,12 +26,18 @@ import {
   inputsUrlPath,
 } from '../urls';
 
+const entryIdToChunkCache: Map<string, Map<string, {[id: string]: CompilerOutput}>> = new Map();
+
 export function serve(config: DuckConfig) {
   const PORT = config.port;
   const HOST = config.host;
   const baseUrl = new URL(`http://${HOST}:${PORT}/`);
   const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
   const depsUrlBase = new URL(depsUrlPath, baseUrl);
+
+  if (config.watch) {
+    watch(config);
+  }
 
   const server = fastify({logger: {prettyPrint: true}});
 
@@ -181,8 +188,6 @@ export function serve(config: DuckConfig) {
       .send(chunkIdToOutput[requestedChunkId || rootChunkId].src);
   }
 
-  const entryIdToChunkCache: Map<string, Map<string, {[id: string]: CompilerOutput}>> = new Map();
-
   function replyPageRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
     // TODO: separate EntryConfigPage from EntryConfig
     const inputs = assertNonNullable(entryConfig.inputs);
@@ -201,16 +206,16 @@ export function serve(config: DuckConfig) {
     entryConfig: EntryConfig
   ) {
     const options = createCompilerOptionsForPage(entryConfig, false);
-    const chunkOutputs = await compileToJson(options);
-    if (chunkOutputs.length !== 1) {
+    const compileOutputs = await compileToJson(options);
+    if (compileOutputs.length !== 1) {
       throw new Error(
-        `Unexpectedly chunkOutputs.length must be 1, but actual ${chunkOutputs.length}`
+        `Unexpectedly chunkOutputs.length must be 1, but actual ${compileOutputs.length}`
       );
     }
     reply
       .code(200)
       .type('application/javascript')
-      .send(chunkOutputs[0].src);
+      .send(compileOutputs[0].src);
   }
 
   server.get<CompileQuery>(depsUrlPath, opts, async (request, reply) => {
@@ -241,4 +246,22 @@ export function serve(config: DuckConfig) {
   };
 
   start();
+}
+
+function watch(config: DuckConfig) {
+  const watcher = chokidar.watch(`${config.inputsRoot}/**/*.js`, {
+    ignoreInitial: true,
+  });
+  watcher.on('ready', () => console.log('Ready for watching JS...'));
+  watcher.on('error', console.error);
+  watcher.on('add', handleJsUpdated.bind(null, config));
+  watcher.on('change', handleJsUpdated.bind(null, config));
+  watcher.on('unlink', handleJsUpdated.bind(null, config));
+}
+
+async function handleJsUpdated(config: DuckConfig, filepath: string) {
+  console.log(`[JS_UPDATED]: ${filepath}`);
+  // TODO: invalidate only target
+  entryIdToChunkCache.clear();
+  removeFromDepCache(filepath);
 }

@@ -2,11 +2,19 @@ import assert = require('assert');
 import {depGraph} from 'google-closure-deps';
 import path from 'path';
 import {EntryConfig, PlovrMode} from '../src/entryconfig';
-import {generateDepFileText, getClosureLibraryDependencies, getDependencies} from '../src/gendeps';
+import {
+  clearDepCache,
+  generateDepFileText,
+  getClosureLibraryDependencies,
+  getDependencies,
+} from '../src/gendeps';
 
 const fixturesBaseDir = path.join(__dirname, 'fixtures');
 
 describe('gendeps', () => {
+  beforeEach(() => {
+    clearDepCache();
+  });
   describe('generateDepFileText()', () => {
     it('returns correct path', async () => {
       const inputsRoot = path.join(fixturesBaseDir, 'generateDepFileText');
