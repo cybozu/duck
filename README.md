@@ -31,8 +31,8 @@ Commands:
   duck clean:soy                  Remove all compiled .soy.js
 
 Options:
-  --version  Show version number                                                 [boolean]
-  --help     Show help                                                           [boolean]
+  -v, --version  Show version number                                             [boolean]
+  -h, --help     Show help                                                       [boolean]
 
 CLI options overwrite config file
 ```
@@ -45,13 +45,14 @@ duck serve [entryConfigDir]
 Start dev server
 
 Options:
-  --version            Show version number                                       [boolean]
-  --help               Show help                                                 [boolean]
-  --inputsRoot         A root directory to serve                                  [string]
-  --closureLibraryDir  Closure Library directory                                  [string]
-  --port, -p           A port number to listen                    [number] [default: 9810]
-  --host               A host to listen                    [string] [default: "localhost"]
-  --config, -c         A path to duck.config.js, the extension can be ommited     [string]
+  --inputsRoot          A root directory to serve                                 [string]
+  --closureLibraryDir   Closure Library directory                                 [string]
+  --skipInitialSoy, -s  Skip initial compiling of Soy templates [boolean] [default: false]
+  --port                A port number to listen                   [number] [default: 9810]
+  --host                A host to listen                   [string] [default: "localhost"]
+  --config              A path to duck.config.js, the extension can be ommited    [string]
+  -v, --version         Show version number                                      [boolean]
+  -h, --help            Show help                                                [boolean]
 ```
 
 ### `duck build`
@@ -62,15 +63,15 @@ duck build [entryConfigDir]
 Compile Soy and JS files
 
 Options:
-  --version            Show version number                                       [boolean]
-  --help               Show help                                                 [boolean]
   --entryConfigs, -e   Entry config files (this option ignores entryConfigDir)     [array]
   --closureLibraryDir  Closure Library directory                                  [string]
-  --config, -c         A path to duck.config.js, the extension can be ommited     [string]
-  --concurrency        Concurrency limit for compiler                [number] [default: 1]
+  --config             A path to duck.config.js, the extension can be ommited     [string]
+  --concurrency, -c    Concurrency limit for compiler                [number] [default: 1]
   --printConfig, -p    Print effective configs for compilers    [boolean] [default: false]
   --soyJarPath         A path to Soy.jar                                          [string]
   --soyFileRoots       Root directories of soy files                               [array]
+  -v, --version        Show version number                                       [boolean]
+  -h, --help           Show help                                                 [boolean]
 ```
 
 Also see [`examples/chunks`](examples/chunks).
