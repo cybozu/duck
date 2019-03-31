@@ -194,6 +194,7 @@ export function run(processArgv: string[]): void {
     .wrap(90)
     .strict()
     .help()
+    .alias('v', 'version')
     .alias('h', 'help')
     .parse(processArgv);
 }
