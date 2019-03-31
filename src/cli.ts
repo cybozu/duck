@@ -36,6 +36,13 @@ const watch = {
   default: false,
 } as const;
 
+const printConfig = {
+  desc: 'Print effective configs for compilers',
+  alias: 'p',
+  type: 'boolean',
+  default: false,
+} as const;
+
 const buildJsOptions = {
   entryConfigDir,
   entryConfigs: {
@@ -51,12 +58,7 @@ const buildJsOptions = {
     type: 'number',
     default: 1,
   },
-  printConfig: {
-    desc: 'Print effective config for Closure Compiler',
-    alias: 'p',
-    type: 'boolean',
-    default: false,
-  },
+  printConfig,
 } as const;
 
 const buildSoyOptoins = {
@@ -72,12 +74,7 @@ const buildSoyOptoins = {
   },
   config,
   watch,
-  printConfig: {
-    desc: 'Print effective config for SoyToJs compiler',
-    alias: 'p',
-    type: 'boolean',
-    default: false,
-  },
+  printConfig,
 } as const;
 
 export function run(processArgv: string[]): void {
@@ -95,7 +92,6 @@ export function run(processArgv: string[]): void {
         closureLibraryDir,
         port: {
           desc: 'A port number to listen',
-          alias: 'p',
           type: 'number',
           default: 9810,
         },
@@ -128,12 +124,6 @@ export function run(processArgv: string[]): void {
         watch: {
           desc: '--watch is not supported in build command',
           hidden: true,
-        },
-        printConfig: {
-          desc: 'Print effective configs for compilers',
-          alias: 'p',
-          type: 'boolean',
-          default: false,
         },
       },
       async argv => {
