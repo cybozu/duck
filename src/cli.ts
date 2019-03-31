@@ -196,5 +196,6 @@ export function run(processArgv: string[]): void {
     .wrap(90)
     .strict()
     .help()
+    .alias('h', 'help')
     .parse(processArgv);
 }
