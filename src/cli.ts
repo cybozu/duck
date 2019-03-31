@@ -29,6 +29,13 @@ const entryConfigDir = {
   coerce: path.resolve,
 } as const;
 
+const watch = {
+  desc: 'Re-compile incrementally when files change',
+  alias: 'w',
+  type: 'boolean',
+  default: false,
+} as const;
+
 const buildJsOptions = {
   entryConfigDir,
   entryConfigs: {
@@ -64,6 +71,7 @@ const buildSoyOptoins = {
     coerce: path.resolve,
   },
   config,
+  watch,
   printConfig: {
     desc: 'Print effective config for SoyToJs compiler',
     alias: 'p',
@@ -100,6 +108,7 @@ export function run(processArgv: string[]): void {
       },
       async argv => {
         const config = loadConfig(argv);
+        config.watch = true;
         if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
           console.log('Compiling Soy templates...');
           await buildSoy(config as BuildSoyConfig);
@@ -116,6 +125,10 @@ export function run(processArgv: string[]): void {
       {
         ...buildJsOptions,
         ...buildSoyOptoins,
+        watch: {
+          desc: '--watch is not supported in build command',
+          hidden: true,
+        },
         printConfig: {
           desc: 'Print effective configs for compilers',
           alias: 'p',

@@ -10,6 +10,7 @@ export interface DuckConfig {
   soyOptions?: SoyToJsOptions;
   soyFileRoots?: string[];
   concurrency: number;
+  watch?: boolean;
   host: string;
   port: number;
 }

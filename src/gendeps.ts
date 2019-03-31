@@ -7,8 +7,7 @@ import util from 'util';
 import {EntryConfig} from './entryconfig';
 import {googBaseUrlPath, inputsUrlPath} from './urls';
 
-const depFileTextCache: Map<string, string> = new Map();
-const dependenciesCache: Map<string, depGraph.Dependency[]> = new Map();
+const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> = new Map();
 
 /**
  * Generate deps.js source text for RAW mode.
@@ -23,10 +22,6 @@ export async function generateDepFileText(
   closureLibraryDir: string,
   inputsRoot: string
 ): Promise<string> {
-  // TODO: invalidate updated files
-  if (depFileTextCache.has(entryConfig.id)) {
-    return depFileTextCache.get(entryConfig.id)!;
-  }
   const dependencies = await getDependencies(entryConfig, closureLibraryDir);
   const googBaseDirVirtualPath = path.dirname(
     path.resolve(inputsRoot, path.relative(inputsUrlPath, googBaseUrlPath))
@@ -43,7 +38,6 @@ export async function generateDepFileText(
   scriptDeps.forEach(dep => {
     dep.type = depGraph.DependencyType.SCRIPT;
   });
-  depFileTextCache.set(entryConfig.id, depFileText);
   return depFileText;
 }
 
@@ -54,10 +48,6 @@ export async function getDependencies(
   entryConfig: EntryConfig,
   ignoreDir?: string
 ): Promise<depGraph.Dependency[]> {
-  // TODO: invalidate updated files
-  if (dependenciesCache.has(entryConfig.id)) {
-    return dependenciesCache.get(entryConfig.id)!;
-  }
   // TODO: uniq
   const parseResultPromises = entryConfig.paths.map(async p => {
     const ignoreDirs: string[] = [];
@@ -78,17 +68,27 @@ export async function getDependencies(
           }
           return true;
         })
-        .map(parser.parseFileAsync)
+        .map(p => {
+          if (pathToDependencyCache.has(p)) {
+            console.debug(`dep cache hit: ${p}`);
+            return pathToDependencyCache.get(p)!;
+          } else {
+            const promise = parser.parseFileAsync(p).then(result => {
+              if (result.hasFatalError) {
+                throw new Error(`Fatal parse error: ${p}`);
+              }
+              if (result.dependencies.length > 1) {
+                throw new Error(`A JS file must have only one dependency: ${p}`);
+              }
+              return result.dependencies[0];
+            });
+            pathToDependencyCache.set(p, promise);
+            return promise;
+          }
+        })
     );
   });
-  const results = flat(await Promise.all(parseResultPromises));
-  if (results.some(result => result.hasFatalError)) {
-    // TODO: create an custom error and send `errors`
-    throw new Error('Fatal parse error');
-  }
-  const deps = flat(results.map(r => r.dependencies));
-  dependenciesCache.set(entryConfig.id, deps);
-  return deps;
+  return flat(await Promise.all(parseResultPromises));
 }
 
 /**
@@ -106,4 +106,11 @@ export async function getClosureLibraryDependencies(
   const googBaseDir = path.dirname(googBasePath);
   result.dependencies.forEach(dep => dep.setClosurePath(googBaseDir));
   return result.dependencies;
+}
+
+export function removeFromDepCache(filepath: string): boolean {
+  return pathToDependencyCache.delete(filepath);
+}
+export function clearDepCache(): void {
+  pathToDependencyCache.clear();
 }
