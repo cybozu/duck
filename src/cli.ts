@@ -2,7 +2,7 @@ import path from 'path';
 import yargs from 'yargs';
 import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
 import {buildJs} from './commands/buildJs';
-import {buildSoy, BuildSoyConfig} from './commands/buildSoy';
+import {buildSoy, BuildSoyConfig, watchSoy} from './commands/buildSoy';
 import {cleanSoy, CleanSoyConfig} from './commands/cleanSoy';
 import {serve} from './commands/serve';
 import {loadConfig} from './duckconfig';
@@ -90,6 +90,12 @@ export function run(processArgv: string[]): void {
           coerce: path.resolve,
         },
         closureLibraryDir,
+        skipInitialSoy: {
+          desc: 'Skip initial compiling of Soy templates',
+          alias: 's',
+          type: 'boolean',
+          default: false,
+        },
         port: {
           desc: 'A port number to listen',
           type: 'number',
@@ -104,10 +110,12 @@ export function run(processArgv: string[]): void {
       },
       async argv => {
         const config = loadConfig(argv);
-        config.watch = true;
         if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
-          console.log('Compiling Soy templates...');
-          await buildSoy(config as BuildSoyConfig);
+          if (!argv.skipInitialSoy) {
+            console.log('Compiling Soy templates...');
+            await buildSoy(config as BuildSoyConfig);
+          }
+          watchSoy(config as BuildSoyConfig);
         } else {
           console.log('Skip compiling Soy templates. (missing config)');
         }

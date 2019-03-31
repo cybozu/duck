@@ -28,15 +28,15 @@ import {
 
 const entryIdToChunkCache: Map<string, Map<string, {[id: string]: CompilerOutput}>> = new Map();
 
-export function serve(config: DuckConfig) {
+export function serve(config: DuckConfig, watch = true) {
   const PORT = config.port;
   const HOST = config.host;
   const baseUrl = new URL(`http://${HOST}:${PORT}/`);
   const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
   const depsUrlBase = new URL(depsUrlPath, baseUrl);
 
-  if (config.watch) {
-    watch(config);
+  if (watch) {
+    watchJs(config);
   }
 
   const server = fastify({logger: {prettyPrint: true}});
@@ -248,7 +248,7 @@ export function serve(config: DuckConfig) {
   start();
 }
 
-function watch(config: DuckConfig) {
+function watchJs(config: DuckConfig) {
   const watcher = chokidar.watch(`${config.inputsRoot}/**/*.js`, {
     ignoreInitial: true,
   });

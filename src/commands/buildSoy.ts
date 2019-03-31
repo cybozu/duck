@@ -8,7 +8,7 @@ import {DuckConfig} from '../duckconfig';
 import {compileSoy} from '../soy';
 
 export type BuildSoyConfig = Required<
-  Pick<DuckConfig, 'soyFileRoots' | 'soyJarPath' | 'soyOptions' | 'watch'>
+  Pick<DuckConfig, 'soyFileRoots' | 'soyJarPath' | 'soyOptions'>
 >;
 
 /**
@@ -19,9 +19,6 @@ export type BuildSoyConfig = Required<
 export async function buildSoy(config: BuildSoyConfig, printConfig = false): Promise<string[]> {
   const soyFiles = await findSoyFiles(config);
   await compileSoy(soyFiles, config, printConfig);
-  if (config.watch) {
-    watch(config);
-  }
   return soyFiles;
 }
 
@@ -34,7 +31,7 @@ async function findSoyFiles(config: BuildSoyConfig): Promise<string[]> {
   return soyFiles;
 }
 
-function watch(config: BuildSoyConfig) {
+export function watchSoy(config: BuildSoyConfig) {
   const watcher = chokidar.watch(config.soyFileRoots.map(p => `${p}/**/*.soy`), {
     ignoreInitial: true,
   });
