@@ -64,7 +64,7 @@ describe('gendeps', () => {
         ])
       );
     });
-    it('ignoreDir', async () => {
+    it('ignoreDirs', async () => {
       const path1 = path.join(fixturesDir, 'path1');
       const path2 = path.join(fixturesDir, 'path2');
       const closureDir = path.join(fixturesDir, 'closure');
@@ -73,7 +73,8 @@ describe('gendeps', () => {
         mode: PlovrMode.RAW,
         paths: [path1, path2, closureDir],
       };
-      const results = await getDependencies(entryConfig, closureDir);
+      const results = await getDependencies(entryConfig, [closureDir]);
+      assert.equal(results.length, 4);
       assert.deepEqual(
         new Set(results),
         new Set([
@@ -94,7 +95,8 @@ describe('gendeps', () => {
         paths: [path1, path2, closureDir],
         'test-excludes': [path2],
       };
-      const results = await getDependencies(entryConfig, closureDir);
+      const results = await getDependencies(entryConfig, [closureDir]);
+      assert.equal(results.length, 3);
       assert.deepEqual(
         new Set(results),
         new Set([

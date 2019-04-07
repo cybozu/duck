@@ -17,7 +17,7 @@ import {
 } from '../compiler';
 import {DuckConfig} from '../duckconfig';
 import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from '../entryconfig';
-import {generateDepFileText, removeFromDepCache} from '../gendeps';
+import {generateDepFileText, removeDepCacheByPath, restoreDepsJs} from '../gendeps';
 import {
   closureLibraryUrlPath,
   compileUrlPath,
@@ -37,6 +37,12 @@ export function serve(config: DuckConfig, watch = true) {
 
   if (watch) {
     watchJs(config);
+  }
+
+  if (config.depsJs) {
+    restoreDepsJs(config.depsJs, config.closureLibraryDir).then(() => {
+      console.log('deps.js restored');
+    });
   }
 
   const server = fastify({logger: {prettyPrint: true}});
@@ -263,5 +269,5 @@ async function handleJsUpdated(config: DuckConfig, filepath: string) {
   console.log(`[JS_UPDATED]: ${filepath}`);
   // TODO: invalidate only target
   entryIdToChunkCache.clear();
-  removeFromDepCache(filepath);
+  removeDepCacheByPath(filepath);
 }

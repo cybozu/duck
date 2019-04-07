@@ -1,6 +1,7 @@
 import path from 'path';
 import yargs from 'yargs';
 import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
+import {buildDeps} from './commands/buildDeps';
 import {buildJs} from './commands/buildJs';
 import {buildSoy, BuildSoyConfig, watchSoy} from './commands/buildSoy';
 import {cleanSoy, CleanSoyConfig} from './commands/cleanSoy';
@@ -42,6 +43,12 @@ const printConfig = {
   default: false,
 } as const;
 
+const depsJs = {
+  desc: 'A path to deps.js to save and load',
+  type: 'string',
+  coerce: path.resolve,
+} as const;
+
 const buildJsOptions = {
   entryConfigDir,
   entryConfigs: {
@@ -58,6 +65,7 @@ const buildJsOptions = {
     type: 'number',
     default: 1,
   },
+  depsJs,
   printConfig,
 } as const;
 
@@ -90,6 +98,7 @@ export function run(processArgv: readonly string[]): void {
           coerce: path.resolve,
         },
         closureLibraryDir,
+        depsJs,
         skipInitialSoy: {
           desc: 'Skip initial compiling of Soy templates',
           alias: 's',
@@ -119,7 +128,7 @@ export function run(processArgv: readonly string[]): void {
         } else {
           console.log('Skip compiling Soy templates. (missing config)');
         }
-        console.log('Starging dev server...');
+        console.log('Starting dev server...');
         serve(config);
       }
     )
@@ -181,6 +190,30 @@ export function run(processArgv: readonly string[]): void {
       const templates = await buildSoy(config as BuildSoyConfig, argv.printConfig);
       console.log(`${templates.length} templates compiled!`);
     })
+    .command(
+      'build:deps',
+      'Generate deps.js',
+      {
+        depsJs,
+        config,
+      },
+      async argv => {
+        const config = loadConfig(argv);
+        try {
+          await buildDeps(config);
+          if (argv.depsJs) {
+            console.log(`Generated: ${argv.depsJs}`);
+          }
+        } catch (e) {
+          if (e instanceof Error) {
+            console.error(e.message);
+          } else {
+            console.error(e);
+          }
+          process.exit(1);
+        }
+      }
+    )
     .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptoins, async argv => {
       const config = loadConfig(argv);
       console.log('Cleaning up soy.js...');
