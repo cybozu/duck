@@ -14,29 +14,29 @@ export interface CompilerOptions {
   [idx: string]: any;
   // 'LOOSE' and 'STRICT' are deprecated. Use 'PRUNE_LEGACY' and 'PRUNE' respectedly.
   dependency_mode?: 'NONE' | 'SORT_ONLY' | 'PRUNE_LEGACY' | 'PRUNE';
-  entry_point?: string[];
+  entry_point?: readonly string[];
   compilation_level?: CompilationLevel;
-  js?: string[];
+  js?: readonly string[];
   js_output_file?: string;
   // chunk (module): `name:num-js-files[:[dep,...][:]]`, ex) "chunk1:3:app"
-  chunk?: string[];
+  chunk?: readonly string[];
   language_in?: string;
   language_out?: string;
   json_streams?: 'IN' | 'OUT' | 'BOTH';
   warning_level?: 'QUIET' | 'DEFAULT' | 'VERBOSE';
   debug?: boolean;
-  formatting?: CompilerOptionsFormattingType[];
-  define?: string[];
-  externs?: string[];
+  formatting?: readonly CompilerOptionsFormattingType[];
+  define?: readonly string[];
+  externs?: readonly string[];
   // chunkname:wrappercode
-  chunk_wrapper?: string[];
+  chunk_wrapper?: readonly string[];
   chunk_output_path_prefix?: string;
   isolation_mode?: 'NONE' | 'IIFE';
   output_wrapper?: string;
   rename_prefix_namespace?: string;
-  jscomp_error?: string[];
-  jscomp_warning?: string[];
-  jscomp_off?: string[];
+  jscomp_error?: readonly string[];
+  jscomp_warning?: readonly string[];
+  jscomp_off?: readonly string[];
   flagfile?: string;
 }
 
@@ -95,10 +95,11 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   } else {
     // for pages
     opts.dependency_mode = 'PRUNE';
-    opts.js = entryConfig.paths.slice();
+    const js = entryConfig.paths.slice();
     if (entryConfig.externs) {
-      opts.js.push(...entryConfig.externs.map(extern => `!${extern}`));
+      js.push(...entryConfig.externs.map(extern => `!${extern}`));
     }
+    opts.js = js;
     opts.entry_point = assertNonNullable(entryConfig.inputs).slice();
     if (outputToFile) {
       if (!entryConfig['output-file']) {
@@ -257,7 +258,7 @@ function createOutputWrapper(entryConfig: EntryConfig, level: CompilationLevel):
 
 function createChunkWrapper(
   entryConfig: EntryConfig,
-  sortedChunkIds: string[],
+  sortedChunkIds: readonly string[],
   compilationLevel: CompilationLevel,
   createModuleUris: (id: string) => string[]
 ): string[] {
@@ -302,9 +303,9 @@ function createBaseOutputWrapper(
 }
 
 function findTransitiveDeps(
-  sortedChunkIds: string[],
-  dependencies: depGraph.Dependency[],
-  modules: {[id: string]: {inputs: string[]; deps: string[]}}
+  sortedChunkIds: readonly string[],
+  dependencies: readonly depGraph.Dependency[],
+  modules: {[id: string]: {inputs: readonly string[]; deps: readonly string[]}}
 ): Map<string, Set<string>> {
   const pathToDep = new Map(
     dependencies.map(dep => [dep.path, dep] as [string, depGraph.Dependency])
@@ -326,7 +327,7 @@ function findTransitiveDeps(
 }
 
 function splitDepsIntoChunks(
-  sortedChunkIds: string[],
+  sortedChunkIds: readonly string[],
   chunkToTransitiveDepPathSet: Map<string, Set<string>>,
   dag: Dag
 ) {
@@ -358,7 +359,7 @@ export function convertModuleInfos(
   const moduleUris: {[id: string]: string[]} = {};
   for (const id in modules) {
     const module = modules[id];
-    moduleInfo[id] = module.deps;
+    moduleInfo[id] = module.deps.slice();
     moduleUris[id] = createModuleUris(id);
   }
   return {moduleInfo, moduleUris};

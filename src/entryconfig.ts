@@ -7,15 +7,15 @@ import {Dag, Node} from './dag';
 export interface EntryConfig {
   id: string;
   mode: PlovrMode;
-  paths: string[];
+  paths: readonly string[];
   inherits?: string;
-  inputs?: string[];
+  inputs?: readonly string[];
   modules?: {
     [id: string]: {
       // string is normalized to string[]
-      inputs: string[];
+      inputs: readonly string[];
       // undefined, null and string are normalized to string[]
-      deps: string[];
+      deps: readonly string[];
     };
   };
   // like "../compiled/modules/%s.js",
@@ -25,14 +25,14 @@ export interface EntryConfig {
   define?: {
     [key: string]: boolean | number | string;
   };
-  externs?: string[];
+  externs?: readonly string[];
   'language-in'?: string;
   'language-out'?: string;
   level?: 'QUIET' | 'DEFAULT' | 'VERBOSE';
   debug?: boolean;
   'pretty-print'?: boolean;
   'print-input-delimiter'?: boolean;
-  'test-excludes'?: string[];
+  'test-excludes'?: readonly string[];
   'output-file'?: string;
   checks?: {
     [error: string]: 'OFF' | 'WARNING' | 'ERROR';

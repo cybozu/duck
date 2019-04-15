@@ -77,7 +77,7 @@ const buildSoyOptoins = {
   printConfig,
 } as const;
 
-export function run(processArgv: string[]): void {
+export function run(processArgv: readonly string[]): void {
   yargs
     .command(
       'serve [entryConfigDir]',

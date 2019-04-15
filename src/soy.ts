@@ -9,13 +9,13 @@ export interface SoyToJsOptions {
   shouldGenerateJsdoc?: boolean;
   shouldProvideRequireSoyNamespaces?: boolean;
   bidiGlobalDir?: 1 | -1;
-  pluginModules?: string[];
+  pluginModules?: readonly string[];
 }
 
 type SoyConfig = Required<Pick<DuckConfig, 'soyJarPath' | 'soyOptions'>>;
 
 export async function compileSoy(
-  soyFiles: string[],
+  soyFiles: readonly string[],
   config: SoyConfig,
   printConfig = false
 ): Promise<void> {
@@ -27,7 +27,10 @@ export async function compileSoy(
   await execa('java', soyArgs);
 }
 
-export function toSoyArgs(soyFiles: string[], {soyJarPath, soyOptions}: SoyConfig): string[] {
+export function toSoyArgs(
+  soyFiles: readonly string[],
+  {soyJarPath, soyOptions}: SoyConfig
+): string[] {
   const args = ['-classpath', soyJarPath, 'com.google.template.soy.SoyToJsSrcCompiler'];
   Object.entries(soyOptions).forEach(([key, value]) => {
     if (typeof value === 'boolean' && value) {

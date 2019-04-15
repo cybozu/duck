@@ -189,7 +189,7 @@ export namespace depGraph {
     /** @const */
     moduleResolver: ModuleResolver;
 
-    constructor(dependencies: Dependency[], moduleResolver?: ModuleResolver);
+    constructor(dependencies: readonly Dependency[], moduleResolver?: ModuleResolver);
 
     /**
      * Validates the dependency graph. Throws an error if the graph is invalid.

@@ -54,7 +54,7 @@ export async function getDependencies(
     if (ignoreDir) {
       ignoreDirs.push(path.join(ignoreDir, '*'));
     }
-    let testExcludes: string[] | null = null;
+    let testExcludes: readonly string[] | null = null;
     if (entryConfig['test-excludes']) {
       testExcludes = entryConfig['test-excludes'];
     }

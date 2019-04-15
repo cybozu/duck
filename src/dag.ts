@@ -10,7 +10,7 @@ export class Node {
    * @param id
    * @param deps IDs of the nodes on which this node depends
    */
-  constructor(id: string, deps: string[] = []) {
+  constructor(id: string, deps: readonly string[] = []) {
     this.id = id;
     this.deps = deps.slice();
   }
@@ -26,7 +26,7 @@ export class Dag {
   private lcaCache: Map<string, Map<string, Node>> = new Map();
   private sortedNodes: Node[] = [];
 
-  constructor(nodes: Node[]) {
+  constructor(nodes: readonly Node[]) {
     let root: Node | null = null;
     if (nodes.length < 1) {
       throw new Error('The `nodes` is empty');
@@ -106,7 +106,7 @@ export class Dag {
    * @return One of LCAs (Least Common Ancestors) of the nodes.
    * In general, LCA of DAG is not unique.
    */
-  getLcaNode(...nodeIds: string[]): Node {
+  getLcaNode(...nodeIds: readonly string[]): Node {
     if (nodeIds.length < 1) {
       throw new Error('Specify one node at least');
     } else if (nodeIds.length < 2) {

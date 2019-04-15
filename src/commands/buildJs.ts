@@ -15,7 +15,7 @@ import {EntryConfig, loadEntryConfig} from '../entryconfig';
  */
 export async function buildJs(
   config: DuckConfig,
-  entryConfigs?: string[],
+  entryConfigs?: readonly string[],
   printConfig = false
 ): Promise<any> {
   const entryConfigPaths = entryConfigs

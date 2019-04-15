@@ -106,7 +106,7 @@ export function serve(config: DuckConfig, watch = true) {
     }
   });
 
-  function inputsToUrisForRaw(inputs: string[]): string[] {
+  function inputsToUrisForRaw(inputs: readonly string[]): string[] {
     return inputs
       .map(input => path.relative(config.inputsRoot, input))
       .map(input => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
