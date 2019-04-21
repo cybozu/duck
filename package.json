@@ -51,7 +51,6 @@
     "@types/rimraf": "^2.0.2",
     "@types/serve-static": "^1.13.2",
     "@types/strip-json-comments": "0.0.30",
-    "@types/tempy": "^0.2.0",
     "@types/yargs": "^13.0.0",
     "eslint": "^5.16.0",
     "eslint-config-teppeis": "^9.5.1",
