@@ -226,7 +226,7 @@ export async function createCompilerOptionsForChunks(
   const modules = assertNonNullable(entryConfig.modules);
   const dependencies = flat(
     await Promise.all([
-      getDependencies(entryConfig, config.closureLibraryDir),
+      getDependencies(entryConfig, [config.closureLibraryDir]),
       getClosureLibraryDependencies(config.closureLibraryDir),
     ])
   );

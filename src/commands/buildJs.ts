@@ -9,6 +9,7 @@ import {
 } from '../compiler';
 import {DuckConfig} from '../duckconfig';
 import {EntryConfig, loadEntryConfig} from '../entryconfig';
+import {restoreDepsJs} from '../gendeps';
 
 /**
  * @throws If compiler throws errors
@@ -18,6 +19,7 @@ export async function buildJs(
   entryConfigs?: readonly string[],
   printConfig = false
 ): Promise<any> {
+  let depsJsRestored = false;
   const entryConfigPaths = entryConfigs
     ? entryConfigs
     : await findEntryConfigs(assertString(config.entryConfigDir));
@@ -26,6 +28,10 @@ export async function buildJs(
     limit(async () => {
       const entryConfig = await loadEntryConfig(entryConfigPath);
       if (entryConfig.modules) {
+        if (config.depsJs && !depsJsRestored) {
+          await restoreDepsJs(config.depsJs, config.closureLibraryDir);
+          depsJsRestored = true;
+        }
         await compileChunk(entryConfig, config, printConfig);
       } else {
         await compilePage(entryConfig, printConfig);

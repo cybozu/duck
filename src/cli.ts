@@ -1,8 +1,10 @@
 import path from 'path';
 import yargs from 'yargs';
 import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
+import {buildDeps} from './commands/buildDeps';
 import {buildJs} from './commands/buildJs';
 import {buildSoy, BuildSoyConfig, watchSoy} from './commands/buildSoy';
+import {cleanDeps} from './commands/cleanDeps';
 import {cleanSoy, CleanSoyConfig} from './commands/cleanSoy';
 import {serve} from './commands/serve';
 import {loadConfig} from './duckconfig';
@@ -42,6 +44,12 @@ const printConfig = {
   default: false,
 } as const;
 
+const depsJs = {
+  desc: 'A path to deps.js to save and load',
+  type: 'string',
+  coerce: path.resolve,
+} as const;
+
 const buildJsOptions = {
   entryConfigDir,
   entryConfigs: {
@@ -58,10 +66,11 @@ const buildJsOptions = {
     type: 'number',
     default: 1,
   },
+  depsJs,
   printConfig,
 } as const;
 
-const buildSoyOptoins = {
+const buildSoyOptions = {
   soyJarPath: {
     desc: 'A path to Soy.jar',
     type: 'string',
@@ -77,6 +86,11 @@ const buildSoyOptoins = {
   printConfig,
 } as const;
 
+const buildDepsOptions = {
+  depsJs,
+  config,
+} as const;
+
 export function run(processArgv: readonly string[]): void {
   yargs
     .command(
@@ -90,6 +104,7 @@ export function run(processArgv: readonly string[]): void {
           coerce: path.resolve,
         },
         closureLibraryDir,
+        depsJs,
         skipInitialSoy: {
           desc: 'Skip initial compiling of Soy templates',
           alias: 's',
@@ -119,7 +134,7 @@ export function run(processArgv: readonly string[]): void {
         } else {
           console.log('Skip compiling Soy templates. (missing config)');
         }
-        console.log('Starging dev server...');
+        console.log('Starting dev server...');
         serve(config);
       }
     )
@@ -128,7 +143,7 @@ export function run(processArgv: readonly string[]): void {
       'Compile Soy and JS files',
       {
         ...buildJsOptions,
-        ...buildSoyOptoins,
+        ...buildSoyOptions,
         watch: {
           desc: '--watch is not supported in build command',
           hidden: true,
@@ -172,7 +187,7 @@ export function run(processArgv: readonly string[]): void {
         process.exit(1);
       }
     })
-    .command('build:soy', 'Compile Soy templates', buildSoyOptoins, async argv => {
+    .command('build:soy', 'Compile Soy templates', buildSoyOptions, async argv => {
       const config = loadConfig(argv);
       console.log('Compiling Soy templates...');
       assertString(config.soyJarPath);
@@ -181,11 +196,32 @@ export function run(processArgv: readonly string[]): void {
       const templates = await buildSoy(config as BuildSoyConfig, argv.printConfig);
       console.log(`${templates.length} templates compiled!`);
     })
-    .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptoins, async argv => {
+    .command('build:deps', 'Generate deps.js', buildDepsOptions, async argv => {
+      const config = loadConfig(argv);
+      try {
+        await buildDeps(config);
+        if (argv.depsJs) {
+          console.log(`Generated: ${argv.depsJs}`);
+        }
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error(e.message);
+        } else {
+          console.error(e);
+        }
+        process.exit(1);
+      }
+    })
+    .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptions, async argv => {
       const config = loadConfig(argv);
       console.log('Cleaning up soy.js...');
       assertNonNullable(config.soyOptions);
       await cleanSoy(config as CleanSoyConfig);
+    })
+    .command('clean:deps', 'Remove generated deps.js', buildDepsOptions, async argv => {
+      const config = loadConfig(argv);
+      console.log('Cleaning up deps.js...');
+      await cleanDeps(assertString(config.depsJs));
     })
     .demandCommand(1, 1)
     .scriptName('duck')

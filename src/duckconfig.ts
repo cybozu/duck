@@ -5,6 +5,8 @@ import {SoyToJsOptions} from './soy';
 export interface DuckConfig {
   closureLibraryDir: string;
   inputsRoot: string;
+  depsJs?: string;
+  depsJsIgnoreDirs?: readonly string[];
   entryConfigDir: string;
   soyJarPath?: string;
   soyOptions?: SoyToJsOptions;
@@ -32,9 +34,9 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPath(config, configDir, 'inputsRoot');
     toAbsPath(config, configDir, 'entryConfigDir');
     toAbsPath(config, configDir, 'soyJarPath');
-    if (config.soyFileRoots) {
-      config.soyFileRoots = config.soyFileRoots.map(root => path.resolve(configDir, root));
-    }
+    toAbsPath(config, configDir, 'depsJs');
+    toAbsPathArray(config, configDir, 'depsJsIgnoreDirs');
+    toAbsPathArray(config, configDir, 'soyFileRoots');
     if (config.soyOptions) {
       const {inputPrefix} = config.soyOptions;
       if (inputPrefix) {
@@ -64,6 +66,17 @@ function toAbsPath<T>(config: T, baseDir: string, key: PickKeysByValue<Required<
   }
 }
 
+function toAbsPathArray<T>(
+  config: T,
+  baseDir: string,
+  key: PickKeysByValue<Required<T>, string[] | readonly string[]>
+) {
+  const values = config[key];
+  if (Array.isArray(values)) {
+    // "as any": TypeScript can not handle conditional type
+    config[key] = values.map(value => path.resolve(baseDir, value)) as any;
+  }
+}
 /**
  * @example
  * type Props = {name: string; age: number; visible: boolean};
