@@ -28,7 +28,9 @@ Commands:
   duck build [entryConfigDir]     Compile Soy and JS files
   duck build:js [entryConfigDir]  Compile JS files
   duck build:soy                  Compile Soy templates
+  duck build:deps                 Generate deps.js
   duck clean:soy                  Remove all compiled .soy.js
+  duck clean:deps                 Remove generated deps.js
 
 Options:
   -v, --version  Show version number                                             [boolean]
@@ -47,6 +49,7 @@ Start dev server
 Options:
   --inputsRoot          A root directory to serve                                 [string]
   --closureLibraryDir   Closure Library directory                                 [string]
+  --depsJs              A path to deps.js to save and load                        [string]
   --skipInitialSoy, -s  Skip initial compiling of Soy templates [boolean] [default: false]
   --port                A port number to listen                   [number] [default: 9810]
   --host                A host to listen                   [string] [default: "localhost"]
@@ -67,6 +70,7 @@ Options:
   --closureLibraryDir  Closure Library directory                                  [string]
   --config             A path to duck.config.js, the extension can be ommited     [string]
   --concurrency, -c    Concurrency limit for compiler                [number] [default: 1]
+  --depsJs             A path to deps.js to save and load                         [string]
   --printConfig, -p    Print effective configs for compilers    [boolean] [default: false]
   --soyJarPath         A path to Soy.jar                                          [string]
   --soyFileRoots       Root directories of soy files                               [array]
