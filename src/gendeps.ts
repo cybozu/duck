@@ -1,13 +1,11 @@
 import flat from 'array.prototype.flat';
-import fs from 'fs';
+import {promises as fs} from 'fs';
 import {depFile, depGraph, parser} from 'google-closure-deps';
 import path from 'path';
 import recursive from 'recursive-readdir';
-import util from 'util';
 import {EntryConfig} from './entryconfig';
 import {googBaseUrlPath, inputsUrlPath} from './urls';
 
-const readFile = util.promisify(fs.readFile);
 const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> = new Map();
 
 /**
@@ -58,7 +56,7 @@ export function generateDepFileTextFromDeps(
 export async function restoreDepsJs(depsJsPath: string, closureLibraryDir: string): Promise<void> {
   let depsText = '';
   try {
-    depsText = await readFile(depsJsPath, 'utf8');
+    depsText = await fs.readFile(depsJsPath, 'utf8');
   } catch (e) {
     throw new Error(`${depsJsPath} doesn't exist. Run \`duck build:deps\`. ${e}`);
   }
@@ -138,7 +136,7 @@ export async function getClosureLibraryDependencies(
   closureLibraryDir: string
 ): Promise<depGraph.Dependency[]> {
   const googDepsPath = path.join(closureLibraryDir, 'closure', 'goog', 'deps.js');
-  const depsContent = await readFile(googDepsPath, 'utf8');
+  const depsContent = await fs.readFile(googDepsPath, 'utf8');
   const result = parser.parseDependencyFile(depsContent, googDepsPath);
   if (result.errors.length > 0) {
     throw new Error(`Fail to parse deps.js of Closure Library: ${result.errors.join(', ')}`);
