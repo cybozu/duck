@@ -31,6 +31,7 @@ Commands:
   duck build:deps                 Generate deps.js
   duck clean:soy                  Remove all compiled .soy.js
   duck clean:deps                 Remove generated deps.js
+  duck completion                 Generate completion script for bash/zsh
 
 Options:
   -v, --version  Show version number                                             [boolean]

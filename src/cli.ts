@@ -223,6 +223,7 @@ export function run(processArgv: readonly string[]): void {
       console.log('Cleaning up deps.js...');
       await cleanDeps(assertString(config.depsJs));
     })
+    .completion('completion', 'Generate completion script for bash/zsh')
     .demandCommand(1, 1)
     .scriptName('duck')
     .epilog('CLI options overwrite config file')
