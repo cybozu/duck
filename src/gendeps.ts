@@ -100,7 +100,6 @@ export async function getDependencies(
         })
         .map(p => {
           if (pathToDependencyCache.has(p)) {
-            // console.debug(`dep cache hit: ${p}`);
             return pathToDependencyCache.get(p)!;
           } else {
             const promise = parser.parseFileAsync(p).then(result => {

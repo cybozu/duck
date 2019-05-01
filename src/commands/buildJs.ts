@@ -1,4 +1,6 @@
 import pLimit from 'p-limit';
+import pSettled from 'p-settle';
+import path from 'path';
 import recursive from 'recursive-readdir';
 import {assertString} from '../assert';
 import {
@@ -10,6 +12,7 @@ import {
 import {DuckConfig} from '../duckconfig';
 import {EntryConfig, loadEntryConfig} from '../entryconfig';
 import {restoreDepsJs} from '../gendeps';
+import {logger} from '../logger';
 
 /**
  * @throws If compiler throws errors
@@ -24,24 +27,79 @@ export async function buildJs(
     ? entryConfigs
     : await findEntryConfigs(assertString(config.entryConfigDir));
   const limit = pLimit(config.concurrency);
+  let count = 0;
   const promises = entryConfigPaths.map(entryConfigPath =>
     limit(async () => {
       const entryConfig = await loadEntryConfig(entryConfigPath);
-      if (entryConfig.modules) {
-        if (config.depsJs && !depsJsRestored) {
-          await restoreDepsJs(config.depsJs, config.closureLibraryDir);
-          depsJsRestored = true;
+      const id = count++;
+      logCompiling(entryConfigPath, id);
+      try {
+        if (entryConfig.modules) {
+          if (config.depsJs && !depsJsRestored) {
+            logger.info('Restoring deps.js cache');
+            await restoreDepsJs(config.depsJs, config.closureLibraryDir);
+            depsJsRestored = true;
+          }
+          await compileChunk(entryConfig, config, printConfig);
+        } else {
+          await compilePage(entryConfig, printConfig);
         }
-        await compileChunk(entryConfig, config, printConfig);
-      } else {
-        await compilePage(entryConfig, printConfig);
+      } catch (e) {
+        logFailed(entryConfigPath, id);
+        throw e;
       }
-    }).catch(e => {
-      console.error(`Error: ${entryConfigPath}`);
-      console.error(e);
     })
   );
-  return Promise.all(promises);
+
+  await waitAllAndThrowIfAnyCompilationsFailed(promises, entryConfigPaths);
+
+  function logCompiling(entryConfigPath: string, id: number): void {
+    const countStatus = entryConfigPaths.length > 1 ? `[${id}/${entryConfigPaths.length}] ` : '';
+    const relativePath = path.relative(process.cwd(), entryConfigPath);
+    logger.info(`${countStatus}Compiling ${relativePath}`);
+  }
+  function logFailed(entryConfigPath: string, id: number): void {
+    const countStatus = entryConfigPaths.length > 1 ? `[${id}/${entryConfigPaths.length}] ` : '';
+    const relativePath = path.relative(process.cwd(), entryConfigPath);
+    logger.error(`${countStatus}Failed ${relativePath}`);
+  }
+}
+
+/**
+ * Wait until all promises for compilation are setteld and throw
+ * a `BuildJsCompilationError` if some promises failed.
+ *
+ * @throws BuildJsCompilationError
+ */
+async function waitAllAndThrowIfAnyCompilationsFailed(
+  promises: readonly Promise<void>[],
+  entryConfigPaths: readonly string[]
+): Promise<void> {
+  const results = await pSettled(promises);
+  const reasons: string[] = results
+    .map((result, idx) => {
+      return {
+        ...result,
+        entryConfigPath: entryConfigPaths[idx],
+      };
+    })
+    .filter(result => result.isRejected)
+    .map(result => {
+      if (!result.isRejected) {
+        throw new Error('Unexpected state');
+      }
+      return `Compile Error in ${result.entryConfigPath}\n${(result.reason as Error).message}`;
+    });
+  if (reasons.length > 0) {
+    throw new BuildJsCompilationError(reasons.join('\n'));
+  }
+}
+
+export class BuildJsCompilationError extends Error {
+  constructor(msg: string) {
+    super(msg);
+    this.name = 'BuildJsCompilationError';
+  }
 }
 
 async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
@@ -55,6 +113,7 @@ async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
 async function compilePage(entryConfig: EntryConfig, printConfig = false): Promise<any> {
   const opts = createCompilerOptionsForPage(entryConfig, true);
   if (printConfig) {
+    // TODO: The last two lines are removed in listr.
     console.log(opts);
     return;
   }
@@ -80,6 +139,7 @@ async function compileChunk(
     createModuleUris
   );
   if (printConfig) {
+    // TODO: The last two lines are removed in listr.
     console.log(options);
     return;
   }

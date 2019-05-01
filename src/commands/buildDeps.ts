@@ -3,16 +3,20 @@ import path from 'path';
 import util from 'util';
 import {DuckConfig} from '../duckconfig';
 import {generateDepFileTextFromDeps, getDependencies} from '../gendeps';
+import {logger} from '../logger';
 
 export async function buildDeps(config: DuckConfig): Promise<void> {
   const paths = [config.inputsRoot];
   const googBaseDir = path.join(config.closureLibraryDir, 'closure', 'goog');
-  const fileText = await getDependencies({paths}, config.depsJsIgnoreDirs).then(deps =>
-    generateDepFileTextFromDeps(deps, googBaseDir)
-  );
+  logger.info(`Analyzing dependencies`);
+  const deps = await getDependencies({paths}, config.depsJsIgnoreDirs);
+  logger.info(`Generating deps.js`);
+  const fileText = await generateDepFileTextFromDeps(deps, googBaseDir);
   if (config.depsJs) {
     await util.promisify(fs.writeFile)(config.depsJs, fileText);
+    logger.info(`Generated: ${config.depsJs}`);
   } else {
+    // TODO: The lines are removed in listr.
     console.log(fileText);
   }
 }

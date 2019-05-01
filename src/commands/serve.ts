@@ -45,7 +45,16 @@ export function serve(config: DuckConfig, watch = true) {
     });
   }
 
-  const server = fastify({logger: {prettyPrint: true}});
+  const server = fastify({
+    logger: {
+      prettyPrint: {
+        translateTime: true,
+        ignore: 'hostname,pid',
+        // hide logs for accesses to static assets
+        search: `!(req.method && starts_with(req.url, '${inputsUrlPath}/')) && !(res.statusCode && res.statusCode == '304')`,
+      },
+    },
+  });
 
   // enable CORS at first
   server.use(cors());
