@@ -33,7 +33,7 @@
     "google-closure-compiler": ">=20190325.0.0",
     "google-closure-deps": ">=20190325.0.0",
     "p-limit": "^2.2.0",
-    "pino-pretty": "^2.6.1",
+    "pino-pretty": "^3.0.0",
     "recursive-readdir": "^2.2.2",
     "serve-static": "^1.13.2",
     "strip-json-comments": "^2.0.1",
