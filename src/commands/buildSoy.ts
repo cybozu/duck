@@ -1,8 +1,9 @@
 import flat from 'array.prototype.flat';
 import chokidar from 'chokidar';
-import {promises as fs} from 'fs';
+import fs from 'fs';
 import path from 'path';
 import recursive from 'recursive-readdir';
+import util from 'util';
 import {DuckConfig} from '../duckconfig';
 import {compileSoy} from '../soy';
 
@@ -49,7 +50,7 @@ async function handleSoyUpdated(config: BuildSoyConfig, filepath: string) {
 async function handleSoyDeleted(config: BuildSoyConfig, filepath: string) {
   console.log(`[SOY_DELETED]: ${filepath}`);
   const outputPath = calcOutputPath(filepath, config);
-  await fs.unlink(outputPath);
+  await util.promisify(fs.unlink)(outputPath);
   console.log(`[REMOVED]: ${outputPath}`);
 }
 

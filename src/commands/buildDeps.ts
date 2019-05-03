@@ -1,5 +1,6 @@
-import {promises as fs} from 'fs';
+import fs from 'fs';
 import path from 'path';
+import util from 'util';
 import {DuckConfig} from '../duckconfig';
 import {generateDepFileTextFromDeps, getDependencies} from '../gendeps';
 
@@ -10,7 +11,7 @@ export async function buildDeps(config: DuckConfig): Promise<void> {
     generateDepFileTextFromDeps(deps, googBaseDir)
   );
   if (config.depsJs) {
-    return fs.writeFile(config.depsJs, fileText);
+    await util.promisify(fs.writeFile)(config.depsJs, fileText);
   } else {
     console.log(fileText);
   }
