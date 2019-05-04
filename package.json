@@ -20,7 +20,7 @@
     "build": "tsc",
     "clean": "rimraf lib",
     "lint": "eslint --ext js,ts src test types",
-    "test": "run-s clean lint build unit",
+    "test": "npm-run-all clean -p lint build unit --aggregate-output -l",
     "unit": "mocha -r espower-typescript/guess --extension ts test"
   },
   "dependencies": {
