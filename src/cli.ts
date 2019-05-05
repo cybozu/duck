@@ -202,17 +202,7 @@ export function run(processArgv: readonly string[]): void {
               toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
           },
         ]);
-        try {
-          await tasks.run();
-        } catch (e) {
-          if (e instanceof BuildJsCompilationError) {
-            // Print compile errors
-            console.error(`\n${e.toString()}`);
-            process.exit(1);
-          } else {
-            throw e;
-          }
-        }
+        await tasks.run().catch(printOnlyCompilationError);
       }
     )
     .command('build:js [entryConfigDir]', 'Compile JS files', buildJsOptions, async argv => {
@@ -224,17 +214,7 @@ export function run(processArgv: readonly string[]): void {
             toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
         },
       ]);
-      try {
-        await tasks.run();
-      } catch (e) {
-        if (e instanceof BuildJsCompilationError) {
-          // Print compile errors
-          console.error(`\n${e.toString()}`);
-          process.exit(1);
-        } else {
-          throw e;
-        }
-      }
+      await tasks.run().catch(printOnlyCompilationError);
     })
     .command('build:soy', 'Compile Soy templates', buildSoyOptions, async argv => {
       const config = loadConfig(argv);
@@ -295,4 +275,13 @@ export function run(processArgv: readonly string[]): void {
     .alias('v', 'version')
     .alias('h', 'help')
     .parse(processArgv);
+}
+
+function printOnlyCompilationError(e: any): Promise<void> {
+  if (e instanceof BuildJsCompilationError) {
+    // Print compile errors
+    console.error(`\n# ${e.message}\n\n${e.reasons.map(m => `## ${m}`).join('\n')}`);
+    process.exit(1);
+  }
+  return Promise.reject(e);
 }

@@ -88,25 +88,19 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
       if (!result.isRejected) {
         throw new Error('Unexpected state');
       }
-      return `## Compile Errors in ${result.entryConfigPath}:\n\n${
-        (result.reason as Error).message
-      }`;
+      return `Compile Errors in ${result.entryConfigPath}:\n\n${(result.reason as Error).message}`;
     });
   if (reasons.length > 0) {
-    throw new BuildJsCompilationError(reasons);
+    throw new BuildJsCompilationError(reasons, results.length);
   }
 }
 
 export class BuildJsCompilationError extends Error {
   reasons: readonly string[];
-  constructor(reasons: readonly string[]) {
-    super(`Failed to compile`);
+  constructor(reasons: readonly string[], totalSize: number) {
+    super(`Failed to compile (${reasons.length}/${totalSize})`);
     this.name = 'BuildJsCompilationError';
     this.reasons = reasons;
-  }
-
-  toString() {
-    return `# ${this.message}\n\n${this.reasons.join('\n')}`;
   }
 }
 
