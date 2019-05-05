@@ -1,5 +1,6 @@
 import path from 'path';
 import {DuckConfig} from './duckconfig';
+import {logger} from './logger';
 import execa = require('execa');
 
 export interface SoyToJsOptions {
@@ -21,9 +22,11 @@ export async function compileSoy(
 ): Promise<void> {
   const soyArgs = toSoyArgs(soyFiles, config);
   if (printConfig) {
+    // TODO: Support listr
     console.log(soyArgs);
     return;
   }
+  logger.info('Compiling soy templates');
   await execa('java', soyArgs);
 }
 

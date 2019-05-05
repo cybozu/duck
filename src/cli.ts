@@ -1,15 +1,45 @@
+import streamToObservable from '@teppeis/stream-to-observable';
+import Listr from 'listr';
 import path from 'path';
+import pino from 'pino';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import split from 'split2';
 import yargs from 'yargs';
 import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
 import {buildDeps} from './commands/buildDeps';
-import {buildJs} from './commands/buildJs';
+import {buildJs, BuildJsCompilationError} from './commands/buildJs';
 import {buildSoy, BuildSoyConfig, watchSoy} from './commands/buildSoy';
 import {cleanDeps} from './commands/cleanDeps';
 import {cleanSoy, CleanSoyConfig} from './commands/cleanSoy';
 import {serve} from './commands/serve';
 import {loadConfig} from './duckconfig';
+import {setGlobalLogger} from './logger';
 
 assertNodeVersionGte(process.version, 10);
+
+/**
+ * Transform ndjson (Newline Delimited JSON) stream to JSON object stream.
+ */
+const logStream = split(JSON.parse);
+const logger = pino(logStream);
+setGlobalLogger(logger);
+
+/**
+ * Conbine log stream with a promise to make an observable that does not "complete" until the promise is resolved,
+ * Because listr can accept only one of Promise, Stream and Observable.
+ */
+function toObservable(p: Promise<any>): Observable<string> {
+  return streamToObservable(logStream, {await: p, endEvent: false}).pipe(
+    map<any, string>(obj => {
+      if (obj.msg) {
+        return String(obj.msg);
+      } else {
+        return String(obj);
+      }
+    })
+  );
+}
 
 const closureLibraryDir = {
   desc: 'Closure Library directory',
@@ -125,16 +155,22 @@ export function run(processArgv: readonly string[]): void {
       },
       async argv => {
         const config = loadConfig(argv);
-        if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
-          if (!argv.skipInitialSoy) {
-            console.log('Compiling Soy templates...');
-            await buildSoy(config as BuildSoyConfig);
-          }
+        const hasSoyConfig: boolean = Boolean(
+          config.soyJarPath && config.soyFileRoots && config.soyOptions
+        );
+        const tasks = new Listr([
+          {
+            title: `Compile Soy templates`,
+            skip: () => !hasSoyConfig || argv.skipInitialSoy,
+            task: () => toObservable(buildSoy(config as BuildSoyConfig)),
+          },
+        ]);
+        await tasks.run();
+        // TODO: use listr
+        if (hasSoyConfig) {
           watchSoy(config as BuildSoyConfig);
-        } else {
-          console.log('Skip compiling Soy templates. (missing config)');
         }
-        console.log('Starting dev server...');
+        logger.info('Starting dev server...');
         serve(config);
       }
     )
@@ -151,77 +187,101 @@ export function run(processArgv: readonly string[]): void {
       },
       async argv => {
         const config = loadConfig(argv);
-        if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
-          console.log('Compiling Soy templates...');
-          const templates = await buildSoy(config as BuildSoyConfig, argv.printConfig);
-          console.log(`${templates.length} templates compiled!`);
-        } else {
-          console.log('Skip compiling Soy templates. (missing config)');
-        }
+        const hasSoyConfig: boolean = Boolean(
+          config.soyJarPath && config.soyFileRoots && config.soyOptions
+        );
+        const tasks = new Listr([
+          {
+            title: `Compile Soy templates`,
+            skip: () => !hasSoyConfig,
+            task: () => toObservable(buildSoy(config as BuildSoyConfig, argv.printConfig)),
+          },
+          {
+            title: `Compile JS files`,
+            task: () =>
+              toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+          },
+        ]);
         try {
-          console.log('Compiling JS files...');
-          await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
-          console.log('JS compiled!');
+          await tasks.run();
         } catch (e) {
-          if (e instanceof Error) {
-            console.error(e.message);
+          if (e instanceof BuildJsCompilationError) {
+            // Print compile errors
+            console.error(`\n${e.toString()}`);
+            process.exit(1);
           } else {
-            console.error(e);
+            throw e;
           }
-          process.exit(1);
         }
       }
     )
     .command('build:js [entryConfigDir]', 'Compile JS files', buildJsOptions, async argv => {
       const config = loadConfig(argv);
+      const tasks = new Listr([
+        {
+          title: `Compile JS files`,
+          task: () =>
+            toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+        },
+      ]);
       try {
-        console.log('Compiling JS files...');
-        await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
-        console.log('JS compiled!');
+        await tasks.run();
       } catch (e) {
-        if (e instanceof Error) {
-          console.error(e.message);
+        if (e instanceof BuildJsCompilationError) {
+          // Print compile errors
+          console.error(`\n${e.toString()}`);
+          process.exit(1);
         } else {
-          console.error(e);
+          throw e;
         }
-        process.exit(1);
       }
     })
     .command('build:soy', 'Compile Soy templates', buildSoyOptions, async argv => {
       const config = loadConfig(argv);
-      console.log('Compiling Soy templates...');
       assertString(config.soyJarPath);
       assertNonNullable(config.soyFileRoots);
       assertNonNullable(config.soyOptions);
-      const templates = await buildSoy(config as BuildSoyConfig, argv.printConfig);
-      console.log(`${templates.length} templates compiled!`);
+      const tasks = new Listr([
+        {
+          title: `Compile Soy templates`,
+          task: () => toObservable(buildSoy(config as BuildSoyConfig, argv.printConfig)),
+        },
+      ]);
+      await tasks.run();
     })
     .command('build:deps', 'Generate deps.js', buildDepsOptions, async argv => {
       const config = loadConfig(argv);
-      try {
-        await buildDeps(config);
-        if (argv.depsJs) {
-          console.log(`Generated: ${argv.depsJs}`);
-        }
-      } catch (e) {
-        if (e instanceof Error) {
-          console.error(e.message);
-        } else {
-          console.error(e);
-        }
-        process.exit(1);
-      }
+      const tasks = new Listr(
+        [
+          {
+            title: `Generate deps.js`,
+            task: () => toObservable(buildDeps(config)),
+          },
+        ],
+        {renderer: 'default', collapse: false, clearOutput: true} as any
+      );
+      await tasks.run();
     })
     .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptions, async argv => {
       const config = loadConfig(argv);
-      console.log('Cleaning up soy.js...');
       assertNonNullable(config.soyOptions);
-      await cleanSoy(config as CleanSoyConfig);
+      const tasks = new Listr([
+        {
+          title: `Clean up soy.js`,
+          task: () => toObservable(cleanSoy(config as CleanSoyConfig)),
+        },
+      ]);
+      await tasks.run();
     })
     .command('clean:deps', 'Remove generated deps.js', buildDepsOptions, async argv => {
       const config = loadConfig(argv);
-      console.log('Cleaning up deps.js...');
-      await cleanDeps(assertString(config.depsJs));
+      const tasks = new Listr([
+        {
+          title: `Clean up deps.js: ${config.depsJs}`,
+          task: () => toObservable(cleanDeps(assertString(config.depsJs))),
+        },
+      ]);
+      await tasks.run();
     })
     .completion('completion', 'Generate completion script for bash/zsh')
     .demandCommand(1, 1)
@@ -231,6 +291,7 @@ export function run(processArgv: readonly string[]): void {
     .wrap(90)
     .strict()
     .help()
+    .showHelpOnFail(false, 'Specify --help or -h for available options')
     .alias('v', 'version')
     .alias('h', 'help')
     .parse(processArgv);

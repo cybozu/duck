@@ -5,6 +5,7 @@ import path from 'path';
 import recursive from 'recursive-readdir';
 import util from 'util';
 import {DuckConfig} from '../duckconfig';
+import {logger} from '../logger';
 import {compileSoy} from '../soy';
 
 export type BuildSoyConfig = Required<
@@ -17,6 +18,7 @@ export type BuildSoyConfig = Required<
  * @return An array of input Soy template filepaths
  */
 export async function buildSoy(config: BuildSoyConfig, printConfig = false): Promise<string[]> {
+  logger.info('Finding soy templates');
   const soyFiles = await findSoyFiles(config);
   await compileSoy(soyFiles, config, printConfig);
   return soyFiles;
