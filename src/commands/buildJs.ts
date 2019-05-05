@@ -25,7 +25,7 @@ export async function buildJs(
   let depsJsRestored = false;
   const entryConfigPaths = entryConfigs
     ? entryConfigs
-    : await findEntryConfigs(assertString(config.entryConfigDir));
+    : (await findEntryConfigs(assertString(config.entryConfigDir))).sort();
   const limit = pLimit(config.concurrency);
   let count = 0;
   const promises = entryConfigPaths.map(entryConfigPath =>
@@ -88,17 +88,25 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
       if (!result.isRejected) {
         throw new Error('Unexpected state');
       }
-      return `Compile Error in ${result.entryConfigPath}\n${(result.reason as Error).message}`;
+      return `## Compile Errors in ${result.entryConfigPath}:\n\n${
+        (result.reason as Error).message
+      }`;
     });
   if (reasons.length > 0) {
-    throw new BuildJsCompilationError(reasons.join('\n'));
+    throw new BuildJsCompilationError(reasons);
   }
 }
 
 export class BuildJsCompilationError extends Error {
-  constructor(msg: string) {
-    super(msg);
+  reasons: readonly string[];
+  constructor(reasons: readonly string[]) {
+    super(`Failed to compile`);
     this.name = 'BuildJsCompilationError';
+    this.reasons = reasons;
+  }
+
+  toString() {
+    return `# ${this.message}\n\n${this.reasons.join('\n')}`;
   }
 }
 

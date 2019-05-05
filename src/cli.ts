@@ -207,7 +207,7 @@ export function run(processArgv: readonly string[]): void {
         } catch (e) {
           if (e instanceof BuildJsCompilationError) {
             // Print compile errors
-            console.error(`\n${e.message}`);
+            console.error(`\n${e.toString()}`);
             process.exit(1);
           } else {
             throw e;
@@ -229,7 +229,7 @@ export function run(processArgv: readonly string[]): void {
       } catch (e) {
         if (e instanceof BuildJsCompilationError) {
           // Print compile errors
-          console.error(`\n${e.message}`);
+          console.error(`\n${e.toString()}`);
           process.exit(1);
         } else {
           throw e;
