@@ -42,7 +42,7 @@
     "rxjs": "^6.5.1",
     "serve-static": "^1.13.2",
     "split2": "^3.1.1",
-    "strip-json-comments": "^2.0.1",
+    "strip-json-comments": "^3.0.1",
     "tempy": "^0.3.0",
     "yargs": "^13.2.2",
     "zet": "^1.0.5"
