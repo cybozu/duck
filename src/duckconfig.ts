@@ -14,6 +14,11 @@ export interface DuckConfig {
   concurrency: number;
   host: string;
   port: number;
+  http2?: boolean;
+  https?: {
+    keyPath: string;
+    certPath: string;
+  };
 }
 
 /**
@@ -47,6 +52,12 @@ export function loadConfig(opts: any = {}): DuckConfig {
           config.soyOptions.inputPrefix += path.sep;
         }
       }
+    }
+    if (config.https) {
+      assertString(config.https.keyPath, `"https.keyPath" is required in duck.config`);
+      assertString(config.https.certPath, `"https.certPath" is required in duck.config`);
+      toAbsPath(config.https, configDir, 'keyPath');
+      toAbsPath(config.https, configDir, 'certPath');
     }
     result = {...config, ...opts};
   } catch {

@@ -81,6 +81,29 @@ Options:
 
 Also see [`examples/chunks`](examples/chunks).
 
+## Tips
+
+### How to use HTTPS and HTTP2 in `duck serve`?
+
+Create a self-signed certificate like
+
+```console
+# https://stackoverflow.com/a/10176685
+$ openssl req -x509 -newkey rsa:4096 -keyout duck-key.pem -out duck-cert.pem -days 365 -nodes -subj '/CN=localhost'
+```
+
+Then specify them and enable `http2` in `duck.config.js`.
+
+```js
+module.exports = {
+  http2: true,
+  https: {
+    keyPath: './path/to/duck-key.pem',
+    certPath: './path/to/duck-cert.pem'
+  }
+};
+```
+
 ## License
 
 MIT License: Teppei Sato &lt;teppeis@gmail.com&gt;

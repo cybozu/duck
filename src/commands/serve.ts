@@ -2,10 +2,12 @@ import flat from 'array.prototype.flat';
 import {stripIndents} from 'common-tags';
 import cors from 'cors';
 import fastify from 'fastify';
+import {readFile} from 'fs';
 import {ServerResponse} from 'http';
 import path from 'path';
 import pino from 'pino';
 import serveStatic from 'serve-static';
+import {promisify} from 'util';
 import {assertNonNullable, assertString} from '../assert';
 import {
   CompilerOutput,
@@ -30,7 +32,7 @@ import {watchJsAndSoy} from '../watch';
 
 const entryIdToChunkCache: Map<string, Map<string, {[id: string]: CompilerOutput}>> = new Map();
 
-export function serve(config: DuckConfig, watch = true) {
+export async function serve(config: DuckConfig, watch = true) {
   const PORT = config.port;
   const HOST = config.host;
   const baseUrl = new URL(`http://${HOST}:${PORT}/`);
@@ -60,7 +62,22 @@ export function serve(config: DuckConfig, watch = true) {
     });
   }
 
-  const server = fastify({logger});
+  const {http2, https} = config;
+  let server: fastify.FastifyInstance;
+  if (https) {
+    const httpsOptions = {
+      key: await promisify(readFile)(https.keyPath, 'utf8'),
+      cert: await promisify(readFile)(https.certPath, 'utf8'),
+    };
+    // TODO: fix typings
+    if (http2) {
+      server = fastify({logger, https: httpsOptions, http2: true}) as any;
+    } else {
+      server = fastify({logger, https: httpsOptions}) as fastify.FastifyInstance;
+    }
+  } else {
+    server = fastify({logger});
+  }
 
   // enable CORS at first
   server.use(cors());

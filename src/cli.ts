@@ -185,7 +185,7 @@ export function run(processArgv: readonly string[]): void {
         ]);
         await tasks.run();
         console.log(''); // a blank line
-        serve(config);
+        await serve(config);
       }
     )
     .command(
@@ -201,19 +201,16 @@ export function run(processArgv: readonly string[]): void {
       },
       async argv => {
         const config = loadConfig(argv);
-        const hasSoyConfig: boolean = Boolean(
-          config.soyJarPath && config.soyFileRoots && config.soyOptions
-        );
-        const {printConfig} = argv;
         const tasks = new Listr([
           {
             title: `Compile Soy templates`,
-            skip: () => !hasSoyConfig,
-            task: () => toObservable(buildSoy(config as BuildSoyConfig, printConfig)),
+            skip: () => !(config.soyJarPath && config.soyFileRoots && config.soyOptions),
+            task: () => toObservable(buildSoy(config as BuildSoyConfig, argv.printConfig)),
           },
           {
             title: `Compile JS files`,
-            task: () => toObservable(buildJs(config, argv.entryConfigs as string[], printConfig)),
+            task: () =>
+              toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
           },
         ]);
         await tasks.run().catch(printOnlyCompilationError);
@@ -222,11 +219,11 @@ export function run(processArgv: readonly string[]): void {
     )
     .command('build:js [entryConfigDir]', 'Compile JS files', buildJsOptions, async argv => {
       const config = loadConfig(argv);
-      const {printConfig} = argv;
       const tasks = new Listr([
         {
           title: `Compile JS files`,
-          task: () => toObservable(buildJs(config, argv.entryConfigs as string[], printConfig)),
+          task: () =>
+            toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
         },
       ]);
       await tasks.run().catch(printOnlyCompilationError);
@@ -237,11 +234,10 @@ export function run(processArgv: readonly string[]): void {
       assertString(config.soyJarPath);
       assertNonNullable(config.soyFileRoots);
       assertNonNullable(config.soyOptions);
-      const {printConfig} = argv;
       const tasks = new Listr([
         {
           title: `Compile Soy templates`,
-          task: () => toObservable(buildSoy(config as BuildSoyConfig, printConfig)),
+          task: () => toObservable(buildSoy(config as BuildSoyConfig, argv.printConfig)),
         },
       ]);
       await tasks.run();
