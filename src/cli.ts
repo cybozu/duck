@@ -266,6 +266,7 @@ export function run(processArgv: readonly string[]): void {
     .completion('completion', 'Generate completion script for bash/zsh')
     .demandCommand(1, 1)
     .scriptName('duck')
+    .locale('en')
     .epilog('CLI options overwrite config file')
     // default 80 is too short for command usage lines
     .wrap(90)
