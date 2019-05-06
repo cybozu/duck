@@ -249,15 +249,12 @@ export function run(processArgv: readonly string[]): void {
     })
     .command('build:deps', 'Generate deps.js', buildDepsOptions, async argv => {
       const config = loadConfig(argv);
-      const tasks = new Listr(
-        [
-          {
-            title: `Generate deps.js`,
-            task: () => toObservable(buildDeps(config)),
-          },
-        ],
-        {renderer: 'default', collapse: false, clearOutput: true} as any
-      );
+      const tasks = new Listr([
+        {
+          title: `Generate deps.js`,
+          task: () => toObservable(buildDeps(config)),
+        },
+      ]);
       await tasks.run();
       printResultInfo();
     })
