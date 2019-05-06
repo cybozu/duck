@@ -1,7 +1,4 @@
-import chokidar from 'chokidar';
-import fs from 'fs';
 import path from 'path';
-import util from 'util';
 import {resultInfoLogType} from './cli';
 import {DuckConfig} from './duckconfig';
 import {logger} from './logger';
@@ -60,50 +57,4 @@ export function toSoyArgs(
   }
   args.push('--srcs', soyFiles.join(','));
   return args;
-}
-
-export type SoyWatchConfig = Required<
-  Pick<DuckConfig, 'soyFileRoots' | 'soyJarPath' | 'soyOptions'>
->;
-
-export function watchSoy(config: SoyWatchConfig) {
-  const watcher = chokidar.watch(config.soyFileRoots.map(p => `${p}/**/*.soy`), {
-    ignoreInitial: true,
-  });
-  watcher.on('ready', () => logger.info('Ready for watching Soy templates...'));
-  watcher.on('error', logger.error.bind(logger));
-  watcher.on('add', handleSoyUpdated.bind(null, config));
-  watcher.on('change', handleSoyUpdated.bind(null, config));
-  watcher.on('unlink', handleSoyDeleted.bind(null, config));
-}
-
-async function handleSoyUpdated(config: SoyConfig, filepath: string) {
-  logger.info(`[SOY_UPDATED]: ${filepath}`);
-  return compileSoy([filepath], config);
-}
-
-async function handleSoyDeleted(config: SoyConfig, filepath: string) {
-  logger.info(`[SOY_DELETED]: ${filepath}`);
-  const outputPath = calcOutputPath(filepath, config);
-  await util.promisify(fs.unlink)(outputPath);
-  logger.info(`[REMOVED]: ${outputPath}`);
-}
-
-/**
- * TODO: support {LOCALE} and {LOCALE_LOWER_CASE}
- */
-function calcOutputPath(inputPath: string, config: SoyConfig) {
-  const {outputPathFormat, inputPrefix} = config.soyOptions;
-  let outputPath = outputPathFormat;
-  let inputDirectory = path.dirname(inputPath);
-  if (inputPrefix) {
-    inputDirectory = path.relative(inputPrefix, inputDirectory);
-    outputPath = outputPath.replace('{INPUT_PREFIX}', inputPrefix);
-  }
-  const filename = path.basename(inputPath);
-  const filenameNoExt = filename.slice(0, -path.extname(filename).length);
-  return outputPath
-    .replace('{INPUT_DIRECTORY}', inputDirectory)
-    .replace('{INPUT_FILE_NAME}', filename)
-    .replace('{INPUT_FILE_NAME_NO_EXT}', filenameNoExt);
 }

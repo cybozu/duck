@@ -1,5 +1,4 @@
 import flat from 'array.prototype.flat';
-import chokidar from 'chokidar';
 import {stripIndents} from 'common-tags';
 import cors from 'cors';
 import fastify from 'fastify';
@@ -18,9 +17,8 @@ import {
 } from '../compiler';
 import {DuckConfig} from '../duckconfig';
 import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from '../entryconfig';
-import {generateDepFileText, removeDepCacheByPath, restoreDepsJs} from '../gendeps';
+import {generateDepFileText, restoreDepsJs} from '../gendeps';
 import {logger, setGlobalLogger} from '../logger';
-import {SoyWatchConfig, watchSoy} from '../soy';
 import {
   closureLibraryUrlPath,
   compileUrlPath,
@@ -28,6 +26,7 @@ import {
   googBaseUrlPath,
   inputsUrlPath,
 } from '../urls';
+import {watchJsAndSoy} from '../watch';
 
 const entryIdToChunkCache: Map<string, Map<string, {[id: string]: CompilerOutput}>> = new Map();
 
@@ -49,13 +48,10 @@ export function serve(config: DuckConfig, watch = true) {
     })
   );
 
-  if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
-    watchSoy(config as SoyWatchConfig);
-  }
   logger.info('Starting dev server...');
 
   if (watch) {
-    watchJs(config);
+    watchJsAndSoy(config);
   }
 
   if (config.depsJs) {
@@ -273,20 +269,7 @@ export function serve(config: DuckConfig, watch = true) {
   start();
 }
 
-function watchJs(config: DuckConfig) {
-  const watcher = chokidar.watch(`${config.inputsRoot}/**/*.js`, {
-    ignoreInitial: true,
-  });
-  watcher.on('ready', () => logger.info('Ready for watching JS files...'));
-  watcher.on('error', logger.error.bind(logger));
-  watcher.on('add', handleJsUpdated);
-  watcher.on('change', handleJsUpdated);
-  watcher.on('unlink', handleJsUpdated);
-}
-
-async function handleJsUpdated(filepath: string) {
-  logger.info(`[JS_UPDATED]: ${filepath}`);
+export function clearEntryIdToChunkCache() {
   // TODO: invalidate only target
   entryIdToChunkCache.clear();
-  removeDepCacheByPath(filepath);
 }
