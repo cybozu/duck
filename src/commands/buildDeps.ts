@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+import {resultInfoLogType} from '../cli';
 import {DuckConfig} from '../duckconfig';
 import {generateDepFileTextFromDeps, getDependencies} from '../gendeps';
 import {logger} from '../logger';
@@ -16,7 +17,11 @@ export async function buildDeps(config: DuckConfig): Promise<void> {
     await util.promisify(fs.writeFile)(config.depsJs, fileText);
     logger.info(`Generated: ${config.depsJs}`);
   } else {
-    // TODO: The lines are removed in listr.
-    console.log(fileText);
+    logger.info({
+      msg: 'Generated to stdout',
+      type: resultInfoLogType,
+      title: 'Generated deps.js',
+      bodyString: fileText,
+    });
   }
 }

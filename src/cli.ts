@@ -9,7 +9,7 @@ import yargs from 'yargs';
 import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
 import {buildDeps} from './commands/buildDeps';
 import {buildJs, BuildJsCompilationError} from './commands/buildJs';
-import {buildSoy, BuildSoyConfig, watchSoy} from './commands/buildSoy';
+import {buildSoy, BuildSoyConfig} from './commands/buildSoy';
 import {cleanDeps} from './commands/cleanDeps';
 import {cleanSoy, CleanSoyConfig} from './commands/cleanSoy';
 import {serve} from './commands/serve';
@@ -39,6 +39,24 @@ function toObservable(p: Promise<any>): Observable<string> {
       }
     })
   );
+}
+
+export const resultInfoLogType = 'resultInfo';
+const resultInfos: ResultInfo[] = [];
+logStream.on('data', (data: any) => {
+  if (data.type === resultInfoLogType) {
+    resultInfos.push({
+      title: assertString(data.title),
+      bodyString: data.bodyString,
+      bodyObject: data.bodyObject,
+    });
+  }
+});
+
+interface ResultInfo {
+  title: string;
+  bodyString?: string;
+  bodyObject?: any;
 }
 
 const closureLibraryDir = {
@@ -166,11 +184,7 @@ export function run(processArgv: readonly string[]): void {
           },
         ]);
         await tasks.run();
-        // TODO: use listr
-        if (hasSoyConfig) {
-          watchSoy(config as BuildSoyConfig);
-        }
-        logger.info('Starting dev server...');
+        console.log(''); // a blank line
         serve(config);
       }
     )
@@ -190,44 +204,48 @@ export function run(processArgv: readonly string[]): void {
         const hasSoyConfig: boolean = Boolean(
           config.soyJarPath && config.soyFileRoots && config.soyOptions
         );
+        const {printConfig} = argv;
         const tasks = new Listr([
           {
             title: `Compile Soy templates`,
             skip: () => !hasSoyConfig,
-            task: () => toObservable(buildSoy(config as BuildSoyConfig, argv.printConfig)),
+            task: () => toObservable(buildSoy(config as BuildSoyConfig, printConfig)),
           },
           {
             title: `Compile JS files`,
-            task: () =>
-              toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+            task: () => toObservable(buildJs(config, argv.entryConfigs as string[], printConfig)),
           },
         ]);
         await tasks.run().catch(printOnlyCompilationError);
+        printResultInfo();
       }
     )
     .command('build:js [entryConfigDir]', 'Compile JS files', buildJsOptions, async argv => {
       const config = loadConfig(argv);
+      const {printConfig} = argv;
       const tasks = new Listr([
         {
           title: `Compile JS files`,
-          task: () =>
-            toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+          task: () => toObservable(buildJs(config, argv.entryConfigs as string[], printConfig)),
         },
       ]);
       await tasks.run().catch(printOnlyCompilationError);
+      printResultInfo();
     })
     .command('build:soy', 'Compile Soy templates', buildSoyOptions, async argv => {
       const config = loadConfig(argv);
       assertString(config.soyJarPath);
       assertNonNullable(config.soyFileRoots);
       assertNonNullable(config.soyOptions);
+      const {printConfig} = argv;
       const tasks = new Listr([
         {
           title: `Compile Soy templates`,
-          task: () => toObservable(buildSoy(config as BuildSoyConfig, argv.printConfig)),
+          task: () => toObservable(buildSoy(config as BuildSoyConfig, printConfig)),
         },
       ]);
       await tasks.run();
+      printResultInfo();
     })
     .command('build:deps', 'Generate deps.js', buildDepsOptions, async argv => {
       const config = loadConfig(argv);
@@ -241,6 +259,7 @@ export function run(processArgv: readonly string[]): void {
         {renderer: 'default', collapse: false, clearOutput: true} as any
       );
       await tasks.run();
+      printResultInfo();
     })
     .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptions, async argv => {
       const config = loadConfig(argv);
@@ -285,4 +304,18 @@ function printOnlyCompilationError(e: any): Promise<void> {
     process.exit(1);
   }
   return Promise.reject(e);
+}
+
+function printResultInfo() {
+  if (resultInfos.length > 0) {
+    resultInfos.forEach(info => {
+      console.log(`\n${info.title}:`);
+      if (info.bodyString) {
+        console.log(info.bodyString);
+      }
+      if (info.bodyObject) {
+        console.dir(info.bodyObject);
+      }
+    });
+  }
 }

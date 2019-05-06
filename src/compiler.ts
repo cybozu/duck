@@ -185,6 +185,10 @@ export async function compileToJson(opts: CompilerOptions): Promise<CompilerOutp
 }
 
 export function compile(opts: CompilerOptions): Promise<string> {
+  // Avoid `spawn E2BIG` error for too large arguments
+  if (opts.js && opts.js.length > 100) {
+    opts = convertToFlagfile(opts);
+  }
   const compiler = new ClosureCompiler(opts as any);
   return new Promise((resolve, reject) => {
     compiler.run((exitCode: number, stdout: string, stderr?: string) => {

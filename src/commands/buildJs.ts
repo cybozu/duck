@@ -3,9 +3,10 @@ import pSettled from 'p-settle';
 import path from 'path';
 import recursive from 'recursive-readdir';
 import {assertString} from '../assert';
+import {resultInfoLogType} from '../cli';
 import {
   compile,
-  convertToFlagfile,
+  CompilerOptions,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
 } from '../compiler';
@@ -33,17 +34,30 @@ export async function buildJs(
       const entryConfig = await loadEntryConfig(entryConfigPath);
       const id = count++;
       logCompiling(entryConfigPath, id);
-      try {
-        if (entryConfig.modules) {
-          if (config.depsJs && !depsJsRestored) {
-            logger.info('Restoring deps.js cache');
-            await restoreDepsJs(config.depsJs, config.closureLibraryDir);
-            depsJsRestored = true;
-          }
-          await compileChunk(entryConfig, config, printConfig);
-        } else {
-          await compilePage(entryConfig, printConfig);
+      let options: CompilerOptions;
+      if (entryConfig.modules) {
+        if (config.depsJs && !depsJsRestored) {
+          logger.info('Restoring deps.js cache');
+          await restoreDepsJs(config.depsJs, config.closureLibraryDir);
+          depsJsRestored = true;
         }
+        options = await createCompilerOptionsForChunks_(entryConfig, config);
+      } else {
+        options = createCompilerOptionsForPage(entryConfig, true);
+      }
+
+      if (printConfig) {
+        logger.info({
+          msg: 'Print config only',
+          type: resultInfoLogType,
+          title: 'Compiler config',
+          bodyObject: options,
+        });
+        return;
+      }
+
+      try {
+        await compile(options);
       } catch (e) {
         logFailed(entryConfigPath, id);
         throw e;
@@ -109,27 +123,10 @@ async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
   return files.filter(file => /\.json$/.test(file));
 }
 
-/**
- * @throws If compiler throws errors
- */
-async function compilePage(entryConfig: EntryConfig, printConfig = false): Promise<any> {
-  const opts = createCompilerOptionsForPage(entryConfig, true);
-  if (printConfig) {
-    // TODO: The last two lines are removed in listr.
-    console.log(opts);
-    return;
-  }
-  return compile(opts);
-}
-
-/**
- * @throws If compiler throws errors
- */
-async function compileChunk(
+async function createCompilerOptionsForChunks_(
   entryConfig: EntryConfig,
-  config: DuckConfig,
-  printConfig = false
-): Promise<any> {
+  config: DuckConfig
+): Promise<CompilerOptions> {
   function createModuleUris(chunkId: string): string[] {
     const moduleProductionUri = assertString(entryConfig['module-production-uri']);
     return [moduleProductionUri.replace(/%s/g, chunkId)];
@@ -140,10 +137,5 @@ async function compileChunk(
     true,
     createModuleUris
   );
-  if (printConfig) {
-    // TODO: The last two lines are removed in listr.
-    console.log(options);
-    return;
-  }
-  return compile(convertToFlagfile(options));
+  return options;
 }

@@ -5,6 +5,7 @@ import cors from 'cors';
 import fastify from 'fastify';
 import {ServerResponse} from 'http';
 import path from 'path';
+import pino from 'pino';
 import serveStatic from 'serve-static';
 import {assertNonNullable, assertString} from '../assert';
 import {
@@ -18,6 +19,8 @@ import {
 import {DuckConfig} from '../duckconfig';
 import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from '../entryconfig';
 import {generateDepFileText, removeDepCacheByPath, restoreDepsJs} from '../gendeps';
+import {logger, setGlobalLogger} from '../logger';
+import {SoyWatchConfig, watchSoy} from '../soy';
 import {
   closureLibraryUrlPath,
   compileUrlPath,
@@ -35,26 +38,33 @@ export function serve(config: DuckConfig, watch = true) {
   const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
   const depsUrlBase = new URL(depsUrlPath, baseUrl);
 
+  setGlobalLogger(
+    pino({
+      prettyPrint: {
+        translateTime: 'SYS:HH:MM:ss.l',
+        ignore: 'hostname,pid',
+        // hide logs for accesses to static assets
+        search: `!(req.url && starts_with(req.url, \`${inputsUrlPath}/\`)) && res.statusCode != \`304\``,
+      },
+    })
+  );
+
+  if (config.soyJarPath && config.soyFileRoots && config.soyOptions) {
+    watchSoy(config as SoyWatchConfig);
+  }
+  logger.info('Starting dev server...');
+
   if (watch) {
     watchJs(config);
   }
 
   if (config.depsJs) {
     restoreDepsJs(config.depsJs, config.closureLibraryDir).then(() => {
-      console.log('deps.js restored');
+      logger.info('deps.js restored');
     });
   }
 
-  const server = fastify({
-    logger: {
-      prettyPrint: {
-        translateTime: true,
-        ignore: 'hostname,pid',
-        // hide logs for accesses to static assets
-        search: `!(req.method && starts_with(req.url, '${inputsUrlPath}/')) && !(res.statusCode && res.statusCode == '304')`,
-      },
-    },
-  });
+  const server = fastify({logger});
 
   // enable CORS at first
   server.use(cors());
@@ -267,15 +277,15 @@ function watchJs(config: DuckConfig) {
   const watcher = chokidar.watch(`${config.inputsRoot}/**/*.js`, {
     ignoreInitial: true,
   });
-  watcher.on('ready', () => console.log('Ready for watching JS files...'));
-  watcher.on('error', console.error);
-  watcher.on('add', handleJsUpdated.bind(null, config));
-  watcher.on('change', handleJsUpdated.bind(null, config));
-  watcher.on('unlink', handleJsUpdated.bind(null, config));
+  watcher.on('ready', () => logger.info('Ready for watching JS files...'));
+  watcher.on('error', logger.error.bind(logger));
+  watcher.on('add', handleJsUpdated);
+  watcher.on('change', handleJsUpdated);
+  watcher.on('unlink', handleJsUpdated);
 }
 
-async function handleJsUpdated(config: DuckConfig, filepath: string) {
-  console.log(`[JS_UPDATED]: ${filepath}`);
+async function handleJsUpdated(filepath: string) {
+  logger.info(`[JS_UPDATED]: ${filepath}`);
   // TODO: invalidate only target
   entryIdToChunkCache.clear();
   removeDepCacheByPath(filepath);
