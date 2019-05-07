@@ -104,6 +104,25 @@ module.exports = {
 };
 ```
 
+### bash/zsh-completion shortcuts for commands and options
+
+Initial setting:
+
+```console
+$ duck completion >> ~/.bashrc
+# or
+$ duck completion >> ~/.zshrc
+```
+
+Then, you can complete commands and options with <kbd>TAB</kbd> !
+
+```console
+$ duck build:<TAB>
+build:deps  -- Generate deps.js
+build:js    -- Compile JS files
+build:soy   -- Compile Soy templates
+```
+
 ## License
 
 MIT License: Teppei Sato &lt;teppeis@gmail.com&gt;
