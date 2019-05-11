@@ -39,7 +39,7 @@
     "pino": "^5.12.3",
     "pino-pretty": "^3.0.0",
     "recursive-readdir": "^2.2.2",
-    "rxjs": "^6.5.1",
+    "rxjs": "^6.5.2",
     "serve-static": "^1.13.2",
     "split2": "^3.1.1",
     "strip-json-comments": "^3.0.1",
