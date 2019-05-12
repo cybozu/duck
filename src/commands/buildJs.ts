@@ -57,7 +57,7 @@ export async function buildJs(
       }
 
       try {
-        await compile(options);
+        await compile(options, config.compilerPlatform === 'native');
       } catch (e) {
         logFailed(entryConfigPath, id);
         throw e;

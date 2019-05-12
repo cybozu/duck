@@ -6,6 +6,8 @@ import {ChildProcess} from 'child_process';
  */
 
 export class compiler {
+  public JAR_PATH: string | null;
+  public javaPath: string;
   constructor(args: {[idx: string]: string} | string[], extraCommandArgs?: string[]);
   run(callback?: (exitCode: number, stdout: string, stderr: string) => void): ChildProcess;
 }

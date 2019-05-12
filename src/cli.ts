@@ -114,6 +114,11 @@ const buildJsOptions = {
     type: 'number',
     default: 1,
   },
+  compilerPlatform: {
+    desc: 'Use Java or Native (Linux/macOS) version of compiler',
+    choices: ['java', 'native'],
+    default: 'java',
+  },
   depsJs,
   printConfig,
 } as const;

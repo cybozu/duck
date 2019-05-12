@@ -12,6 +12,7 @@ export interface DuckConfig {
   soyOptions?: SoyToJsOptions;
   soyFileRoots?: readonly string[];
   concurrency: number;
+  compilerPlatform: 'java' | 'native';
   host: string;
   port: number;
   http2?: boolean;
