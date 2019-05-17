@@ -40,7 +40,7 @@
     "listr": "^0.14.3",
     "p-limit": "^2.2.0",
     "p-settle": "^3.1.0",
-    "pino": "^5.12.4",
+    "pino": "^5.12.5",
     "pino-pretty": "^3.0.0",
     "recursive-readdir": "^2.2.2",
     "rxjs": "^6.5.2",
