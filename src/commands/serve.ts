@@ -69,11 +69,16 @@ export async function serve(config: DuckConfig, watch = true) {
       key: await promisify(readFile)(https.keyPath, 'utf8'),
       cert: await promisify(readFile)(https.certPath, 'utf8'),
     };
-    // TODO: fix typings
+    // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
+    // But it is not a big deal.
     if (http2) {
-      server = fastify({logger, https: httpsOptions, http2: true}) as any;
+      server = fastify({logger, https: httpsOptions, http2: true}) as fastify.FastifyInstance<
+        any,
+        any,
+        any
+      >;
     } else {
-      server = fastify({logger, https: httpsOptions}) as fastify.FastifyInstance;
+      server = fastify({logger, https: httpsOptions}) as fastify.FastifyInstance<any>;
     }
   } else {
     server = fastify({logger});
