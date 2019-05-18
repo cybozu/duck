@@ -23,8 +23,9 @@
     "build": "tsc",
     "clean": "rimraf lib .tsbuildinfo",
     "lint": "eslint --ext js,ts src test types",
-    "test": "npm-run-all clean -p lint build unit --aggregate-output -l",
-    "unit": "mocha -r espower-typescript/guess --extension ts test"
+    "test": "npm-run-all clean -p lint build unit -s unit:bin --aggregate-output -l",
+    "unit": "mocha -r espower-typescript/guess --extension ts test",
+    "unit:bin": "mocha test/bin-test"
   },
   "dependencies": {
     "@teppeis/stream-to-observable": "^0.3.1",

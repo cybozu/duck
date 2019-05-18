@@ -1,1 +1,3 @@
 /test/fixtures
+# TODO: update eslint-config-teppeis and apply config for JS
+/test/bin-test
