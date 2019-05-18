@@ -1,7 +1,7 @@
 {
   "name": "@teppeis/duck",
   "description": "Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to plovr.",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "author": "Teppei Sato <teppeis@gmail.com>",
   "publishConfig": {
     "access": "public"
