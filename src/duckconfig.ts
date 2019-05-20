@@ -11,7 +11,8 @@ export interface DuckConfig {
   soyJarPath?: string;
   soyOptions?: SoyToJsOptions;
   soyFileRoots?: readonly string[];
-  concurrency: number;
+  concurrency?: number;
+  batch?: boolean;
   compilerPlatform: 'java' | 'native';
   host: string;
   port: number;
@@ -20,6 +21,7 @@ export interface DuckConfig {
     keyPath: string;
     certPath: string;
   };
+  batchOptions?: import('faastjs').AwsOptions | import('faastjs').LocalOptions;
 }
 
 /**
@@ -30,7 +32,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
   if (opts.config) {
     configPath = assertString(opts.config);
   }
-  let result = opts;
+  let result: DuckConfig = opts;
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const config: DuckConfig = require(configPath);
@@ -65,6 +67,11 @@ export function loadConfig(opts: any = {}): DuckConfig {
     if (opts.config) {
       throw new Error(`duck.config not found: ${opts.config}`);
     }
+  }
+
+  if (process.env.AWS && result.batch && !result.concurrency) {
+    // 1000 is the max concurrency of AWS Lambda
+    result.concurrency = 1000;
   }
 
   return result;

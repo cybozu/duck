@@ -1,19 +1,27 @@
+import {CommonOptions, FaastModuleProxy} from 'faastjs';
+import fs from 'fs';
 import pLimit from 'p-limit';
 import pSettled from 'p-settle';
 import path from 'path';
 import recursive from 'recursive-readdir';
+import {promisify} from 'util';
 import {assertString} from '../assert';
+import {getFaastCompiler} from '../batch';
 import {resultInfoLogType} from '../cli';
 import {
-  compile,
   CompilerOptions,
+  compileToJson,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
 } from '../compiler';
+import * as compilerFaastFunctions from '../compiler-core';
 import {DuckConfig} from '../duckconfig';
 import {EntryConfig, loadEntryConfig} from '../entryconfig';
 import {restoreDepsJs} from '../gendeps';
 import {logger} from '../logger';
+
+const writeFile = promisify(fs.writeFile);
+const mkdir = promisify(fs.mkdir);
 
 /**
  * @throws If compiler throws errors
@@ -23,11 +31,22 @@ export async function buildJs(
   entryConfigs?: readonly string[],
   printConfig = false
 ): Promise<any> {
+  let compileFn = compileToJson;
+  let faastModule: FaastModuleProxy<
+    typeof compilerFaastFunctions,
+    CommonOptions,
+    any
+  > | null = null;
+  if (config.batch) {
+    config.compilerPlatform = 'native';
+    faastModule = await getFaastCompiler(config);
+    compileFn = faastModule.functions.compileToJson;
+  }
   let depsJsRestored = false;
   const entryConfigPaths = entryConfigs
     ? entryConfigs
     : (await findEntryConfigs(assertString(config.entryConfigDir))).sort();
-  const limit = pLimit(config.concurrency);
+  const limit = pLimit(config.concurrency || 1);
   let count = 0;
   const promises = entryConfigPaths.map(entryConfigPath =>
     limit(async () => {
@@ -57,7 +76,15 @@ export async function buildJs(
       }
 
       try {
-        await compile(options, config.compilerPlatform === 'native');
+        if (config.batch) {
+          convertCompilerOptionsToRelative(options, process.cwd());
+        }
+        const outputs = await compileFn(options, config.compilerPlatform === 'native');
+        const promises = outputs.map(async output => {
+          await mkdir(path.dirname(output.path), {recursive: true});
+          return writeFile(output.path, output.src);
+        });
+        await Promise.all(promises);
       } catch (e) {
         logFailed(entryConfigPath, id);
         throw e;
@@ -65,7 +92,13 @@ export async function buildJs(
     })
   );
 
-  await waitAllAndThrowIfAnyCompilationsFailed(promises, entryConfigPaths);
+  try {
+    await waitAllAndThrowIfAnyCompilationsFailed(promises, entryConfigPaths);
+  } finally {
+    if (faastModule) {
+      faastModule.cleanup({deleteResources: false});
+    }
+  }
 
   function logCompiling(entryConfigPath: string, id: number): void {
     const countStatus = entryConfigPaths.length > 1 ? `[${id}/${entryConfigPaths.length}] ` : '';
@@ -138,4 +171,22 @@ async function createCompilerOptionsForChunks_(
     createModuleUris
   );
   return options;
+}
+
+function convertCompilerOptionsToRelative(options: CompilerOptions, basepath: string): void {
+  if (options.js) {
+    options.js = options.js.map(file => {
+      if (file.startsWith('!')) {
+        return `!${path.relative(basepath, file.slice(1))}`;
+      } else {
+        return path.relative(basepath, file);
+      }
+    });
+  }
+  if (options.externs) {
+    options.externs = options.externs.map(file => path.relative(basepath, file));
+  }
+  if (options.entry_point) {
+    options.entry_point = options.entry_point.map(file => path.relative(basepath, file));
+  }
 }
