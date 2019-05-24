@@ -42,7 +42,7 @@
     "p-limit": "^2.2.0",
     "p-settle": "^3.1.0",
     "pino": "^5.12.5",
-    "pino-pretty": "^3.0.0",
+    "pino-pretty": "^3.0.1",
     "recursive-readdir": "^2.2.2",
     "rxjs": "^6.5.2",
     "serve-static": "^1.14.1",
