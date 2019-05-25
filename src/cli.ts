@@ -112,12 +112,16 @@ const buildJsOptions = {
     desc: 'Concurrency limit for compiler',
     alias: 'c',
     type: 'number',
-    default: 1,
   },
   compilerPlatform: {
     desc: 'Use Java or Native (Linux/macOS) version of compiler',
     choices: ['java', 'native'],
     default: 'java',
+  },
+  batch: {
+    desc: 'Build in batch mode (AWS or Local)',
+    type: 'boolean',
+    default: false,
   },
   depsJs,
   printConfig,
