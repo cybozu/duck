@@ -88,7 +88,7 @@ Also see [`examples/chunks`](examples/chunks).
 duck provides batch mode that compiles all entry points simultaneously in parallel on AWS Lambda with [faast.js](https://faastjs.org/).
 
 1. Setting AWS credentials in Node.js (See [AWS document](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html))
-2. Configure `batchOptions` in `duck.config.js` (See [faast.js document](https://faastjs.org/docs/api/faastjs.awsoptions)).
+2. Configure `batchOptions` in `duck.config.js`. It's used for faast.js as [AWSOptions](https://faastjs.org/docs/api/faastjs.awsoptions).
 ```js
 const closureVersion = require('google-closure-compiler/package.json').version;
 
@@ -116,19 +116,18 @@ $ duck build --batch aws
 
 #### How to debug in batch mode?
 
-- Use `--batch local` to [debug on local](https://faastjs.org/docs/local)
-- Use `DEBUG=faast:info` or [other log level](https://faastjs.org/docs/workflow#debug-environment-variable) to get more information
+- Use `--batch local` for [local debugging](https://faastjs.org/docs/local)
+- Use `DEBUG=faast:info` or [other log level](https://faastjs.org/docs/workflow#debug-environment-variable) to get more debug information
 - Get `logUrl` from debug info and view it in CloudWatch logs
 - Use `FAAST_PACKAGE_DIR=foo/bar` to investigate a package sent to Lambda 
 
-See [faast.js document](https://faastjs.org/docs/api/faastjs.awsoptions).
+Also see [faast.js document](https://faastjs.org/docs/api/faastjs.awsoptions) for more information.
 
 ### How to use HTTPS and HTTP2 in `duck serve`?
 
-Create a self-signed certificate like
+[Create a self-signed certificate](https://stackoverflow.com/a/10176685) like
 
 ```console
-# https://stackoverflow.com/a/10176685
 $ openssl req -x509 -newkey rsa:4096 -keyout duck-key.pem -out duck-cert.pem -days 365 -nodes -subj '/CN=localhost'
 ```
 
