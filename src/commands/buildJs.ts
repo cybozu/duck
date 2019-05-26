@@ -47,46 +47,47 @@ export async function buildJs(
     ? entryConfigs
     : (await findEntryConfigs(assertString(config.entryConfigDir))).sort();
   const limit = pLimit(config.concurrency || 1);
-  let count = 0;
+  let runningJobCount = 1;
+  let completedJobCount = 1;
   const promises = entryConfigPaths.map(entryConfigPath =>
     limit(async () => {
-      const entryConfig = await loadEntryConfig(entryConfigPath);
-      const id = count++;
-      logCompiling(entryConfigPath, id);
-      let options: CompilerOptions;
-      if (entryConfig.modules) {
-        if (config.depsJs && !depsJsRestored) {
-          logger.info('Restoring deps.js cache');
-          await restoreDepsJs(config.depsJs, config.closureLibraryDir);
-          depsJsRestored = true;
-        }
-        options = await createCompilerOptionsForChunks_(entryConfig, config);
-      } else {
-        options = createCompilerOptionsForPage(entryConfig, true);
-      }
-
-      if (printConfig) {
-        logger.info({
-          msg: 'Print config only',
-          type: resultInfoLogType,
-          title: 'Compiler config',
-          bodyObject: options,
-        });
-        return;
-      }
-
       try {
+        const entryConfig = await loadEntryConfig(entryConfigPath);
+        let options: CompilerOptions;
+        if (entryConfig.modules) {
+          if (config.depsJs && !depsJsRestored) {
+            log(entryConfigPath, 'Restoring deps.js cache');
+            await restoreDepsJs(config.depsJs, config.closureLibraryDir);
+            depsJsRestored = true;
+          }
+          options = await createCompilerOptionsForChunks_(entryConfig, config);
+        } else {
+          options = createCompilerOptionsForPage(entryConfig, true);
+        }
+
+        if (printConfig) {
+          logger.info({
+            msg: 'Print config only',
+            type: resultInfoLogType,
+            title: 'Compiler config',
+            bodyObject: options,
+          });
+          return;
+        }
+
         if (config.batch) {
           convertCompilerOptionsToRelative(options, process.cwd());
         }
+        logWithCount(entryConfigPath, runningJobCount++, 'Compiling');
         const outputs = await compileFn(options, config.compilerPlatform === 'native');
         const promises = outputs.map(async output => {
           await mkdir(path.dirname(output.path), {recursive: true});
           return writeFile(output.path, output.src);
         });
         await Promise.all(promises);
+        logWithCount(entryConfigPath, completedJobCount++, 'Compiled');
       } catch (e) {
-        logFailed(entryConfigPath, id);
+        logWithCount(entryConfigPath, completedJobCount++, 'Failed');
         throw e;
       }
     })
@@ -100,15 +101,12 @@ export async function buildJs(
     }
   }
 
-  function logCompiling(entryConfigPath: string, id: number): void {
-    const countStatus = entryConfigPaths.length > 1 ? `[${id}/${entryConfigPaths.length}] ` : '';
+  function log(entryConfigPath: string, msg: string): void {
     const relativePath = path.relative(process.cwd(), entryConfigPath);
-    logger.info(`${countStatus}Compiling ${relativePath}`);
+    logger.info(`${msg}: ${relativePath}`);
   }
-  function logFailed(entryConfigPath: string, id: number): void {
-    const countStatus = entryConfigPaths.length > 1 ? `[${id}/${entryConfigPaths.length}] ` : '';
-    const relativePath = path.relative(process.cwd(), entryConfigPath);
-    logger.error(`${countStatus}Failed ${relativePath}`);
+  function logWithCount(entryConfigPath: string, count: number, msg: string): void {
+    log(entryConfigPath, `[${count}/${entryConfigPaths.length}] ${msg}`);
   }
 }
 
