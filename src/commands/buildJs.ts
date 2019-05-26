@@ -30,13 +30,7 @@ export async function buildJs(
   printConfig = false
 ): Promise<any> {
   let compileFn = compileToJson;
-  let faastModule:
-    | import('faastjs').FaastModuleProxy<
-        typeof compilerFaastFunctions,
-        import('faastjs').CommonOptions,
-        any
-      >
-    | null = null;
+  let faastModule: import('faastjs').FaastModule<typeof compilerFaastFunctions> | null = null;
   if (config.batch) {
     const {getFaastCompiler} = await import('../batch');
     faastModule = await getFaastCompiler(config);
