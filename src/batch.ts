@@ -6,6 +6,7 @@ import {
   FaastModuleProxy,
   LocalOptions,
 } from 'faastjs';
+import {assertNonNullable} from './assert';
 import * as compilerFaastFunctions from './compiler-core';
 import {DuckConfig} from './duckconfig';
 import {logger} from './logger';
@@ -14,10 +15,17 @@ export async function getFaastCompiler(
   config: DuckConfig
 ): Promise<FaastModuleProxy<typeof compilerFaastFunctions, CommonOptions, any>> {
   logger.info('Initializing batch mode');
+  const batch = assertNonNullable(config.batch);
   const batchOptions = getBatchOptions(config);
-  const m = process.env.AWS
-    ? await faastAws(compilerFaastFunctions, batchOptions as AwsOptions)
-    : await faastLocal(compilerFaastFunctions, batchOptions as LocalOptions);
+  const m =
+    batch === 'aws'
+      ? await faastAws(compilerFaastFunctions, batchOptions as AwsOptions)
+      : batch === 'local'
+      ? await faastLocal(compilerFaastFunctions, batchOptions as LocalOptions)
+      : null;
+  if (!m) {
+    throw new TypeError(`Unsupported batch mode: ${batch}`);
+  }
   return m;
 }
 

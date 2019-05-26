@@ -68,7 +68,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
     }
   }
 
-  if (process.env.AWS && result.batch && !result.concurrency) {
+  if (result.batch === 'aws' && !result.concurrency) {
     // 1000 is the max concurrency of AWS Lambda
     result.concurrency = 1000;
   }
