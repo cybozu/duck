@@ -1,4 +1,3 @@
-import {CommonOptions, FaastModuleProxy} from 'faastjs';
 import fs from 'fs';
 import pLimit from 'p-limit';
 import pSettled from 'p-settle';
@@ -6,7 +5,6 @@ import path from 'path';
 import recursive from 'recursive-readdir';
 import {promisify} from 'util';
 import {assertString} from '../assert';
-import {getFaastCompiler} from '../batch';
 import {resultInfoLogType} from '../cli';
 import {
   CompilerOptions,
@@ -32,13 +30,16 @@ export async function buildJs(
   printConfig = false
 ): Promise<any> {
   let compileFn = compileToJson;
-  let faastModule: FaastModuleProxy<
-    typeof compilerFaastFunctions,
-    CommonOptions,
-    any
-  > | null = null;
+  let faastModule:
+    | import('faastjs').FaastModuleProxy<
+        typeof compilerFaastFunctions,
+        import('faastjs').CommonOptions,
+        any
+      >
+    | null = null;
   if (config.batch) {
     config.compilerPlatform = 'native';
+    const {getFaastCompiler} = await import('../batch');
     faastModule = await getFaastCompiler(config);
     compileFn = faastModule.functions.compileToJson;
   }
