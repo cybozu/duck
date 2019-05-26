@@ -6,6 +6,7 @@ import {
   FaastModuleProxy,
   LocalOptions,
 } from 'faastjs';
+import mergeOptions from 'merge-options';
 import {assertNonNullable} from './assert';
 import * as compilerFaastFunctions from './compiler-core';
 import {DuckConfig} from './duckconfig';
@@ -31,32 +32,42 @@ export async function getFaastCompiler(
 
 function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
   const {batchOptions = {}} = config;
-  if (!batchOptions.webpackOptions) {
-    batchOptions.webpackOptions = {};
-  }
-  if (!batchOptions.webpackOptions.externals) {
-    batchOptions.webpackOptions.externals = [];
-  }
-  if (!Array.isArray(batchOptions.webpackOptions.externals)) {
-    batchOptions.webpackOptions.externals = [batchOptions.webpackOptions.externals];
-  }
-  batchOptions.webpackOptions.externals = [
-    ...batchOptions.webpackOptions.externals,
-    ...defaultWebpackExternals(),
-  ];
-  return batchOptions;
+  return mergeOptions.call({concatArrays: true}, defaultBatchOptions(config), batchOptions);
 }
 
-function defaultWebpackExternals(): import('webpack').ExternalsElement[] {
-  return [
-    /^aws-sdk\/?/,
-    'google-closure-compiler-js',
-    'google-closure-compiler-linux',
-    'google-closure-compiler-osx',
-    // used in google-closure-compiler/lib/(grunt|gulp)
-    'chalk',
-    // used in google-closure-compiler/lib/gulp
-    /^gulp($|-)/,
-    /^vinyl($|-)/,
-  ];
+function defaultBatchOptions(config: DuckConfig): AwsOptions {
+  const closureVersion = require('google-closure-compiler/package.json').version;
+  return {
+    packageJson: {
+      // To suppress npm warnings
+      private: true,
+      dependencies: {
+        [`google-closure-compiler-${getOsForNativeImage(config)}`]: closureVersion,
+      },
+    },
+    webpackOptions: {
+      externals: [
+        /^aws-sdk\/?/,
+        'google-closure-compiler-js',
+        'google-closure-compiler-linux',
+        'google-closure-compiler-osx',
+        // used in google-closure-compiler/lib/(grunt|gulp)
+        'chalk',
+        // used in google-closure-compiler/lib/gulp
+        /^gulp($|-)/,
+        /^vinyl($|-)/,
+      ],
+    },
+  };
+}
+
+function getOsForNativeImage(config: DuckConfig) {
+  const {platform} = process;
+  if (config.batch === 'aws' || platform === 'linux') {
+    return 'linux';
+  } else if (platform === 'darwin') {
+    return 'osx';
+  } else {
+    throw new Error(`Unsuported Platform: ${platform}`);
+  }
 }
