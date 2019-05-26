@@ -26,19 +26,24 @@ const logger = pino(logStream);
 setGlobalLogger(logger);
 
 /**
- * Conbine log stream with a promise to make an observable that does not "complete" until the promise is resolved,
- * Because listr can accept only one of Promise, Stream and Observable.
+ * Task wrapper that conbines the log stream with the promise to make an
+ * observable that does not "complete" until the promise is resolved,
+ * because listr can accept only one of Promise, Stream and Observable.
  */
-function toObservable(p: Promise<any>): Observable<string> {
-  return streamToObservable(logStream, {await: p, endEvent: false}).pipe(
-    map<any, string>(obj => {
-      if (obj.msg) {
-        return String(obj.msg);
-      } else {
-        return String(obj);
-      }
-    })
-  );
+function wrap(task: () => Promise<any>): () => Observable<string> {
+  return () => {
+    // Run the task in the next tick to register the observable to listr before the first logging.
+    const await = Promise.resolve().then(task);
+    return streamToObservable(logStream, {await, endEvent: false}).pipe(
+      map<any, string>(obj => {
+        if (obj.msg) {
+          return String(obj.msg);
+        } else {
+          return String(obj);
+        }
+      })
+    );
+  };
 }
 
 export const resultInfoLogType = 'resultInfo';
@@ -189,7 +194,7 @@ export function run(processArgv: readonly string[]): void {
           {
             title: `Compile Soy templates`,
             skip: () => !hasSoyConfig || argv.skipInitialSoy,
-            task: () => toObservable(buildSoy(config as BuildSoyConfig)),
+            task: wrap(() => buildSoy(config as BuildSoyConfig)),
           },
         ]);
         await tasks.run();
@@ -214,12 +219,11 @@ export function run(processArgv: readonly string[]): void {
           {
             title: `Compile Soy templates`,
             skip: () => !(config.soyJarPath && config.soyFileRoots && config.soyOptions),
-            task: () => toObservable(buildSoy(config as BuildSoyConfig, argv.printConfig)),
+            task: wrap(() => buildSoy(config as BuildSoyConfig, argv.printConfig)),
           },
           {
             title: `Compile JS files`,
-            task: () =>
-              toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+            task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
           },
         ]);
         await tasks.run().catch(printOnlyCompilationError);
@@ -231,8 +235,7 @@ export function run(processArgv: readonly string[]): void {
       const tasks = new Listr([
         {
           title: `Compile JS files`,
-          task: () =>
-            toObservable(buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+          task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
         },
       ]);
       await tasks.run().catch(printOnlyCompilationError);
@@ -246,7 +249,7 @@ export function run(processArgv: readonly string[]): void {
       const tasks = new Listr([
         {
           title: `Compile Soy templates`,
-          task: () => toObservable(buildSoy(config as BuildSoyConfig, argv.printConfig)),
+          task: wrap(() => buildSoy(config as BuildSoyConfig, argv.printConfig)),
         },
       ]);
       await tasks.run();
@@ -257,7 +260,7 @@ export function run(processArgv: readonly string[]): void {
       const tasks = new Listr([
         {
           title: `Generate deps.js`,
-          task: () => toObservable(buildDeps(config)),
+          task: wrap(() => buildDeps(config)),
         },
       ]);
       await tasks.run();
@@ -269,7 +272,7 @@ export function run(processArgv: readonly string[]): void {
       const tasks = new Listr([
         {
           title: `Clean up soy.js`,
-          task: () => toObservable(cleanSoy(config as CleanSoyConfig)),
+          task: wrap(() => cleanSoy(config as CleanSoyConfig)),
         },
       ]);
       await tasks.run();
@@ -279,7 +282,7 @@ export function run(processArgv: readonly string[]): void {
       const tasks = new Listr([
         {
           title: `Clean up deps.js: ${config.depsJs}`,
-          task: () => toObservable(cleanDeps(assertString(config.depsJs))),
+          task: wrap(() => cleanDeps(assertString(config.depsJs))),
         },
       ]);
       await tasks.run();
