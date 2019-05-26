@@ -8,10 +8,12 @@ import {
 } from 'faastjs';
 import * as compilerFaastFunctions from './compiler-core';
 import {DuckConfig} from './duckconfig';
+import {logger} from './logger';
 
 export async function getFaastCompiler(
   config: DuckConfig
 ): Promise<FaastModuleProxy<typeof compilerFaastFunctions, CommonOptions, any>> {
+  logger.info('Initializing batch mode');
   const batchOptions = getBatchOptions(config);
   const m = process.env.AWS
     ? await faastAws(compilerFaastFunctions, batchOptions as AwsOptions)

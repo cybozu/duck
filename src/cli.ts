@@ -83,13 +83,6 @@ const entryConfigDir = {
   coerce: path.resolve,
 } as const;
 
-const watch = {
-  desc: 'Re-compile incrementally when files change',
-  alias: 'w',
-  type: 'boolean',
-  default: false,
-} as const;
-
 const printConfig = {
   desc: 'Print effective configs for compilers',
   alias: 'p',
@@ -118,15 +111,9 @@ const buildJsOptions = {
     alias: 'c',
     type: 'number',
   },
-  compilerPlatform: {
-    desc: 'Use Java or Native (Linux/macOS) version of compiler',
-    choices: ['java', 'native'],
-    default: 'java',
-  },
   batch: {
-    desc: 'Build in batch mode (AWS or Local)',
-    type: 'boolean',
-    default: false,
+    desc: 'Build in batch mode (on AWS or local for debug)',
+    choices: ['aws', 'local'],
   },
   depsJs,
   printConfig,
@@ -144,7 +131,12 @@ const buildSoyOptions = {
     coerce: path.resolve,
   },
   config,
-  watch,
+  watch: {
+    desc: 'Re-compile incrementally when files change',
+    alias: 'w',
+    type: 'boolean',
+    default: false,
+  },
   printConfig,
 } as const;
 
@@ -293,7 +285,7 @@ export function run(processArgv: readonly string[]): void {
     .locale('en')
     .epilog('CLI options overwrite config file')
     // default 80 is too short for command usage lines
-    .wrap(90)
+    .wrap(98)
     .strict()
     .help()
     .showHelpOnFail(false, 'Specify --help or -h for available options')
