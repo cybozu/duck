@@ -129,10 +129,9 @@ export function convertToFlagfile(opts: CompilerOptions): {flagfile: string} {
     }
   });
   fs.writeFileSync(flagfile, lines.join('\n'), 'utf8');
-  // TODO: logger is undefined in faast.js
-  if (logger) {
-    logger.info(`flagfile: ${flagfile}`);
-  }
+  // logger is not initialized with pino in batch mode.
+  const log = logger ? logger.info.bind(logger) : console.info.bind(console);
+  log(`flagfile: ${flagfile}`);
   return {flagfile};
 
   function createKeyValue(key: string, value: any): string {
