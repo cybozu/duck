@@ -12,8 +12,8 @@ export interface DuckConfig {
   soyOptions?: SoyToJsOptions;
   soyFileRoots?: readonly string[];
   concurrency?: number;
-  batch?: boolean;
-  compilerPlatform: 'java' | 'native';
+  batch?: 'aws' | 'local';
+  batchOptions?: import('faastjs').AwsOptions | import('faastjs').LocalOptions;
   host: string;
   port: number;
   http2?: boolean;
@@ -21,7 +21,6 @@ export interface DuckConfig {
     keyPath: string;
     certPath: string;
   };
-  batchOptions?: import('faastjs').AwsOptions | import('faastjs').LocalOptions;
 }
 
 /**

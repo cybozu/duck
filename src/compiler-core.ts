@@ -52,13 +52,13 @@ export interface CompilerOutput {
  */
 export async function compileToJson(
   opts: CompilerOptions,
-  useNative = false
+  batchMode?: 'aws' | 'local'
 ): Promise<CompilerOutput[]> {
   opts = {...opts, json_streams: 'OUT'};
-  return JSON.parse(await compile(opts, useNative));
+  return JSON.parse(await compile(opts, batchMode));
 }
 
-export function compile(opts: CompilerOptions, useNative = false): Promise<string> {
+export function compile(opts: CompilerOptions, batchMode?: 'aws' | 'local'): Promise<string> {
   if (isInAwsLambda()) {
     rewriteNodePathForAwsLambda(opts);
   }
@@ -67,7 +67,7 @@ export function compile(opts: CompilerOptions, useNative = false): Promise<strin
     opts = convertToFlagfile(opts);
   }
   const compiler = new ClosureCompiler(opts as any);
-  if (useNative) {
+  if (batchMode) {
     compiler.JAR_PATH = null;
     compiler.javaPath = getNativeImagePath();
   }

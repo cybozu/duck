@@ -38,7 +38,6 @@ export async function buildJs(
       >
     | null = null;
   if (config.batch) {
-    config.compilerPlatform = 'native';
     const {getFaastCompiler} = await import('../batch');
     faastModule = await getFaastCompiler(config);
     compileFn = faastModule.functions.compileToJson;
@@ -80,7 +79,7 @@ export async function buildJs(
           convertCompilerOptionsToRelative(options, process.cwd());
         }
         logWithCount(entryConfigPath, runningJobCount++, 'Compiling');
-        const outputs = await compileFn(options, config.compilerPlatform === 'native');
+        const outputs = await compileFn(options, config.batch);
         const promises = outputs.map(async output => {
           await mkdir(path.dirname(output.path), {recursive: true});
           return writeFile(output.path, output.src);
