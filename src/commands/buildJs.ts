@@ -91,7 +91,7 @@ export async function buildJs(
     await waitAllAndThrowIfAnyCompilationsFailed(promises, entryConfigPaths);
   } finally {
     if (faastModule) {
-      faastModule.cleanup({deleteResources: false});
+      faastModule.cleanup();
     }
   }
 
