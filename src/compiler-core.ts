@@ -55,7 +55,15 @@ export async function compileToJson(
   batchMode?: 'aws' | 'local'
 ): Promise<CompilerOutput[]> {
   opts = {...opts, json_streams: 'OUT'};
-  return JSON.parse(await compile(opts, batchMode));
+  const outputs: CompilerOutput[] = JSON.parse(await compile(opts, batchMode));
+  if (batchMode) {
+    // Reduce transfer size in batch mode.
+    // The maximum request/response size of AWS Lambda is 6MB each.
+    // See https://faastjs.org/docs/aws#queue-vs-https-mode
+    return outputs.map(({path, src}) => ({path, src, source_map: ''}));
+  } else {
+    return outputs;
+  }
 }
 
 export function compile(opts: CompilerOptions, batchMode?: 'aws' | 'local'): Promise<string> {
