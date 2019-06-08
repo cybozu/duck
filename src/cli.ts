@@ -96,6 +96,12 @@ const depsJs = {
   coerce: path.resolve,
 } as const;
 
+const skipDepsJs = {
+  desc: 'Skip generating deps.js',
+  type: 'boolean',
+  default: false,
+} as const;
+
 const buildJsOptions = {
   entryConfigDir,
   entryConfigs: {
@@ -115,8 +121,8 @@ const buildJsOptions = {
     desc: 'Build in batch mode (on AWS or local for debug)',
     choices: ['aws', 'local'],
   },
-  depsJs,
   printConfig,
+  depsJs,
 } as const;
 
 const buildSoyOptions = {
@@ -159,8 +165,8 @@ export function run(processArgv: readonly string[]): void {
         },
         closureLibraryDir,
         depsJs,
-        skipInitialSoy: {
-          desc: 'Skip initial compiling of Soy templates',
+        skipInitialBuild: {
+          desc: "Don't build Soy and deps.js before serving",
           alias: 's',
           type: 'boolean',
           default: false,
@@ -185,8 +191,13 @@ export function run(processArgv: readonly string[]): void {
         const tasks = new Listr([
           {
             title: `Compile Soy templates`,
-            skip: () => !hasSoyConfig || argv.skipInitialSoy,
+            skip: () => !hasSoyConfig || argv.skipInitialBuild,
             task: wrap(() => buildSoy(config as BuildSoyConfig)),
+          },
+          {
+            title: `Generate deps.js`,
+            skip: () => !config.depsJs || argv.skipInitialBuild,
+            task: wrap(() => buildDeps(config)),
           },
         ]);
         await tasks.run();
@@ -196,14 +207,11 @@ export function run(processArgv: readonly string[]): void {
     )
     .command(
       'build [entryConfigDir]',
-      'Compile Soy and JS files',
+      'Build Soy, deps.js and JS',
       {
         ...buildJsOptions,
+        skipDepsJs,
         ...buildSoyOptions,
-        watch: {
-          desc: '--watch is not supported in build command',
-          hidden: true,
-        },
       },
       async argv => {
         const config = loadConfig(argv);
@@ -212,6 +220,11 @@ export function run(processArgv: readonly string[]): void {
             title: `Compile Soy templates`,
             skip: () => !(config.soyJarPath && config.soyFileRoots && config.soyOptions),
             task: wrap(() => buildSoy(config as BuildSoyConfig, argv.printConfig)),
+          },
+          {
+            title: `Generate deps.js`,
+            skip: () => !config.depsJs || argv.skipDepsJs,
+            task: wrap(() => buildDeps(config)),
           },
           {
             title: `Compile JS files`,
