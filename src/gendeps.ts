@@ -3,27 +3,24 @@ import fs from 'fs';
 import {depFile, depGraph, parser} from 'google-closure-deps';
 import path from 'path';
 import recursive from 'recursive-readdir';
-import util from 'util';
+import {promisify} from 'util';
 import {EntryConfig} from './entryconfig';
 import {googBaseUrlPath, inputsUrlPath} from './urls';
 
-const readFile = util.promisify(fs.readFile);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
 const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> = new Map();
 
 /**
  * Generate deps.js source text for RAW mode.
  * The result excludes deps of Closure Library.
- *
- * @param entryConfig
- * @param closureLibraryDir "${closureLibraryDir}/closure/goog/base.js" exists.
- * @param inputsRoot
  */
 export async function generateDepFileText(
   entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
-  closureLibraryDir: string,
-  inputsRoot: string
+  inputsRoot: string,
+  ignoreDirs: readonly string[] = []
 ): Promise<string> {
-  const dependencies = await getDependencies(entryConfig, [closureLibraryDir]);
+  const dependencies = await getDependencies(entryConfig, ignoreDirs);
   const googBaseDirVirtualPath = path.dirname(
     path.resolve(inputsRoot, path.relative(inputsUrlPath, googBaseUrlPath))
   );
@@ -36,7 +33,7 @@ export function generateDepFileTextFromDeps(
 ): string {
   // `getDepFileText()` doesn't generate addDependency() for SCRIPT,
   // so change the type to CLOSURE_PROVIDE temporally.
-  // TODO: remove in the future
+  // TODO: fix upstream google-closure-deps and remove this
   const scriptDeps = dependencies.filter(dep => dep.type === depGraph.DependencyType.SCRIPT);
   scriptDeps.forEach(dep => {
     dep.type = depGraph.DependencyType.CLOSURE_PROVIDE;
@@ -47,6 +44,16 @@ export function generateDepFileTextFromDeps(
     dep.type = depGraph.DependencyType.SCRIPT;
   });
   return depFileText;
+}
+
+/**
+ * NOTE: This doesn't support ES Modules, because a bug of google-closure-deps.
+ */
+export async function writeCachedDepsOnDisk(depsJsPath: string, closureLibraryDir: string) {
+  const closureBaseDir = path.join(closureLibraryDir, 'closure', 'goog');
+  const deps = await Promise.all(Array.from(pathToDependencyCache.values()));
+  const content = generateDepFileTextFromDeps(deps, closureBaseDir);
+  return writeFile(depsJsPath, content);
 }
 
 /**
