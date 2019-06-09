@@ -41,12 +41,7 @@ export async function serve(config: DuckConfig, watch = true) {
 
   setGlobalLogger(
     pino({
-      prettyPrint: {
-        translateTime: 'SYS:HH:MM:ss.l',
-        ignore: 'hostname,pid',
-        // hide logs for accesses to static assets
-        search: `!(req.url && starts_with(req.url, \`${inputsUrlPath}/\`)) && res.statusCode != \`304\``,
-      },
+      prettyPrint: {translateTime: 'SYS:HH:MM:ss.l', ignore: 'hostname,pid'},
     })
   );
 
@@ -63,9 +58,6 @@ export async function serve(config: DuckConfig, watch = true) {
   }
 
   const server = await createServer(config);
-
-  // enable CORS at first
-  server.use(cors());
 
   // static assets
   server.use(closureLibraryUrlPath, serveStatic(config.closureLibraryDir, {
@@ -278,14 +270,23 @@ function updateDepsJsCache(config: DuckConfig) {
   if (depsJs) {
     writeCachedDepsOnDisk(depsJs, config.closureLibraryDir).then(
       () => logger.debug(`[DEPSJS_UPDATED]: ${path.relative(process.cwd(), depsJs)}`),
-      e => logger.error('Error: Fail to write deps.js', e)
+      err => logger.error({err}, 'Fail to write deps.js')
     );
   }
 }
 
+const numberFormat = new Intl.NumberFormat();
+
 async function createServer(config: DuckConfig): Promise<fastify.FastifyInstance> {
+  const opts: fastify.ServerOptions = {
+    logger,
+    disableRequestLogging: true,
+  };
   const {http2, https} = config;
-  let server: fastify.FastifyInstance;
+  // `req.originalUrl` is added by fastify but doesn't exist in the type definition.
+  // https://github.com/fastify/fastify/blob/ecea232ae596fd0eb06a5b38080e19e4414bd942/lib/route.js#L285
+  type FastifyIncomingMessage = import('http').IncomingMessage & {originalUrl?: string};
+  let server: fastify.FastifyInstance<import('http').Server, FastifyIncomingMessage>;
   if (https) {
     const httpsOptions = {
       key: await promisify(readFile)(https.keyPath, 'utf8'),
@@ -294,18 +295,63 @@ async function createServer(config: DuckConfig): Promise<fastify.FastifyInstance
     // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
     // But it is not a big deal.
     if (http2) {
-      server = fastify({logger, https: httpsOptions, http2: true}) as fastify.FastifyInstance<
-        any,
-        any,
-        any
-      >;
+      server = fastify({
+        ...opts,
+        https: httpsOptions,
+        http2: true,
+      }) as fastify.FastifyInstance<any, any, any>;
     } else {
-      server = fastify({logger, https: httpsOptions}) as fastify.FastifyInstance<any>;
+      server = fastify({...opts, https: httpsOptions}) as any;
     }
   } else {
-    server = fastify({logger});
+    server = fastify(opts);
   }
+
+  // enable CORS at first
+  server.use(cors());
+
+  // customize log output
+  server.addHook('onRequest', async ({raw, log}, reply) => {
+    const {method, url} = raw;
+    if (url && url.startsWith(inputsUrlPath)) {
+      // skip logging for static assets
+      return;
+    }
+    setStartTime(reply);
+    log.info({request: `${method} ${url}`}, 'incoming request');
+  });
+  server.addHook('onResponse', async ({raw, log}, reply) => {
+    const {method, url, originalUrl} = raw;
+    if (originalUrl && originalUrl.startsWith(inputsUrlPath)) {
+      // skip logging for static assets
+      return;
+    }
+    log.info(
+      {
+        request: `${method} ${originalUrl || url || '"N/A"'}`,
+        statusCode: reply.res.statusCode,
+        responseTime: getResopnseTime(reply),
+      },
+      'request completed'
+    );
+  });
   return server;
+}
+
+// Self-implementation of recording responseTime because the default
+// responseTime feature is disabled by disableRequestLogging.
+const startTimeKey = Symbol('startTime');
+function setStartTime(reply: any): void {
+  reply[startTimeKey] = Date.now();
+}
+function getResopnseTime(reply: any): string {
+  const startTime = reply[startTimeKey];
+  if (typeof startTime === 'number') {
+    const responseTime = Date.now() - startTime;
+    return `${numberFormat.format(responseTime)}ms`;
+  } else {
+    return 'N/A';
+  }
 }
 
 /**
