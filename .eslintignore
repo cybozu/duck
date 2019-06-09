@@ -1,5 +1,5 @@
 /test/fixtures
 # TODO: update eslint-config-teppeis and apply config for JS
 /test/bin-test
-/test/fixtures/*.js
+/test/fixtures/**/*-deps.js
 deps.js
