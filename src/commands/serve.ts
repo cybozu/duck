@@ -270,7 +270,7 @@ function updateDepsJsCache(config: DuckConfig) {
   if (depsJs) {
     writeCachedDepsOnDisk(depsJs, config.closureLibraryDir).then(
       () => logger.debug(`[DEPSJS_UPDATED]: ${path.relative(process.cwd(), depsJs)}`),
-      e => logger.error('Error: Fail to write deps.js', e)
+      err => logger.error({err}, 'Fail to write deps.js')
     );
   }
 }
