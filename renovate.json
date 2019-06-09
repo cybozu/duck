@@ -2,6 +2,7 @@
   "extends": ["@teppeis"],
   "packageRules": [
     {
+      "groupName": "Google Closure Tools",
       "packagePatterns": ["^google-closure-"],
       "rangeStrategy": "update-lockfile"
     }
