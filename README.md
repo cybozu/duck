@@ -25,7 +25,7 @@ duck <command>
 
 Commands:
   duck serve [entryConfigDir]     Start dev server
-  duck build [entryConfigDir]     Compile Soy and JS files
+  duck build [entryConfigDir]     Build Soy, deps.js and JS
   duck build:js [entryConfigDir]  Compile JS files
   duck build:soy                  Compile Soy templates
   duck build:deps                 Generate deps.js
@@ -34,8 +34,8 @@ Commands:
   duck completion                 Generate completion script for bash/zsh
 
 Options:
-  -v, --version  Show version number                                             [boolean]
-  -h, --help     Show help                                                       [boolean]
+  -v, --version  Show version number                                                     [boolean]
+  -h, --help     Show help                                                               [boolean]
 
 CLI options overwrite config file
 ```
@@ -48,15 +48,15 @@ duck serve [entryConfigDir]
 Start dev server
 
 Options:
-  --inputsRoot          A root directory to serve                                 [string]
-  --closureLibraryDir   Closure Library directory                                 [string]
-  --depsJs              A path to deps.js to save and load                        [string]
-  --skipInitialSoy, -s  Skip initial compiling of Soy templates [boolean] [default: false]
-  --port                A port number to listen                   [number] [default: 9810]
-  --host                A host to listen                   [string] [default: "localhost"]
-  --config              A path to duck.config.js, the extension can be ommited    [string]
-  -v, --version         Show version number                                      [boolean]
-  -h, --help            Show help                                                [boolean]
+  --inputsRoot            A root directory to serve                                       [string]
+  --closureLibraryDir     Closure Library directory                                       [string]
+  --depsJs                A path to deps.js to save and load                              [string]
+  --skipInitialBuild, -s  Don't build Soy and deps.js before serving    [boolean] [default: false]
+  --port                  A port number to listen                         [number] [default: 9810]
+  --host                  A host to listen                         [string] [default: "localhost"]
+  --config                A path to duck.config.js, the extension can be ommited          [string]
+  -v, --version           Show version number                                            [boolean]
+  -h, --help              Show help                                                      [boolean]
 ```
 
 ### `duck build`
