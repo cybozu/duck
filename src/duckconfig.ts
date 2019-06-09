@@ -103,5 +103,5 @@ function toAbsPathArray<T>(
  * type Keys = PickKeysByValue<Props, string | number>;
  */
 type PickKeysByValue<T, ValueType> = {
-  [Key in keyof T]: T[Key] extends ValueType ? Key : never
+  [Key in keyof T]: T[Key] extends ValueType ? Key : never;
 }[keyof T];
