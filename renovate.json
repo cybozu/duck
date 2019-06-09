@@ -1,5 +1,9 @@
 {
-  "extends": [
-    "@teppeis"
+  "extends": ["@teppeis"],
+  "packageRules": [
+    {
+      "packagePatterns": ["^google-closure-"],
+      "rangeStrategy": "update-lockfile"
+    }
   ]
 }
