@@ -45,16 +45,14 @@ export async function serve(config: DuckConfig, watch = true) {
     })
   );
 
-  logger.info('Starting dev server...');
-
   if (watch) {
     watchJsAndSoy(config);
   }
 
   if (config.depsJs) {
-    restoreDepsJs(config.depsJs, config.closureLibraryDir).then(() => {
-      logger.info('deps.js restored');
-    });
+    restoreDepsJs(config.depsJs, config.closureLibraryDir).then(() =>
+      logger.debug('deps.js restored', config.depsJs)
+    );
   }
 
   const server = await createServer(config);
