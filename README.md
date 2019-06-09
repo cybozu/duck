@@ -64,19 +64,22 @@ Options:
 ```
 duck build [entryConfigDir]
 
-Compile Soy and JS files
+Build Soy, deps.js and JS
 
 Options:
-  --entryConfigs, -e   Entry config files (this option ignores entryConfigDir)     [array]
-  --closureLibraryDir  Closure Library directory                                  [string]
-  --config             A path to duck.config.js, the extension can be ommited     [string]
-  --concurrency, -c    Concurrency limit for compiler                [number] [default: 1]
-  --depsJs             A path to deps.js to save and load                         [string]
-  --printConfig, -p    Print effective configs for compilers    [boolean] [default: false]
-  --soyJarPath         A path to Soy.jar                                          [string]
-  --soyFileRoots       Root directories of soy files                               [array]
-  -v, --version        Show version number                                       [boolean]
-  -h, --help           Show help                                                 [boolean]
+  --entryConfigs, -e   Entry config files (this option ignores entryConfigDir)             [array]
+  --closureLibraryDir  Closure Library directory                                          [string]
+  --config             A path to duck.config.js, the extension can be ommited             [string]
+  --concurrency, -c    Concurrency limit for compiler                                     [number]
+  --batch              Build in batch mode (on AWS or local for debug)   [choices: "aws", "local"]
+  --printConfig, -p    Print effective configs for compilers            [boolean] [default: false]
+  --depsJs             A path to deps.js to save and load                                 [string]
+  --skipDepsJs         Skip generating deps.js                          [boolean] [default: false]
+  --soyJarPath         A path to Soy.jar                                                  [string]
+  --soyFileRoots       Root directories of soy files                                       [array]
+  --watch, -w          Re-compile incrementally when files change       [boolean] [default: false]
+  -v, --version        Show version number                                               [boolean]
+  -h, --help           Show help                                                         [boolean]
 ```
 
 Also see [`examples/chunks`](examples/chunks).
