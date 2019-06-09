@@ -1,6 +1,7 @@
 import flat from 'array.prototype.flat';
 import fs from 'fs';
 import {depFile, depGraph, parser} from 'google-closure-deps';
+import pLimit from 'p-limit';
 import path from 'path';
 import recursive from 'recursive-readdir';
 import {promisify} from 'util';
@@ -95,9 +96,15 @@ export async function getDependencies(
       testExcludes = entryConfig['test-excludes'];
     }
     const files = await recursive(p, ignoreDirPatterns);
+    // NOTE: This logic is executed in a single thread (not forking),
+    // so this concurrency doesn't affect the prformance.
+    // But it improves smooth animation of "in-progress circle" and "Ctrl-C" handling.
+    // TODO: Use workers in Node v12+.
+    const limit = pLimit(10);
     return Promise.all(
       files
         .filter(file => /\.js$/.test(file))
+        // TODO: load deps.js path from config
         .filter(file => !/\bdeps\.js$/.test(file))
         .filter(file => {
           if (testExcludes.some(exclude => file.startsWith(exclude))) {
@@ -105,26 +112,28 @@ export async function getDependencies(
           }
           return true;
         })
-        .map(p => {
-          if (pathToDependencyCache.has(p)) {
-            return pathToDependencyCache.get(p)!;
-          } else {
-            const promise = parser.parseFileAsync(p).then(result => {
-              if (result.hasFatalError) {
-                throw new Error(`Fatal parse error in ${p}: ${result.errors}`);
-              }
-              if (result.dependencies.length > 1) {
-                throw new Error(`A JS file must have only one dependency: ${p}`);
-              }
-              if (result.dependencies.length === 0) {
-                throw new Error(`No dependencies found: ${p}`);
-              }
-              return result.dependencies[0];
-            });
-            pathToDependencyCache.set(p, promise);
-            return promise;
-          }
-        })
+        .map(p =>
+          limit(() => {
+            if (pathToDependencyCache.has(p)) {
+              return pathToDependencyCache.get(p)!;
+            } else {
+              const promise = parser.parseFileAsync(p).then(result => {
+                if (result.hasFatalError) {
+                  throw new Error(`Fatal parse error in ${p}: ${result.errors}`);
+                }
+                if (result.dependencies.length > 1) {
+                  throw new Error(`A JS file must have only one dependency: ${p}`);
+                }
+                if (result.dependencies.length === 0) {
+                  throw new Error(`No dependencies found: ${p}`);
+                }
+                return result.dependencies[0];
+              });
+              pathToDependencyCache.set(p, promise);
+              return promise;
+            }
+          })
+        )
     );
   });
   return flat(await Promise.all(parseResultPromises));
