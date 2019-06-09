@@ -1,4 +1,12 @@
+node_modules
 /lib
+
+# editors
 .vscode
+
+# TypeScript
 .tsbuildinfo
-node_modules/
+
+# nyc
+/coverage
+.nyc_output

@@ -23,6 +23,9 @@ commands:
             CLOSURE_VER=20190325
             npm i "google-closure-compiler@${CLOSURE_VER}" "google-closure-deps@${CLOSURE_VER}" "google-closure-library@${CLOSURE_VER}"
             npm test
+      - run:
+          name: Report coverage to codecov
+          command: npx codecov
       - save_cache:
           key: v{{ .Environment.CIRCLE_CACHE_VERSION }}-{{ arch }}-npm-cache-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}
           paths:
