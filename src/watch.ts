@@ -20,9 +20,11 @@ export function watchJsAndSoy(config: DuckConfig) {
     paths.push(...soyFileRoots.map(p => `${p}/**/*.soy`));
     target = 'JS and Soy';
   }
-  const watcher = chokidar.watch(paths, {
-    ignoreInitial: true,
-  });
+  const ignored = [...config.depsJsIgnoreDirs];
+  if (config.depsJs) {
+    ignored.push(config.depsJs);
+  }
+  const watcher = chokidar.watch(paths, {ignored, ignoreInitial: true});
   watcher.on('ready', () => logger.info(`Watching for ${target} file changes...`));
   watcher.on('error', logger.error.bind(logger));
   chokidarEvents.forEach(event => {
@@ -43,39 +45,44 @@ function handleChokidarEvent(
 }
 
 const jsHandlers = {
-  add: handleJsUpdated,
-  change: handleJsUpdated,
-  unlink: handleJsUpdated,
+  add: handleJsUpdated.bind(null, 'ADDED'),
+  change: handleJsUpdated.bind(null, 'CHANGED'),
+  unlink: handleJsUpdated.bind(null, 'DELETED'),
 } as const;
 
-function handleJsUpdated(filepath: string) {
-  logger.info(`[JS_UPDATED]: ${filepath}`);
+/**
+ * This handler just invalidates cache for the updated JS file.
+ * The deps.js or chunk cache will be actually updated on the request.
+ */
+function handleJsUpdated(event: string, filepath: string) {
+  logger.info(`[JS_${event}]: ${path.relative(process.cwd(), filepath)}`);
   clearEntryIdToChunkCache();
   removeDepCacheByPath(filepath);
 }
 
 const soyHandlers = {
-  add: handleSoyUpdated,
-  change: handleSoyUpdated,
+  add: handleSoyUpdated.bind(null, 'ADDED'),
+  change: handleSoyUpdated.bind(null, 'CHANGED'),
   unlink: handleSoyDeleted,
 } as const;
 
 type SoyConfig = Required<Pick<DuckConfig, 'soyJarPath' | 'soyOptions'>>;
 
-async function handleSoyUpdated(config: SoyConfig, filepath: string) {
-  logger.info(`[SOY_UPDATED]: ${filepath}`);
+async function handleSoyUpdated(event: string, config: SoyConfig, filepath: string) {
+  logger.info(`[SOY_${event}]: ${path.relative(process.cwd(), filepath)}`);
   return compileSoy([filepath], config);
 }
 
 async function handleSoyDeleted(config: SoyConfig, filepath: string) {
-  logger.info(`[SOY_DELETED]: ${filepath}`);
+  logger.info(`[SOY_DELETED]: ${path.relative(process.cwd(), filepath)}`);
   const outputPath = calcOutputPath(filepath, config);
   await util.promisify(fs.unlink)(outputPath);
   logger.info(`Removed: ${outputPath}`);
 }
 
 /**
- * TODO: support {LOCALE} and {LOCALE_LOWER_CASE}
+ * NOTE: This logic doesn't support {LOCALE} and {LOCALE_LOWER_CASE}.
+ * This is temporary work around because the latest Closure Templates no longer has this feature.
  */
 function calcOutputPath(inputPath: string, config: Required<Pick<DuckConfig, 'soyOptions'>>) {
   const {outputPathFormat, inputPrefix} = config.soyOptions;

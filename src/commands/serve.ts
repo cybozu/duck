@@ -19,7 +19,7 @@ import {
 } from '../compiler';
 import {DuckConfig} from '../duckconfig';
 import {createDag, EntryConfig, loadEntryConfigById, PlovrMode} from '../entryconfig';
-import {generateDepFileText, restoreDepsJs} from '../gendeps';
+import {generateDepFileText, restoreDepsJs, writeCachedDepsOnDisk} from '../gendeps';
 import {logger, setGlobalLogger} from '../logger';
 import {
   closureLibraryUrlPath,
@@ -62,27 +62,7 @@ export async function serve(config: DuckConfig, watch = true) {
     });
   }
 
-  const {http2, https} = config;
-  let server: fastify.FastifyInstance;
-  if (https) {
-    const httpsOptions = {
-      key: await promisify(readFile)(https.keyPath, 'utf8'),
-      cert: await promisify(readFile)(https.certPath, 'utf8'),
-    };
-    // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
-    // But it is not a big deal.
-    if (http2) {
-      server = fastify({logger, https: httpsOptions, http2: true}) as fastify.FastifyInstance<
-        any,
-        any,
-        any
-      >;
-    } else {
-      server = fastify({logger, https: httpsOptions}) as fastify.FastifyInstance<any>;
-    }
-  } else {
-    server = fastify({logger});
-  }
+  const server = await createServer(config);
 
   // enable CORS at first
   server.use(cors());
@@ -219,6 +199,7 @@ export async function serve(config: DuckConfig, watch = true) {
       false,
       createModuleUris
     );
+    updateDepsJsCache(config);
     const chunkOutputs = await compileToJson(convertToFlagfile(options));
     const chunkIdToOutput: {[id: string]: CompilerOutput} = {};
     sortedChunkIds.forEach((id, index) => {
@@ -269,13 +250,14 @@ export async function serve(config: DuckConfig, watch = true) {
     );
     const depsContent = await generateDepFileText(
       entryConfig,
-      config.closureLibraryDir,
-      config.inputsRoot
+      config.inputsRoot,
+      config.depsJsIgnoreDirs.concat(config.closureLibraryDir)
     );
     reply
       .code(200)
       .type('application/javascript')
       .send(depsContent);
+    updateDepsJsCache(config);
   });
 
   // start server
@@ -291,7 +273,44 @@ export async function serve(config: DuckConfig, watch = true) {
   start();
 }
 
+function updateDepsJsCache(config: DuckConfig) {
+  const {depsJs} = config;
+  if (depsJs) {
+    writeCachedDepsOnDisk(depsJs, config.closureLibraryDir).then(
+      () => logger.debug(`[DEPSJS_UPDATED]: ${path.relative(process.cwd(), depsJs)}`),
+      e => logger.error('Error: Fail to write deps.js', e)
+    );
+  }
+}
+
+async function createServer(config: DuckConfig): Promise<fastify.FastifyInstance> {
+  const {http2, https} = config;
+  let server: fastify.FastifyInstance;
+  if (https) {
+    const httpsOptions = {
+      key: await promisify(readFile)(https.keyPath, 'utf8'),
+      cert: await promisify(readFile)(https.certPath, 'utf8'),
+    };
+    // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
+    // But it is not a big deal.
+    if (http2) {
+      server = fastify({logger, https: httpsOptions, http2: true}) as fastify.FastifyInstance<
+        any,
+        any,
+        any
+      >;
+    } else {
+      server = fastify({logger, https: httpsOptions}) as fastify.FastifyInstance<any>;
+    }
+  } else {
+    server = fastify({logger});
+  }
+  return server;
+}
+
+/**
+ * Clear all compiled chunks
+ */
 export function clearEntryIdToChunkCache() {
-  // TODO: invalidate only target
   entryIdToChunkCache.clear();
 }

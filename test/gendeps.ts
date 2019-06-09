@@ -2,6 +2,7 @@ import assert = require('assert');
 import {promises as fs} from 'fs';
 import {depGraph} from 'google-closure-deps';
 import path from 'path';
+import tempy from 'tempy';
 import {
   clearDepCache,
   countDepCache,
@@ -10,11 +11,13 @@ import {
   getClosureLibraryDependencies,
   getDependencies,
   restoreDepsJs,
+  writeCachedDepsOnDisk,
 } from '../src/gendeps';
 
 const fixturesBaseDir = path.join(__dirname, 'fixtures');
 
 const variousModulesFixturesDir = path.join(fixturesBaseDir, 'various-modules');
+const variousModulesDepsJsPath = path.join(fixturesBaseDir, 'various-modules-deps.js');
 const expectedVariousModulesDeps = [
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_MODULE,
@@ -62,7 +65,7 @@ describe('gendeps', () => {
         paths: [inputsRoot],
       };
       assert.equal(
-        await generateDepFileText(entryConfig, closureDir, inputsRoot),
+        await generateDepFileText(entryConfig, inputsRoot, [closureDir]),
         "goog.addDependency('../../../../foo/init.js', ['foo.init'], ['foo.bar', 'goog.array'], {});\n"
       );
     });
@@ -164,14 +167,28 @@ describe('gendeps', () => {
           deps,
           path.join(fixturesDir, 'closure', 'goog')
         );
-        await fs.writeFile(path.join(fixturesBaseDir, 'various-modules-deps.js'), text, 'utf8');
+        await fs.writeFile(variousModulesDepsJsPath, text, 'utf8');
       }
+    });
+  });
+  describe('writeCachedDepsOnDisk()', () => {
+    const fixturesDir = path.join(fixturesBaseDir, 'writeCachedDepsOnDisk');
+    it('writes the same content as the deps.js from which it was read', async () => {
+      // NOTE: This doesn't support ES Modules, because a bug of google-closure-deps.
+      const originalDepsJs = path.join(fixturesDir, 'deps.js');
+      const closureLibraryDir = path.join(fixturesDir, 'closure');
+      await restoreDepsJs(originalDepsJs, closureLibraryDir);
+      const actualDepsJsPath = tempy.file({name: 'writeCachedDepsOnDisk-deps.js'});
+      await writeCachedDepsOnDisk(actualDepsJsPath, closureLibraryDir);
+      const actual = await fs.readFile(actualDepsJsPath, 'utf8');
+      const expected = await fs.readFile(originalDepsJs, 'utf8');
+      assert.equal(actual, expected);
     });
   });
   describe('restoreDepsJs()', () => {
     it('restores various modules from deps.js', async () => {
       assert.equal(countDepCache(), 0);
-      await restoreDepsJs(`${fixturesBaseDir}/various-modules-deps.js`, variousModulesFixturesDir);
+      await restoreDepsJs(variousModulesDepsJsPath, variousModulesFixturesDir);
       assert.equal(countDepCache(), 5);
 
       const entryConfig = {

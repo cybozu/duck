@@ -6,7 +6,7 @@ export interface DuckConfig {
   closureLibraryDir: string;
   inputsRoot: string;
   depsJs?: string;
-  depsJsIgnoreDirs?: readonly string[];
+  depsJsIgnoreDirs: readonly string[];
   entryConfigDir: string;
   soyJarPath?: string;
   soyOptions?: SoyToJsOptions;
@@ -43,6 +43,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPath(config, configDir, 'soyJarPath');
     toAbsPath(config, configDir, 'depsJs');
     toAbsPathArray(config, configDir, 'depsJsIgnoreDirs');
+    config.depsJsIgnoreDirs = config.depsJsIgnoreDirs || [];
     toAbsPathArray(config, configDir, 'soyFileRoots');
     if (config.soyOptions) {
       const {inputPrefix} = config.soyOptions;

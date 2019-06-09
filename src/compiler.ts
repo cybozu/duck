@@ -162,9 +162,10 @@ export async function createCompilerOptionsForChunks(
 ): Promise<{options: CompilerOptions; sortedChunkIds: string[]; rootChunkId: string}> {
   // TODO: separate EntryConfigChunks from EntryConfig
   const modules = assertNonNullable(entryConfig.modules);
+  const ignoreDirs = config.depsJsIgnoreDirs.concat(config.closureLibraryDir);
   const dependencies = flat(
     await Promise.all([
-      getDependencies(entryConfig, [config.closureLibraryDir]),
+      getDependencies(entryConfig, ignoreDirs),
       getClosureLibraryDependencies(config.closureLibraryDir),
     ])
   );
