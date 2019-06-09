@@ -4,11 +4,12 @@ Serves and builds an app with Google Closure Compiler/Library/Templates. An alte
 
 Status: **_WIP_**
 
-[![npm version][npm-image]][npm-url]
-![Node.js Version Support][node-version]
+[![npm][npm-image]][npm-url]
+![node.js support versions][node-version]
 [![build status][circleci-image]][circleci-url]
+[![coverage][codecov-image]][codecov-url]
 [![dependency status][deps-image]][deps-url]
-![License][license]
+[![license][license]](./LICENSE)
 
 <a title="Berkaycagdas [CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Yellow_Duck.jpg"><img width="256" alt="Yellow Duck" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Yellow_Duck.jpg/256px-Yellow_Duck.jpg"></a>
 
@@ -178,3 +179,5 @@ MIT License: Teppei Sato &lt;teppeis@gmail.com&gt;
 [license]: https://img.shields.io/npm/l/@teppeis/duck.svg
 [circleci-image]: https://circleci.com/gh/teppeis/duck.svg?style=shield
 [circleci-url]: https://circleci.com/gh/teppeis/duck
+[codecov-image]: https://codecov.io/gh/teppeis/duck/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/teppeis/duck
