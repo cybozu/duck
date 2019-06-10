@@ -1,5 +1,5 @@
 {
-  "extends": ["@teppeis"],
+  "extends": ["@teppeis:anytime"],
   "packageRules": [
     {
       "groupName": "Google Closure Tools",
