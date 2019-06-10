@@ -25,7 +25,12 @@ commands:
             npm run unit
       - run:
           name: Report coverage to codecov
-          command: npx codecov
+          command: |
+            if [ "$CIRCLE_JOB" = 'node-v12' ]; then
+              npx codecov
+            else
+              echo "Skip reporting coverage to codecov"
+            fi
       - save_cache:
           key: v{{ .Environment.CIRCLE_CACHE_VERSION }}-{{ arch }}-npm-cache-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}
           paths:
