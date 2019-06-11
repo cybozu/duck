@@ -56,6 +56,7 @@ Options:
   --port                  A port number to listen                         [number] [default: 9810]
   --host                  A host to listen                         [string] [default: "localhost"]
   --config                A path to duck.config.js, the extension can be ommited          [string]
+  --noTTY                 Output in noTTY mode                          [boolean] [default: false]
   -v, --version           Show version number                                            [boolean]
   -h, --help              Show help                                                      [boolean]
 ```
@@ -75,6 +76,7 @@ Options:
   --batch              Build in batch mode (on AWS or local for debug)   [choices: "aws", "local"]
   --printConfig, -p    Print effective configs for compilers            [boolean] [default: false]
   --depsJs             A path to deps.js to save and load                                 [string]
+  --noTTY              Output in noTTY mode                             [boolean] [default: false]
   --skipDepsJs         Skip generating deps.js                          [boolean] [default: false]
   --soyJarPath         A path to Soy.jar                                                  [string]
   --soyFileRoots       Root directories of soy files                                       [array]
