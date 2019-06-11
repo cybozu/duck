@@ -311,7 +311,7 @@ function printOnlyCompilationError(e: any): Promise<void> {
   if (e instanceof BuildJsCompilationError) {
     // Print compile errors
     console.error(`\n# ${e.message}\n\n${e.reasons.map(m => `## ${m}`).join('\n')}`);
-    process.exit(1);
+    return Promise.reject();
   }
   return Promise.reject(e);
 }

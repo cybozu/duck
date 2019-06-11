@@ -5,12 +5,16 @@ import {
   faastLocal,
   FaastModuleProxy,
   LocalOptions,
+  log,
 } from 'faastjs';
 import mergeOptions from 'merge-options';
 import {assertNonNullable} from './assert';
 import * as compilerFaastFunctions from './compiler-core';
 import {DuckConfig} from './duckconfig';
 import {logger} from './logger';
+
+// change to stdout
+log.info.log = console.log.bind(console);
 
 export async function getFaastCompiler(
   config: DuckConfig
