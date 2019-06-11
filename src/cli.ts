@@ -64,6 +64,12 @@ interface ResultInfo {
   bodyObject?: any;
 }
 
+const noTTY = {
+  desc: 'Output in noTTY mode',
+  type: 'boolean',
+  default: false,
+} as const;
+
 const closureLibraryDir = {
   desc: 'Closure Library directory',
   type: 'string',
@@ -123,6 +129,7 @@ const buildJsOptions = {
   },
   printConfig,
   depsJs,
+  noTTY,
 } as const;
 
 const buildSoyOptions = {
@@ -144,11 +151,13 @@ const buildSoyOptions = {
     default: false,
   },
   printConfig,
+  noTTY,
 } as const;
 
 const buildDepsOptions = {
   depsJs,
   config,
+  noTTY,
 } as const;
 
 export function run(processArgv: readonly string[]): void {
@@ -182,24 +191,28 @@ export function run(processArgv: readonly string[]): void {
           default: 'localhost',
         },
         config,
+        noTTY,
       },
       async argv => {
         const config = loadConfig(argv);
         const hasSoyConfig: boolean = Boolean(
           config.soyJarPath && config.soyFileRoots && config.soyOptions
         );
-        const tasks = new Listr([
-          {
-            title: `Compile Soy templates`,
-            skip: () => !hasSoyConfig || argv.skipInitialBuild,
-            task: wrap(() => buildSoy(config as BuildSoyConfig)),
-          },
-          {
-            title: `Generate deps.js`,
-            skip: () => !config.depsJs || argv.skipInitialBuild,
-            task: wrap(() => buildDeps(config)),
-          },
-        ]);
+        const tasks = listr(
+          [
+            {
+              title: `Compile Soy templates`,
+              skip: () => !hasSoyConfig || argv.skipInitialBuild,
+              task: wrap(() => buildSoy(config as BuildSoyConfig)),
+            },
+            {
+              title: `Generate deps.js`,
+              skip: () => !config.depsJs || argv.skipInitialBuild,
+              task: wrap(() => buildDeps(config)),
+            },
+          ],
+          argv
+        );
         await tasks.run();
         console.log(''); // a blank line
         await serve(config);
@@ -212,37 +225,44 @@ export function run(processArgv: readonly string[]): void {
         ...buildJsOptions,
         skipDepsJs,
         ...buildSoyOptions,
+        noTTY,
       },
       async argv => {
         const config = loadConfig(argv);
-        const tasks = new Listr([
-          {
-            title: `Compile Soy templates`,
-            skip: () => !(config.soyJarPath && config.soyFileRoots && config.soyOptions),
-            task: wrap(() => buildSoy(config as BuildSoyConfig, argv.printConfig)),
-          },
-          {
-            title: `Generate deps.js`,
-            skip: () => !config.depsJs || argv.skipDepsJs,
-            task: wrap(() => buildDeps(config)),
-          },
-          {
-            title: `Compile JS files`,
-            task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
-          },
-        ]);
+        const tasks = listr(
+          [
+            {
+              title: `Compile Soy templates`,
+              skip: () => !(config.soyJarPath && config.soyFileRoots && config.soyOptions),
+              task: wrap(() => buildSoy(config as BuildSoyConfig, argv.printConfig)),
+            },
+            {
+              title: `Generate deps.js`,
+              skip: () => !config.depsJs || argv.skipDepsJs,
+              task: wrap(() => buildDeps(config)),
+            },
+            {
+              title: `Compile JS files`,
+              task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+            },
+          ],
+          argv
+        );
         await tasks.run().catch(printOnlyCompilationError);
         printResultInfo();
       }
     )
     .command('build:js [entryConfigDir]', 'Compile JS files', buildJsOptions, async argv => {
       const config = loadConfig(argv);
-      const tasks = new Listr([
-        {
-          title: `Compile JS files`,
-          task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
-        },
-      ]);
+      const tasks = listr(
+        [
+          {
+            title: `Compile JS files`,
+            task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+          },
+        ],
+        argv
+      );
       await tasks.run().catch(printOnlyCompilationError);
       printResultInfo();
     })
@@ -251,45 +271,57 @@ export function run(processArgv: readonly string[]): void {
       assertString(config.soyJarPath);
       assertNonNullable(config.soyFileRoots);
       assertNonNullable(config.soyOptions);
-      const tasks = new Listr([
-        {
-          title: `Compile Soy templates`,
-          task: wrap(() => buildSoy(config as BuildSoyConfig, argv.printConfig)),
-        },
-      ]);
+      const tasks = listr(
+        [
+          {
+            title: `Compile Soy templates`,
+            task: wrap(() => buildSoy(config as BuildSoyConfig, argv.printConfig)),
+          },
+        ],
+        argv
+      );
       await tasks.run();
       printResultInfo();
     })
     .command('build:deps', 'Generate deps.js', buildDepsOptions, async argv => {
       const config = loadConfig(argv);
-      const tasks = new Listr([
-        {
-          title: `Generate deps.js`,
-          task: wrap(() => buildDeps(config)),
-        },
-      ]);
+      const tasks = listr(
+        [
+          {
+            title: `Generate deps.js`,
+            task: wrap(() => buildDeps(config)),
+          },
+        ],
+        argv
+      );
       await tasks.run();
       printResultInfo();
     })
     .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptions, async argv => {
       const config = loadConfig(argv);
       assertNonNullable(config.soyOptions);
-      const tasks = new Listr([
-        {
-          title: `Clean up soy.js`,
-          task: wrap(() => cleanSoy(config as CleanSoyConfig)),
-        },
-      ]);
+      const tasks = listr(
+        [
+          {
+            title: `Clean up soy.js`,
+            task: wrap(() => cleanSoy(config as CleanSoyConfig)),
+          },
+        ],
+        argv
+      );
       await tasks.run();
     })
     .command('clean:deps', 'Remove generated deps.js', buildDepsOptions, async argv => {
       const config = loadConfig(argv);
-      const tasks = new Listr([
-        {
-          title: `Clean up deps.js: ${config.depsJs}`,
-          task: wrap(() => cleanDeps(assertString(config.depsJs))),
-        },
-      ]);
+      const tasks = listr(
+        [
+          {
+            title: `Clean up deps.js: ${config.depsJs}`,
+            task: wrap(() => cleanDeps(assertString(config.depsJs))),
+          },
+        ],
+        argv
+      );
       await tasks.run();
     })
     .completion('completion', 'Generate completion script for bash/zsh')
@@ -305,6 +337,17 @@ export function run(processArgv: readonly string[]): void {
     .alias('v', 'version')
     .alias('h', 'help')
     .parse(processArgv);
+}
+
+function listr(
+  tasks: readonly Listr.ListrTask[],
+  argv: {noTTY: boolean},
+  options: Listr.ListrOptions = {}
+): Listr {
+  return new Listr(tasks, {
+    ...options,
+    renderer: argv.noTTY ? 'verbose' : 'default',
+  });
 }
 
 function printOnlyCompilationError(e: any): Promise<void> {
