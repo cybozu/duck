@@ -273,8 +273,6 @@ function updateDepsJsCache(config: DuckConfig) {
   }
 }
 
-const numberFormat = new Intl.NumberFormat();
-
 async function createServer(config: DuckConfig): Promise<fastify.FastifyInstance> {
   const opts: fastify.ServerOptions = {
     logger,
@@ -315,7 +313,6 @@ async function createServer(config: DuckConfig): Promise<fastify.FastifyInstance
       // skip logging for static assets
       return;
     }
-    setStartTime(reply);
     log.info({request: `${method} ${url}`}, 'incoming request');
   });
   server.addHook('onResponse', async ({raw, log}, reply) => {
@@ -328,28 +325,12 @@ async function createServer(config: DuckConfig): Promise<fastify.FastifyInstance
       {
         request: `${method} ${originalUrl || url || '"N/A"'}`,
         statusCode: reply.res.statusCode,
-        responseTime: getResopnseTime(reply),
+        responseTime: `${Math.round(reply.getResponseTime())}ms`,
       },
       'request completed'
     );
   });
   return server;
-}
-
-// Self-implementation of recording responseTime because the default
-// responseTime feature is disabled by disableRequestLogging.
-const startTimeKey = Symbol('startTime');
-function setStartTime(reply: any): void {
-  reply[startTimeKey] = Date.now();
-}
-function getResopnseTime(reply: any): string {
-  const startTime = reply[startTimeKey];
-  if (typeof startTime === 'number') {
-    const responseTime = Date.now() - startTime;
-    return `${numberFormat.format(responseTime)}ms`;
-  } else {
-    return 'N/A';
-  }
 }
 
 /**
