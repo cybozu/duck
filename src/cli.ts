@@ -13,8 +13,9 @@ import {buildSoy, BuildSoyConfig} from './commands/buildSoy';
 import {cleanDeps} from './commands/cleanDeps';
 import {cleanSoy, CleanSoyConfig} from './commands/cleanSoy';
 import {serve} from './commands/serve';
-import {loadConfig} from './duckconfig';
+import {DuckConfig, loadConfig} from './duckconfig';
 import {setGlobalLogger} from './logger';
+import {reportTestResults} from './report';
 
 assertNodeVersionGte(process.version, 10);
 
@@ -126,6 +127,17 @@ const buildJsOptions = {
   batch: {
     desc: 'Build in batch mode (on AWS or local for debug)',
     choices: ['aws', 'local'],
+  },
+  reporter: {
+    desc: 'Test reporter',
+    choices: ['text', 'xunit'],
+    default: 'text',
+  },
+  reporterOutputDir: {
+    desc: 'Output directory of test reporter',
+    type: 'string',
+    default: 'test-results',
+    coerce: path.resolve,
   },
   printConfig,
   depsJs,
@@ -248,7 +260,7 @@ export function run(processArgv: readonly string[]): void {
           ],
           argv
         );
-        await tasks.run().catch(printOnlyCompilationError);
+        await tasks.run().catch(printOnlyCompilationError(config));
         printResultInfo();
       }
     )
@@ -263,7 +275,7 @@ export function run(processArgv: readonly string[]): void {
         ],
         argv
       );
-      await tasks.run().catch(printOnlyCompilationError);
+      await tasks.run().catch(printOnlyCompilationError(config));
       printResultInfo();
     })
     .command('build:soy', 'Compile Soy templates', buildSoyOptions, async argv => {
@@ -350,13 +362,14 @@ function listr(
   });
 }
 
-function printOnlyCompilationError(e: any): Promise<void> {
-  if (e instanceof BuildJsCompilationError) {
-    // Print compile errors
-    console.error(`\n# ${e.message}\n\n${e.reasons.map(m => `## ${m}`).join('\n')}`);
-    return Promise.reject();
-  }
-  return Promise.reject(e);
+function printOnlyCompilationError(config: DuckConfig) {
+  return async (e: any) => {
+    if (e instanceof BuildJsCompilationError) {
+      await reportTestResults(e.reasons, config);
+      return Promise.reject();
+    }
+    return Promise.reject(e);
+  };
 }
 
 function printResultInfo() {
