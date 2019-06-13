@@ -44,7 +44,7 @@ describe('xunit-reporter', () => {
       <testsuites>
         <testsuite name="${entryConfigPath}">
           <testcase classname="/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js" name="JSC_DEPRECATED_CLASS_REASON">
-            <failure message="Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.">
+            <failure message="Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead. (line 57, col 32)">
               <![CDATA[  this.outstandingEvents_ = new goog.structs.Map();%%newline%%                                ^^^^^^^^^^^^^^^^]]>
             </failure>
           </testcase>
@@ -74,7 +74,7 @@ describe('xunit-reporter', () => {
       <testsuites>
         <testsuite name="${entryConfigPath}">
           <testcase classname="/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js" name="JSC_DEPRECATED_CLASS_REASON">
-            <failure message="Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead."/>
+            <failure message="Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead. (line 57, col 32)"/>
           </testcase>
         </testsuite>
       </testsuites>`.replace(/%%newline%%/g, '\n')

@@ -11,7 +11,8 @@ export function formatXUnitReport({entryConfigPath, command, items}: ErrorReason
         .element('testcase')
         .attribute('classname', error.source)
         .attribute('name', error.key);
-      const failure = testcase.element('failure').attribute('message', error.description);
+      const message = `${error.description} (line ${error.line}, col ${error.column})`;
+      const failure = testcase.element('failure').attribute('message', message);
       if (error.context) {
         failure.cdata(error.context);
       }
