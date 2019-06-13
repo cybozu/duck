@@ -74,6 +74,8 @@ Options:
   --config             A path to duck.config.js, the extension can be ommited             [string]
   --concurrency, -c    Concurrency limit for compiler                                     [number]
   --batch              Build in batch mode (on AWS or local for debug)   [choices: "aws", "local"]
+  --reporter           Test reporter                  [choices: "text", "xunit"] [default: "text"]
+  --reporterOutputDir  Output directory of test reporter        [string] [default: "test-results"]
   --printConfig, -p    Print effective configs for compilers            [boolean] [default: false]
   --depsJs             A path to deps.js to save and load                                 [string]
   --noTTY              Output in noTTY mode                             [boolean] [default: false]
