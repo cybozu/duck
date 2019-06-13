@@ -14,6 +14,8 @@ export interface DuckConfig {
   concurrency?: number;
   batch?: 'aws' | 'local';
   batchOptions?: import('faastjs').AwsOptions | import('faastjs').LocalOptions;
+  reporter?: 'text' | 'xunit';
+  reporterOutputDir?: string;
   host: string;
   port: number;
   http2?: boolean;
@@ -42,6 +44,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPath(config, configDir, 'entryConfigDir');
     toAbsPath(config, configDir, 'soyJarPath');
     toAbsPath(config, configDir, 'depsJs');
+    toAbsPath(config, configDir, 'reporterOutputDir');
     toAbsPathArray(config, configDir, 'depsJsIgnoreDirs');
     config.depsJsIgnoreDirs = config.depsJsIgnoreDirs || [];
     toAbsPathArray(config, configDir, 'soyFileRoots');

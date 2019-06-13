@@ -18,6 +18,7 @@ export interface CompilerOptions {
   language_in?: string;
   language_out?: string;
   json_streams?: 'IN' | 'OUT' | 'BOTH';
+  error_format?: 'STANDARD' | 'JSON';
   warning_level?: 'QUIET' | 'DEFAULT' | 'VERBOSE';
   debug?: boolean;
   formatting?: readonly CompilerOptionsFormattingType[];
@@ -54,7 +55,7 @@ export async function compileToJson(
   opts: CompilerOptions,
   batchMode?: 'aws' | 'local'
 ): Promise<CompilerOutput[]> {
-  opts = {...opts, json_streams: 'OUT'};
+  opts = {...opts, json_streams: 'OUT', error_format: 'JSON'};
   const outputs: CompilerOutput[] = JSON.parse(await compile(opts, batchMode));
   if (batchMode) {
     // Reduce transfer size in batch mode.

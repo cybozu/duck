@@ -12,11 +12,12 @@ import {
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
 } from '../compiler';
-import * as compilerFaastFunctions from '../compiler-core';
+import * as compilerCoreFunctions from '../compiler-core';
 import {DuckConfig} from '../duckconfig';
 import {EntryConfig, loadEntryConfig} from '../entryconfig';
 import {restoreDepsJs} from '../gendeps';
 import {logger} from '../logger';
+import {CompileErrorItem} from '../report';
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
@@ -30,7 +31,7 @@ export async function buildJs(
   printConfig = false
 ): Promise<any> {
   let compileFn = compileToJson;
-  let faastModule: import('faastjs').FaastModule<typeof compilerFaastFunctions> | null = null;
+  let faastModule: import('faastjs').FaastModule<typeof compilerCoreFunctions> | null = null;
   if (config.batch) {
     const {getFaastCompiler} = await import('../batch');
     faastModule = await getFaastCompiler(config);
@@ -115,7 +116,7 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
   entryConfigPaths: readonly string[]
 ): Promise<void> {
   const results = await pSettled(promises);
-  const reasons: string[] = results
+  const reasons: ErrorReason[] = results
     .map((result, idx) => {
       return {
         ...result,
@@ -127,16 +128,28 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
       if (!result.isRejected) {
         throw new Error('Unexpected state');
       }
-      return `Compile Errors in ${result.entryConfigPath}:\n\n${(result.reason as Error).message}`;
+      const {message: stderr} = result.reason as Error;
+      const [command, , ...messages] = stderr.split('\n');
+      const items: CompileErrorItem[] = JSON.parse(messages.join('\n'));
+      return {
+        entryConfigPath: result.entryConfigPath,
+        command,
+        items,
+      };
     });
   if (reasons.length > 0) {
     throw new BuildJsCompilationError(reasons, results.length);
   }
 }
+interface ErrorReason {
+  entryConfigPath: string;
+  command: string;
+  items: CompileErrorItem[];
+}
 
 export class BuildJsCompilationError extends Error {
-  reasons: readonly string[];
-  constructor(reasons: readonly string[], totalSize: number) {
+  reasons: readonly ErrorReason[];
+  constructor(reasons: readonly ErrorReason[], totalSize: number) {
     super(`Failed to compile (${reasons.length}/${totalSize})`);
     this.name = 'BuildJsCompilationError';
     this.reasons = reasons;
