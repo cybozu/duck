@@ -1,14 +1,18 @@
 import assert = require('assert');
 import {stripIndent} from 'common-tags';
-import {formatTextReport} from '../src/reporters/text-reporter';
+import {TextReporter} from '../src/reporters/text-reporter';
 
-describe('text-reporter', () => {
-  describe('toTextReport()', () => {
+describe('TextReporter', () => {
+  describe('format()', () => {
     const entryConfigPath = '/path/to/entryConfig.json';
     const command = 'java -jar compiler.jar';
+    let reporter: TextReporter;
+    beforeEach(() => {
+      reporter = new TextReporter();
+    });
     it('success', async () => {
       // TODO: don't report as errors
-      const actual = formatTextReport({
+      const actual = reporter.format({
         entryConfigPath,
         command,
         items: [{level: 'info', description: '89 error(s), 5 warning(s), 98.4% typed'}],
@@ -25,7 +29,7 @@ ${command}
     });
 
     it('error', async () => {
-      const actual = formatTextReport({
+      const actual = reporter.format({
         entryConfigPath,
         command,
         items: [
@@ -55,7 +59,7 @@ ${command}
     });
 
     it('error without context', async () => {
-      const actual = formatTextReport({
+      const actual = reporter.format({
         entryConfigPath,
         command,
         items: [

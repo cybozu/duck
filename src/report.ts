@@ -1,13 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import {promisify} from 'util';
-import {assertString} from './assert';
 import {DuckConfig} from './duckconfig';
-import {formatTextReport} from './reporters/text-reporter';
-import {formatXUnitReport} from './reporters/xunit-reporter';
-
-const mkdir = promisify(fs.mkdir);
-const writeFile = promisify(fs.writeFile);
+import {JsonReporter} from './reporters/json-reporter';
+import {TextReporter} from './reporters/text-reporter';
+import {XUnitReporter} from './reporters/xunit-reporter';
 
 export type CompileErrorItem = CompileErrorCase | CompileErrorInfo;
 export interface CompileErrorCase {
@@ -30,24 +24,21 @@ export interface ErrorReason {
   items: readonly CompileErrorItem[];
 }
 
+const reporterClasses = {
+  json: JsonReporter,
+  text: TextReporter,
+  xunit: XUnitReporter,
+} as const;
+
 export async function reportTestResults(
   reasons: readonly ErrorReason[],
   config: DuckConfig
 ): Promise<void> {
-  if (config.reporter === 'xunit') {
-    const outputDir = assertString(config.reporterOutputDir);
-    const promises = reasons.map(async reason => {
-      const subDir = path.join(outputDir, path.basename(reason.entryConfigPath, '.json'));
-      await mkdir(subDir, {recursive: true});
-      const xml = formatXUnitReport(reason);
-      await writeFile(path.join(subDir, 'results.xml'), xml);
-    });
-    await Promise.all(promises);
-  } else {
-    // default text reporter
-    console.log('');
-    const msg = `${reasons.map(reason => formatTextReport(reason)).join('\n')}`;
-    console.error(msg);
-  }
-  console.log('');
+  const reporters = config.reporters || ['text'];
+  const promises = reporters.map(name => {
+    const options = (config.reporterOptions || {})[name];
+    const reporter = new reporterClasses[name](options);
+    return reporter.output(reasons);
+  });
+  await Promise.all(promises);
 }

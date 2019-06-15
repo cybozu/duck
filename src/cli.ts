@@ -128,16 +128,13 @@ const buildJsOptions = {
     desc: 'Build in batch mode (on AWS or local for debug)',
     choices: ['aws', 'local'],
   },
-  reporter: {
-    desc: 'Test reporter',
-    choices: ['text', 'xunit'],
-    default: 'text',
+  reporters: {
+    desc: 'Test reporters ("text" or "xunit")',
+    type: 'array',
+    default: ['text'],
   },
-  reporterOutputDir: {
-    desc: 'Output directory of test reporter',
-    type: 'string',
-    default: 'test-results',
-    coerce: path.resolve,
+  reporterOptions: {
+    desc: 'Test reporter options',
   },
   printConfig,
   depsJs,
@@ -240,6 +237,7 @@ export function run(processArgv: readonly string[]): void {
         noTTY,
       },
       async argv => {
+        console.log(argv.reporterOptions);
         const config = loadConfig(argv);
         const tasks = listr(
           [
@@ -366,6 +364,7 @@ function printOnlyCompilationError(config: DuckConfig) {
   return async (e: any) => {
     if (e instanceof BuildJsCompilationError) {
       await reportTestResults(e.reasons, config);
+      console.log('');
       return Promise.reject();
     }
     return Promise.reject(e);
