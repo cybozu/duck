@@ -129,7 +129,7 @@ const buildJsOptions = {
     choices: ['aws', 'local'],
   },
   reporters: {
-    desc: 'Test reporters ("text" or "xunit")',
+    desc: 'Test reporters ("text", "xunit" or "json")',
     type: 'array',
     default: ['text'],
   },
