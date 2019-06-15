@@ -1,5 +1,8 @@
 import path from 'path';
 import {assertString} from './assert';
+import {JsonReporterOptions} from './reporters/json-reporter';
+import {TextReporterOptions} from './reporters/text-reporter';
+import {XUnitReporterOptions} from './reporters/xunit-reporter';
 import {SoyToJsOptions} from './soy';
 
 export interface DuckConfig {
@@ -14,8 +17,13 @@ export interface DuckConfig {
   concurrency?: number;
   batch?: 'aws' | 'local';
   batchOptions?: import('faastjs').AwsOptions | import('faastjs').LocalOptions;
-  reporter?: 'text' | 'xunit';
-  reporterOutputDir?: string;
+  reporters?: ('text' | 'xunit')[];
+  reportersOutputDir?: string;
+  reporterOptions?: {
+    json?: JsonReporterOptions;
+    text?: TextReporterOptions;
+    xunit?: XUnitReporterOptions;
+  };
   host: string;
   port: number;
   http2?: boolean;
@@ -44,7 +52,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPath(config, configDir, 'entryConfigDir');
     toAbsPath(config, configDir, 'soyJarPath');
     toAbsPath(config, configDir, 'depsJs');
-    toAbsPath(config, configDir, 'reporterOutputDir');
+    toAbsPath(config, configDir, 'reportersOutputDir');
     toAbsPathArray(config, configDir, 'depsJsIgnoreDirs');
     config.depsJsIgnoreDirs = config.depsJsIgnoreDirs || [];
     toAbsPathArray(config, configDir, 'soyFileRoots');

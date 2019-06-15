@@ -1,13 +1,74 @@
 import assert = require('assert');
 import {oneLineTrim} from 'common-tags';
-import {formatXUnitReport} from '../src/reporters/xunit-reporter';
+import fs from 'fs';
+import path from 'path';
+import tempy from 'tempy';
+import {promisify} from 'util';
+import {XUnitReporter} from '../src/reporters/xunit-reporter';
 
-describe('xunit-reporter', () => {
-  describe('formatXUnitReport()', () => {
-    const entryConfigPath = '/path/to/entryConfig.json';
-    const command = 'java -jar compiler.jar';
+const readFile = promisify(fs.readFile);
+
+describe('XUnitReporter', () => {
+  const entryConfigPath = '/path/to/entry.json';
+  const command = 'java -jar compiler.jar';
+
+  describe('output()', () => {
+    let reporter: XUnitReporter;
+    let outputDir: string;
+    let actualMessage: string | undefined;
+    const originalConsoleError = console.error;
+    beforeEach(() => {
+      outputDir = tempy.directory();
+      reporter = new XUnitReporter({outputDir});
+      actualMessage = undefined;
+      console.error = (message: string) => (actualMessage = message);
+    });
+    afterEach(() => {
+      console.error = originalConsoleError;
+    });
+
+    const reasons = [
+      {
+        entryConfigPath,
+        command,
+        items: [{level: 'info', description: '89 error(s), 5 warning(s), 98.4% typed'}],
+      },
+    ] as const;
+    const expected = oneLineTrim`
+        <?xml version="1.0"?>
+        <testsuites>
+          <testsuite name="${entryConfigPath}"/>
+        </testsuites>`;
+
+    it('makes a directory and a result file', async () => {
+      await reporter.output(reasons);
+      const actual = await readFile(path.join(outputDir, 'entry', 'results.xml'), 'utf8');
+      assert.equal(actual, expected);
+      assert.equal(actualMessage, undefined);
+    });
+
+    it('does not make any dirs or files', async () => {
+      reporter = new XUnitReporter({outputDir: null});
+      await reporter.output(reasons);
+      assert(!fs.existsSync(path.join(process.cwd(), 'test-results')));
+      assert.equal(actualMessage, undefined);
+    });
+
+    it('outputs to stderr', async () => {
+      reporter = new XUnitReporter({outputDir: null, stderr: true});
+      await reporter.output(reasons);
+      assert.equal(actualMessage, expected);
+    });
+  });
+
+  describe('format()', () => {
+    let reporter: XUnitReporter;
+    beforeEach(() => {
+      reporter = new XUnitReporter();
+    });
+
     it('success', async () => {
-      const actual = formatXUnitReport({
+      const actual = reporter.format({
         entryConfigPath,
         command,
         items: [{level: 'info', description: '89 error(s), 5 warning(s), 98.4% typed'}],
@@ -20,8 +81,9 @@ describe('xunit-reporter', () => {
       </testsuites>`
       );
     });
+
     it('error', async () => {
-      const actual = formatXUnitReport({
+      const actual = reporter.format({
         entryConfigPath,
         command,
         items: [
@@ -52,8 +114,9 @@ describe('xunit-reporter', () => {
       </testsuites>`.replace(/%%newline%%/g, '\n')
       );
     });
+
     it('error without context', async () => {
-      const actual = formatXUnitReport({
+      const actual = reporter.format({
         entryConfigPath,
         command,
         items: [
