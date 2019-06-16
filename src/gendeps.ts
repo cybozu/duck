@@ -1,10 +1,10 @@
 import flat from 'array.prototype.flat';
 import fs from 'fs';
 import {depFile, depGraph, parser} from 'google-closure-deps';
-import pLimit from 'p-limit';
 import path from 'path';
 import recursive from 'recursive-readdir';
 import {promisify} from 'util';
+import {parseDependency} from './dependency-parser';
 import {EntryConfig} from './entryconfig';
 import {googBaseUrlPath, inputsUrlPath} from './urls';
 
@@ -88,6 +88,15 @@ export async function getDependencies(
   entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
   ignoreDirs: readonly string[] = []
 ): Promise<depGraph.Dependency[]> {
+  let parseDependencyFn = parseDependency;
+  let terminatePool: (() => {}) | null = null;
+  try {
+    const {DependencyParserWithWorkers} = await import('./dependency-parser-wrapper');
+    const parser = new DependencyParserWithWorkers();
+    terminatePool = parser.terminate.bind(parser);
+    parseDependencyFn = parser.parse.bind(parser);
+  } catch {}
+
   const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, '*'));
   // TODO: uniq
   const parseResultPromises = entryConfig.paths.map(async p => {
@@ -96,11 +105,6 @@ export async function getDependencies(
       testExcludes = entryConfig['test-excludes'];
     }
     const files = await recursive(p, ignoreDirPatterns);
-    // NOTE: This logic is executed in a single thread (not forking),
-    // so this concurrency doesn't affect the prformance.
-    // But it improves smooth animation of "in-progress circle" and "Ctrl-C" handling.
-    // TODO: Use workers in Node v12+.
-    const limit = pLimit(10);
     return Promise.all(
       files
         .filter(file => /\.js$/.test(file))
@@ -112,31 +116,22 @@ export async function getDependencies(
           }
           return true;
         })
-        .map(p =>
-          limit(() => {
-            if (pathToDependencyCache.has(p)) {
-              return pathToDependencyCache.get(p)!;
-            } else {
-              const promise = parser.parseFileAsync(p).then(result => {
-                if (result.hasFatalError) {
-                  throw new Error(`Fatal parse error in ${p}: ${result.errors}`);
-                }
-                if (result.dependencies.length > 1) {
-                  throw new Error(`A JS file must have only one dependency: ${p}`);
-                }
-                if (result.dependencies.length === 0) {
-                  throw new Error(`No dependencies found: ${p}`);
-                }
-                return result.dependencies[0];
-              });
-              pathToDependencyCache.set(p, promise);
-              return promise;
-            }
-          })
-        )
+        .map(async file => {
+          if (pathToDependencyCache.has(file)) {
+            return pathToDependencyCache.get(file)!;
+          } else {
+            const promise = parseDependencyFn(file);
+            pathToDependencyCache.set(file, promise);
+            return promise;
+          }
+        })
     );
   });
-  return flat(await Promise.all(parseResultPromises));
+  const deps = flat(await Promise.all(parseResultPromises));
+  if (terminatePool) {
+    terminatePool();
+  }
+  return deps;
 }
 
 /**

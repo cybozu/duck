@@ -14,5 +14,24 @@
   },
   "parserOptions": {
     "project": null
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/dependency-parser-worker.ts",
+        "src/dependency-parser-wrapper.ts",
+        "test/dependency-parser.ts"
+      ],
+      "rules": {
+        "node/no-missing-import": [
+          "error",
+          {
+            "allowModules": [
+              "worker_threads"
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

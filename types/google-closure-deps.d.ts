@@ -103,7 +103,7 @@ export namespace depGraph {
      * The language level of this file; e.g. "es3", "es6", etc.
      * @const
      */
-    language: string | null;
+    language: string;
 
     constructor(
       type: DependencyType,
