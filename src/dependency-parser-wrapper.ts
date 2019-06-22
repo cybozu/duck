@@ -6,10 +6,13 @@ const script = path.join(__dirname, '../lib/dependency-parser-worker.js');
 
 export class DependencyParserWithWorkers {
   private pool: workerpool.WorkerPool;
-  constructor(workers = 1) {
+  constructor(numOfWorkers = 1) {
+    if (numOfWorkers < 1) {
+      throw new TypeError(`numOfWorkers must be an integer >= 1, but "${numOfWorkers}"`);
+    }
     this.pool = workerpool.pool(script, {
-      minWorkers: workers,
-      maxWorkers: workers,
+      minWorkers: numOfWorkers,
+      maxWorkers: numOfWorkers,
       nodeWorker: 'auto',
     } as any);
   }

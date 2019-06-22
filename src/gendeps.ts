@@ -88,10 +88,10 @@ export async function restoreDepsJs(depsJsPath: string, closureLibraryDir: strin
 export async function getDependencies(
   entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
   ignoreDirs: readonly string[] = [],
-  workers?: number
+  numOfWorkers?: number
 ): Promise<depGraph.Dependency[]> {
   const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, '*'));
-  const parser = new DependencyParserWithWorkers(workers);
+  const parser = new DependencyParserWithWorkers(numOfWorkers);
   try {
     // TODO: uniq
     const parseResultPromises = entryConfig.paths.map(async p => {

@@ -1,5 +1,6 @@
 import streamToObservable from '@teppeis/stream-to-observable';
 import Listr from 'listr';
+import os from 'os';
 import path from 'path';
 import pino from 'pino';
 import {Observable} from 'rxjs';
@@ -113,6 +114,7 @@ const concurrency = {
   desc: 'Concurrency of compiler and deps analyzer',
   alias: 'c',
   type: 'number',
+  default: Math.min(4, Math.max(os.cpus().length, 1)),
 } as const;
 
 const buildJsOptions = {
