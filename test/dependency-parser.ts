@@ -50,9 +50,17 @@ describe('DependencyParser()', () => {
 });
 
 describe('DependencyParserWithWorkers()', () => {
+  let parser: DependencyParserWithWorkers;
+  beforeEach(() => {
+    parser = new DependencyParserWithWorkers();
+  });
+  afterEach(() => {
+    if (parser) {
+      parser.terminate();
+    }
+  });
   it('parses closure provide script with worker', async () => {
     // This requires tsc compiling before testing
-    const parser = new DependencyParserWithWorkers();
     const dep = await parser.parse(path.join(variousModulesFixturesDir, 'closureprovide.js'));
     assertDependencyEquals(dep, expectedVariousModulesDeps[1]);
   });
