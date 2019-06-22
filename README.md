@@ -72,7 +72,7 @@ Options:
   --entryConfigs, -e   Entry config files (this option ignores entryConfigDir)             [array]
   --closureLibraryDir  Closure Library directory                                          [string]
   --config             A path to duck.config.js, the extension can be ommited             [string]
-  --concurrency, -c    Concurrency limit for compiler                                     [number]
+  --concurrency, -c    Concurrency of compiler and deps analyzer             [number] [default: 4]
   --batch              Build in batch mode (on AWS or local for debug)   [choices: "aws", "local"]
   --reporters          Test reporters ("text", "xunit" or "json")      [array] [default: ["text"]]
   --reporterOptions    Test reporter options
