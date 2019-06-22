@@ -37,7 +37,7 @@ export async function buildJs(
     faastModule = await getFaastCompiler(config);
     compileFn = faastModule.functions.compileToJson;
   }
-  let depsJsRestored = false;
+  let restoringDepsJs: Promise<void> | null = null;
   const entryConfigPaths = entryConfigs
     ? entryConfigs
     : (await findEntryConfigs(assertString(config.entryConfigDir))).sort();
@@ -50,10 +50,11 @@ export async function buildJs(
         const entryConfig = await loadEntryConfig(entryConfigPath);
         let options: CompilerOptions;
         if (entryConfig.modules) {
-          if (config.depsJs && !depsJsRestored) {
-            log(entryConfigPath, 'Restoring deps.js cache');
-            await restoreDepsJs(config.depsJs, config.closureLibraryDir);
-            depsJsRestored = true;
+          if (config.depsJs) {
+            if (!restoringDepsJs) {
+              restoringDepsJs = restoreDepsJs(config.depsJs, config.closureLibraryDir);
+            }
+            await restoringDepsJs;
           }
           options = await createCompilerOptionsForChunks_(entryConfig, config);
         } else {
