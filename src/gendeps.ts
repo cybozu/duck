@@ -19,9 +19,10 @@ const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> = new Map
 export async function generateDepFileText(
   entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
   inputsRoot: string,
-  ignoreDirs: readonly string[] = []
+  ignoreDirs: readonly string[] = [],
+  workers?: number
 ): Promise<string> {
-  const dependencies = await getDependencies(entryConfig, ignoreDirs);
+  const dependencies = await getDependencies(entryConfig, ignoreDirs, workers);
   const googBaseDirVirtualPath = path.dirname(
     path.resolve(inputsRoot, path.relative(inputsUrlPath, googBaseUrlPath))
   );
@@ -86,10 +87,11 @@ export async function restoreDepsJs(depsJsPath: string, closureLibraryDir: strin
  */
 export async function getDependencies(
   entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
-  ignoreDirs: readonly string[] = []
+  ignoreDirs: readonly string[] = [],
+  workers?: number
 ): Promise<depGraph.Dependency[]> {
   const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, '*'));
-  const parser = new DependencyParserWithWorkers();
+  const parser = new DependencyParserWithWorkers(workers);
   try {
     // TODO: uniq
     const parseResultPromises = entryConfig.paths.map(async p => {
@@ -122,7 +124,7 @@ export async function getDependencies(
     });
     return flat(await Promise.all(parseResultPromises));
   } finally {
-    parser.terminate();
+    await parser.terminate();
   }
 }
 

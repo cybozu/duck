@@ -6,8 +6,12 @@ const script = path.join(__dirname, '../lib/dependency-parser-worker.js');
 
 export class DependencyParserWithWorkers {
   private pool: workerpool.WorkerPool;
-  constructor() {
-    this.pool = workerpool.pool(script, {minWorkers: 'max', maxWorkers: 2});
+  constructor(workers = 1) {
+    this.pool = workerpool.pool(script, {
+      minWorkers: workers,
+      maxWorkers: workers,
+      nodeWorker: 'auto',
+    } as any);
   }
   async parse(filepath: string): Promise<depGraph.Dependency> {
     const depData = await this.pool.exec('parseDependency', [filepath]);

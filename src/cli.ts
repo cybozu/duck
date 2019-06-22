@@ -109,6 +109,12 @@ const skipDepsJs = {
   default: false,
 } as const;
 
+const concurrency = {
+  desc: 'Concurrency of compiler and deps analyzer',
+  alias: 'c',
+  type: 'number',
+} as const;
+
 const buildJsOptions = {
   entryConfigDir,
   entryConfigs: {
@@ -119,11 +125,7 @@ const buildJsOptions = {
   },
   closureLibraryDir,
   config,
-  concurrency: {
-    desc: 'Concurrency limit for compiler',
-    alias: 'c',
-    type: 'number',
-  },
+  concurrency,
   batch: {
     desc: 'Build in batch mode (on AWS or local for debug)',
     choices: ['aws', 'local'],
@@ -165,6 +167,7 @@ const buildSoyOptions = {
 
 const buildDepsOptions = {
   depsJs,
+  concurrency,
   config,
   noTTY,
 } as const;

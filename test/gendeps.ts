@@ -178,7 +178,9 @@ describe('gendeps', () => {
       const originalDepsJs = path.join(fixturesDir, 'deps.js');
       const closureLibraryDir = path.join(fixturesDir, 'closure');
       await restoreDepsJs(originalDepsJs, closureLibraryDir);
-      const actualDepsJsPath = tempy.file({name: 'writeCachedDepsOnDisk-deps.js'});
+      const actualDepsJsPath = tempy.file({
+        name: 'writeCachedDepsOnDisk-deps.js',
+      });
       await writeCachedDepsOnDisk(actualDepsJsPath, closureLibraryDir);
       const actual = await fs.readFile(actualDepsJsPath, 'utf8');
       const expected = await fs.readFile(originalDepsJs, 'utf8');
