@@ -241,7 +241,8 @@ export async function serve(config: DuckConfig, watch = true) {
     const depsContent = await generateDepFileText(
       entryConfig,
       config.inputsRoot,
-      config.depsJsIgnoreDirs.concat(config.closureLibraryDir)
+      config.depsJsIgnoreDirs.concat(config.closureLibraryDir),
+      config.concurrency
     );
     reply
       .code(200)

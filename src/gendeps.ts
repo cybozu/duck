@@ -1,10 +1,10 @@
 import flat from 'array.prototype.flat';
 import fs from 'fs';
 import {depFile, depGraph, parser} from 'google-closure-deps';
-import pLimit from 'p-limit';
 import path from 'path';
 import recursive from 'recursive-readdir';
 import {promisify} from 'util';
+import {DependencyParserWithWorkers} from './dependency-parser-wrapper';
 import {EntryConfig} from './entryconfig';
 import {googBaseUrlPath, inputsUrlPath} from './urls';
 
@@ -19,9 +19,10 @@ const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> = new Map
 export async function generateDepFileText(
   entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
   inputsRoot: string,
-  ignoreDirs: readonly string[] = []
+  ignoreDirs: readonly string[] = [],
+  workers?: number
 ): Promise<string> {
-  const dependencies = await getDependencies(entryConfig, ignoreDirs);
+  const dependencies = await getDependencies(entryConfig, ignoreDirs, workers);
   const googBaseDirVirtualPath = path.dirname(
     path.resolve(inputsRoot, path.relative(inputsUrlPath, googBaseUrlPath))
   );
@@ -86,57 +87,45 @@ export async function restoreDepsJs(depsJsPath: string, closureLibraryDir: strin
  */
 export async function getDependencies(
   entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
-  ignoreDirs: readonly string[] = []
+  ignoreDirs: readonly string[] = [],
+  numOfWorkers?: number
 ): Promise<depGraph.Dependency[]> {
   const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, '*'));
-  // TODO: uniq
-  const parseResultPromises = entryConfig.paths.map(async p => {
-    let testExcludes: readonly string[] = [];
-    if (entryConfig['test-excludes']) {
-      testExcludes = entryConfig['test-excludes'];
-    }
-    const files = await recursive(p, ignoreDirPatterns);
-    // NOTE: This logic is executed in a single thread (not forking),
-    // so this concurrency doesn't affect the prformance.
-    // But it improves smooth animation of "in-progress circle" and "Ctrl-C" handling.
-    // TODO: Use workers in Node v12+.
-    const limit = pLimit(10);
-    return Promise.all(
-      files
-        .filter(file => /\.js$/.test(file))
-        // TODO: load deps.js path from config
-        .filter(file => !/\bdeps\.js$/.test(file))
-        .filter(file => {
-          if (testExcludes.some(exclude => file.startsWith(exclude))) {
-            return !/_test\.js$/.test(file);
-          }
-          return true;
-        })
-        .map(p =>
-          limit(() => {
-            if (pathToDependencyCache.has(p)) {
-              return pathToDependencyCache.get(p)!;
+  const parser = new DependencyParserWithWorkers(numOfWorkers);
+  try {
+    // TODO: uniq
+    const parseResultPromises = entryConfig.paths.map(async p => {
+      let testExcludes: readonly string[] = [];
+      if (entryConfig['test-excludes']) {
+        testExcludes = entryConfig['test-excludes'];
+      }
+      const files = await recursive(p, ignoreDirPatterns);
+      return Promise.all(
+        files
+          .filter(file => /\.js$/.test(file))
+          // TODO: load deps.js path from config
+          .filter(file => !/\bdeps\.js$/.test(file))
+          .filter(file => {
+            if (testExcludes.some(exclude => file.startsWith(exclude))) {
+              return !/_test\.js$/.test(file);
+            }
+            return true;
+          })
+          .map(async file => {
+            if (pathToDependencyCache.has(file)) {
+              return pathToDependencyCache.get(file)!;
             } else {
-              const promise = parser.parseFileAsync(p).then(result => {
-                if (result.hasFatalError) {
-                  throw new Error(`Fatal parse error in ${p}: ${result.errors}`);
-                }
-                if (result.dependencies.length > 1) {
-                  throw new Error(`A JS file must have only one dependency: ${p}`);
-                }
-                if (result.dependencies.length === 0) {
-                  throw new Error(`No dependencies found: ${p}`);
-                }
-                return result.dependencies[0];
-              });
-              pathToDependencyCache.set(p, promise);
+              const promise = parser.parse(file);
+              pathToDependencyCache.set(file, promise);
               return promise;
             }
           })
-        )
-    );
-  });
-  return flat(await Promise.all(parseResultPromises));
+      );
+    });
+    return flat(await Promise.all(parseResultPromises));
+  } finally {
+    await parser.terminate();
+  }
 }
 
 /**
