@@ -1,6 +1,5 @@
 {
   "require": ["espower-typescript/guess"],
   "extension": ["ts"],
-  "spec": ["test", "test/bin-test"],
-  "timeout": 5000
+  "spec": ["test", "test/bin-test"]
 }
