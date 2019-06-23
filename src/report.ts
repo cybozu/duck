@@ -7,7 +7,10 @@ export type CompileErrorItem = CompileErrorCase | CompileErrorInfo;
 export interface CompileErrorCase {
   level: "warning" | "error";
   description: string;
-  key: string;
+  /**
+   * Added in google-closure-compiler@20180910
+   */
+  key?: string;
   source: string;
   line: number;
   column: number;
