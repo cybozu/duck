@@ -245,7 +245,6 @@ export function run(processArgv: readonly string[]): void {
         noTTY,
       },
       async argv => {
-        console.log(argv.reporterOptions);
         const config = loadConfig(argv);
         const tasks = listr(
           [
