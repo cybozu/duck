@@ -139,6 +139,7 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
           items,
         };
       } catch {
+        // for invalid compiler options errors
         throw new Error(`Unexpected non-JSON error: ${stderr}`);
       }
     });
