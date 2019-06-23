@@ -20,8 +20,7 @@ commands:
       - run:
           name: Test in the oldest Google Closure Tools
           command: |
-            CLOSURE_VER=20190325
-            npm i "google-closure-compiler@${CLOSURE_VER}" "google-closure-deps@${CLOSURE_VER}" "google-closure-library@${CLOSURE_VER}"
+            npm i --no-save google-closure-compiler@20180910 google-closure-deps@20190325
             npm run unit
       - run:
           name: Report coverage to codecov
