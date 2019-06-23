@@ -131,12 +131,16 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
       }
       const { message: stderr } = result.reason as Error;
       const [command, , ...messages] = stderr.split("\n");
-      const items: CompileErrorItem[] = JSON.parse(messages.join("\n"));
-      return {
-        entryConfigPath: result.entryConfigPath,
-        command,
-        items,
-      };
+      try {
+        const items: CompileErrorItem[] = JSON.parse(messages.join("\n"));
+        return {
+          entryConfigPath: result.entryConfigPath,
+          command,
+          items,
+        };
+      } catch {
+        throw new Error(`Unexpected non-JSON error: ${stderr}`);
+      }
     });
   if (reasons.length > 0) {
     throw new BuildJsCompilationError(reasons, results.length);
