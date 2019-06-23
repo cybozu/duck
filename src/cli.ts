@@ -104,8 +104,9 @@ const depsJs = {
   coerce: path.resolve,
 } as const;
 
-const skipDepsJs = {
-  desc: "Skip generating deps.js",
+const skipInitialBuild = {
+  desc: "Skip initial building of Soy and deps.js",
+  alias: "s",
   type: "boolean",
   default: false,
 } as const;
@@ -190,12 +191,7 @@ export function run(processArgv: readonly string[]): void {
         closureLibraryDir,
         depsJs,
         ...buildDepsOptions,
-        skipInitialBuild: {
-          desc: "Don't build Soy and deps.js before serving",
-          alias: "s",
-          type: "boolean",
-          default: false,
-        },
+        skipInitialBuild,
         port: {
           desc: "A port number to listen",
           type: "number",
@@ -240,7 +236,7 @@ export function run(processArgv: readonly string[]): void {
       {
         ...buildJsOptions,
         ...buildDepsOptions,
-        skipDepsJs,
+        skipInitialBuild,
         ...buildSoyOptions,
         noTTY,
       },
@@ -250,12 +246,14 @@ export function run(processArgv: readonly string[]): void {
           [
             {
               title: `Compile Soy templates`,
-              skip: () => !(config.soyJarPath && config.soyFileRoots && config.soyOptions),
+              skip: () =>
+                argv.skipInitialBuild ||
+                !(config.soyJarPath && config.soyFileRoots && config.soyOptions),
               task: wrap(() => buildSoy(config as BuildSoyConfig, argv.printConfig)),
             },
             {
               title: `Generate deps.js`,
-              skip: () => !config.depsJs || argv.skipDepsJs,
+              skip: () => !config.depsJs || argv.skipInitialBuild,
               task: wrap(() => buildDeps(config)),
             },
             {
