@@ -57,7 +57,7 @@
     "zet": "^1.0.5"
   },
   "peerDependencies": {
-    "google-closure-compiler": ">=20180716.0.1"
+    "google-closure-compiler": ">=20180101.0.0"
   },
   "devDependencies": {
     "@types/chokidar": "^2.1.3",
