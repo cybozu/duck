@@ -27,8 +27,8 @@ ${items
 
   private formatErrorCase(item: CompileErrorCase): string {
     const { source, line, column, level, key, description, context } = item;
-    return `${source}:${line}:${column} ${level.toUpperCase()} - [${key}] ${description}${
-      context ? `\n${context}` : ""
-    }`;
+    const errorCode = key ? `[${key}] ` : "";
+    const code = context ? `\n${context}` : "";
+    return `${source}:${line}:${column} ${level.toUpperCase()} - ${errorCode}${description}${code}`;
   }
 }

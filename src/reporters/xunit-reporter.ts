@@ -28,7 +28,7 @@ export class XUnitReporter extends BaseReporter {
         const testcase = testsuite
           .element("testcase")
           .attribute("classname", error.source)
-          .attribute("name", error.key);
+          .attribute("name", error.key || error.description);
         const message = `${error.description} (line ${error.line}, col ${error.column})`;
         const failure = testcase.element("failure").attribute("message", message);
         if (error.context) {
