@@ -1,1 +1,1 @@
-declare module 'cors';
+declare module "cors";

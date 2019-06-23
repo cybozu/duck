@@ -1,1 +1,1 @@
-declare module 'merge-options';
+declare module "merge-options";

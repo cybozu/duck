@@ -1,14 +1,14 @@
-import fs from 'fs';
-import {compiler as ClosureCompiler} from 'google-closure-compiler';
-import {getNativeImagePath} from 'google-closure-compiler/lib/utils';
-import {dirname} from 'path';
-import * as tempy from 'tempy';
-import {logger} from './logger';
+import fs from "fs";
+import { compiler as ClosureCompiler } from "google-closure-compiler";
+import { getNativeImagePath } from "google-closure-compiler/lib/utils";
+import { dirname } from "path";
+import * as tempy from "tempy";
+import { logger } from "./logger";
 
 export interface CompilerOptions {
   [idx: string]: any;
   // 'LOOSE' and 'STRICT' are deprecated. Use 'PRUNE_LEGACY' and 'PRUNE' respectedly.
-  dependency_mode?: 'NONE' | 'SORT_ONLY' | 'PRUNE_LEGACY' | 'PRUNE';
+  dependency_mode?: "NONE" | "SORT_ONLY" | "PRUNE_LEGACY" | "PRUNE";
   entry_point?: readonly string[];
   compilation_level?: CompilationLevel;
   js?: readonly string[];
@@ -17,9 +17,9 @@ export interface CompilerOptions {
   chunk?: readonly string[];
   language_in?: string;
   language_out?: string;
-  json_streams?: 'IN' | 'OUT' | 'BOTH';
-  error_format?: 'STANDARD' | 'JSON';
-  warning_level?: 'QUIET' | 'DEFAULT' | 'VERBOSE';
+  json_streams?: "IN" | "OUT" | "BOTH";
+  error_format?: "STANDARD" | "JSON";
+  warning_level?: "QUIET" | "DEFAULT" | "VERBOSE";
   debug?: boolean;
   formatting?: readonly CompilerOptionsFormattingType[];
   define?: readonly string[];
@@ -27,7 +27,7 @@ export interface CompilerOptions {
   // chunkname:wrappercode
   chunk_wrapper?: readonly string[];
   chunk_output_path_prefix?: string;
-  isolation_mode?: 'NONE' | 'IIFE';
+  isolation_mode?: "NONE" | "IIFE";
   output_wrapper?: string;
   rename_prefix_namespace?: string;
   jscomp_error?: readonly string[];
@@ -36,11 +36,11 @@ export interface CompilerOptions {
   flagfile?: string;
 }
 
-export type CompilationLevel = 'BUNDLE' | 'WHITESPACE' | 'SIMPLE' | 'ADVANCED';
+export type CompilationLevel = "BUNDLE" | "WHITESPACE" | "SIMPLE" | "ADVANCED";
 export type CompilerOptionsFormattingType =
-  | 'PRETTY_PRINT'
-  | 'PRINT_INPUT_DELIMITER'
-  | 'SINGLE_QUOTES';
+  | "PRETTY_PRINT"
+  | "PRINT_INPUT_DELIMITER"
+  | "SINGLE_QUOTES";
 
 export interface CompilerOutput {
   path: string;
@@ -53,21 +53,21 @@ export interface CompilerOutput {
  */
 export async function compileToJson(
   opts: CompilerOptions,
-  batchMode?: 'aws' | 'local'
+  batchMode?: "aws" | "local"
 ): Promise<CompilerOutput[]> {
-  opts = {...opts, json_streams: 'OUT', error_format: 'JSON'};
+  opts = { ...opts, json_streams: "OUT", error_format: "JSON" };
   const outputs: CompilerOutput[] = JSON.parse(await compile(opts, batchMode));
   if (batchMode) {
     // Reduce transfer size in batch mode.
     // The maximum request/response size of AWS Lambda is 6MB each.
     // See https://faastjs.org/docs/aws#queue-vs-https-mode
-    return outputs.map(({path, src}) => ({path, src, source_map: ''}));
+    return outputs.map(({ path, src }) => ({ path, src, source_map: "" }));
   } else {
     return outputs;
   }
 }
 
-export function compile(opts: CompilerOptions, batchMode?: 'aws' | 'local'): Promise<string> {
+export function compile(opts: CompilerOptions, batchMode?: "aws" | "local"): Promise<string> {
   if (isInAwsLambda()) {
     rewriteNodePathForAwsLambda(opts);
   }
@@ -104,7 +104,7 @@ function rewriteNodePathForAwsLambda(options: CompilerOptions): void {
     const closureLibraryDir = dirname(
       // use `eval` to avoid webpack replacement
       // eslint-disable-next-line no-eval
-      eval('require.resolve')('google-closure-library/package.json')
+      eval("require.resolve")("google-closure-library/package.json")
     );
     options.js = options.js.map(js =>
       js.replace(/^node_modules\/google-closure-library/, closureLibraryDir)
@@ -116,7 +116,7 @@ class CompilerError extends Error {
   exitCode: number;
   constructor(msg: string, exitCode: number) {
     super(msg);
-    this.name = 'CompilerError';
+    this.name = "CompilerError";
     this.exitCode = exitCode;
   }
 }
@@ -125,9 +125,9 @@ class CompilerError extends Error {
  * To avoid "spawn E2BIG" errors on a large scale project,
  * transfer compiler options via a flagfile instead of CLI arguments.
  */
-export function convertToFlagfile(opts: CompilerOptions): {flagfile: string} {
+export function convertToFlagfile(opts: CompilerOptions): { flagfile: string } {
   const flagfile = tempy.file({
-    name: `${new Date().toISOString().replace(/[^\w]/g, '')}.closure.conf`,
+    name: `${new Date().toISOString().replace(/[^\w]/g, "")}.closure.conf`,
   });
   const lines: string[] = [];
   Object.entries(opts).forEach(([key, value]) => {
@@ -137,11 +137,11 @@ export function convertToFlagfile(opts: CompilerOptions): {flagfile: string} {
       lines.push(createKeyValue(key, value));
     }
   });
-  fs.writeFileSync(flagfile, lines.join('\n'), 'utf8');
+  fs.writeFileSync(flagfile, lines.join("\n"), "utf8");
   // logger is not initialized with pino in batch mode.
   const log = logger ? logger.info.bind(logger) : console.info.bind(console);
   log(`flagfile: ${flagfile}`);
-  return {flagfile};
+  return { flagfile };
 
   function createKeyValue(key: string, value: any): string {
     return `--${key} "${escape(String(value))}"`;

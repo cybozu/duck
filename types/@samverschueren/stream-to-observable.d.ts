@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-import {Observable} from 'rxjs';
+import { Observable } from "rxjs";
 
 interface Options {
   /**

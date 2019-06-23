@@ -1,57 +1,57 @@
-import flat from 'array.prototype.flat';
-import {stripIndents} from 'common-tags';
-import {depGraph} from 'google-closure-deps';
-import {assertNonNullable} from './assert';
-import {CompilationLevel, CompilerOptions, CompilerOptionsFormattingType} from './compiler-core';
-import {Dag} from './dag';
-import {DuckConfig} from './duckconfig';
-import {createDag, EntryConfig, PlovrMode} from './entryconfig';
-import {getClosureLibraryDependencies, getDependencies} from './gendeps';
+import flat from "array.prototype.flat";
+import { stripIndents } from "common-tags";
+import { depGraph } from "google-closure-deps";
+import { assertNonNullable } from "./assert";
+import { CompilationLevel, CompilerOptions, CompilerOptionsFormattingType } from "./compiler-core";
+import { Dag } from "./dag";
+import { DuckConfig } from "./duckconfig";
+import { createDag, EntryConfig, PlovrMode } from "./entryconfig";
+import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
 
-export {compile, CompilerOptions, compileToJson, convertToFlagfile} from './compiler-core';
+export { compile, CompilerOptions, compileToJson, convertToFlagfile } from "./compiler-core";
 
 /**
  * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.
  * @see https://github.com/bolinfest/plovr/blob/v8.0.0/src/org/plovr/Config.java#L81-L93
  */
-const GLOBAL_NAMESPACE = 'z';
+const GLOBAL_NAMESPACE = "z";
 
 function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
   const opts: CompilerOptions = {};
   if (!outputToFile) {
-    opts.json_streams = 'OUT';
+    opts.json_streams = "OUT";
   }
 
-  function copy(entryKey: keyof EntryConfig, closureKey = entryKey.replace(/-/g, '_')) {
+  function copy(entryKey: keyof EntryConfig, closureKey = entryKey.replace(/-/g, "_")) {
     if (entryKey in entryConfig) {
       opts[closureKey] = entryConfig[entryKey];
     }
   }
 
-  copy('language-in');
-  copy('language-out');
-  copy('level', 'warning_level');
-  copy('debug');
+  copy("language-in");
+  copy("language-out");
+  copy("level", "warning_level");
+  copy("debug");
 
-  if (entryConfig['global-scope-name']) {
+  if (entryConfig["global-scope-name"]) {
     opts.rename_prefix_namespace = GLOBAL_NAMESPACE;
   }
 
   if (entryConfig.mode === PlovrMode.RAW) {
-    opts.compilation_level = 'WHITESPACE';
+    opts.compilation_level = "WHITESPACE";
   } else {
     opts.compilation_level = entryConfig.mode;
   }
 
   if (entryConfig.modules) {
     // for chunks
-    opts.dependency_mode = 'NONE';
+    opts.dependency_mode = "NONE";
     if (outputToFile) {
-      if (!entryConfig['module-output-path']) {
+      if (!entryConfig["module-output-path"]) {
         throw new Error('entryConfig["module-output-path"] must be specified');
       }
-      const outputPath = entryConfig['module-output-path'];
-      const suffix = '%s.js';
+      const outputPath = entryConfig["module-output-path"];
+      const suffix = "%s.js";
       if (!outputPath.endsWith(suffix)) {
         throw new TypeError(
           `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
@@ -61,7 +61,7 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
     }
   } else {
     // for pages
-    opts.dependency_mode = 'PRUNE';
+    opts.dependency_mode = "PRUNE";
     const js = entryConfig.paths.slice();
     if (entryConfig.externs) {
       js.push(...entryConfig.externs.map(extern => `!${extern}`));
@@ -69,10 +69,10 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
     opts.js = js;
     opts.entry_point = assertNonNullable(entryConfig.inputs).slice();
     if (outputToFile) {
-      if (!entryConfig['output-file']) {
+      if (!entryConfig["output-file"]) {
         throw new Error('entryConfig["output-file"] must be specified');
       }
-      copy('output-file', 'js_output_file');
+      copy("output-file", "js_output_file");
     }
   }
 
@@ -81,11 +81,11 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   }
 
   const formatting: CompilerOptionsFormattingType[] = [];
-  if (entryConfig['pretty-print']) {
-    formatting.push('PRETTY_PRINT');
+  if (entryConfig["pretty-print"]) {
+    formatting.push("PRETTY_PRINT");
   }
-  if (entryConfig['print-input-delimiter']) {
-    formatting.push('PRINT_INPUT_DELIMITER');
+  if (entryConfig["print-input-delimiter"]) {
+    formatting.push("PRINT_INPUT_DELIMITER");
   }
   if (formatting.length > 0) {
     opts.formatting = formatting;
@@ -93,7 +93,7 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
 
   if (entryConfig.define) {
     opts.define = Object.entries(entryConfig.define).map(([key, value]) => {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         if (value.includes("'")) {
           throw new Error(`define value should not include single-quote: "${key}: ${value}"`);
         }
@@ -109,13 +109,13 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
     const jscompOff: string[] = [];
     Object.entries(entryConfig.checks).forEach(([name, value]) => {
       switch (value) {
-        case 'ERROR':
+        case "ERROR":
           jscompError.push(name);
           break;
-        case 'WARNING':
+        case "WARNING":
           jscompWarning.push(name);
           break;
-        case 'OFF':
+        case "OFF":
           jscompOff.push(name);
           break;
         default:
@@ -159,7 +159,7 @@ export async function createCompilerOptionsForChunks(
   config: DuckConfig,
   outputToFile: boolean,
   createModuleUris: (chunkId: string) => string[]
-): Promise<{options: CompilerOptions; sortedChunkIds: string[]; rootChunkId: string}> {
+): Promise<{ options: CompilerOptions; sortedChunkIds: string[]; rootChunkId: string }> {
   // TODO: separate EntryConfigChunks from EntryConfig
   const modules = assertNonNullable(entryConfig.modules);
   const ignoreDirs = config.depsJsIgnoreDirs.concat(config.closureLibraryDir);
@@ -177,7 +177,7 @@ export async function createCompilerOptionsForChunks(
   options.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
   options.chunk = sortedChunkIds.map(id => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
-    return `${id}:${numOfInputs}:${modules[id].deps.join(',')}`;
+    return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;
   });
   options.chunk_wrapper = createChunkWrapper(
     entryConfig,
@@ -185,14 +185,14 @@ export async function createCompilerOptionsForChunks(
     assertNonNullable(options.compilation_level),
     createModuleUris
   );
-  return {options, sortedChunkIds, rootChunkId: sortedChunkIds[0]};
+  return { options, sortedChunkIds, rootChunkId: sortedChunkIds[0] };
 }
 
-const wrapperMarker = '%output%';
+const wrapperMarker = "%output%";
 
 function createOutputWrapper(entryConfig: EntryConfig, level: CompilationLevel): string {
   // output_wrapper doesn't support "%n%"
-  return createBaseOutputWrapper(entryConfig, level, true).replace(/\n+/g, '');
+  return createBaseOutputWrapper(entryConfig, level, true).replace(/\n+/g, "");
 }
 
 function createChunkWrapper(
@@ -201,7 +201,7 @@ function createChunkWrapper(
   compilationLevel: CompilationLevel,
   createModuleUris: (id: string) => string[]
 ): string[] {
-  const {moduleInfo, moduleUris} = convertModuleInfos(entryConfig, createModuleUris);
+  const { moduleInfo, moduleUris } = convertModuleInfos(entryConfig, createModuleUris);
   return sortedChunkIds.map((chunkId, index) => {
     const isRootChunk = index === 0;
     let wrapper = createBaseOutputWrapper(entryConfig, compilationLevel, isRootChunk);
@@ -209,11 +209,11 @@ function createChunkWrapper(
       wrapper = stripIndents`
       var PLOVR_MODULE_INFO=${JSON.stringify(moduleInfo)};
       var PLOVR_MODULE_URIS=${JSON.stringify(moduleUris)};
-      ${entryConfig.debug ? 'var PLOVR_MODULE_USE_DEBUG_MODE=true;' : ''}
+      ${entryConfig.debug ? "var PLOVR_MODULE_USE_DEBUG_MODE=true;" : ""}
       ${wrapper}`;
     }
     // chunk_wrapper supports "%n%"
-    return `${chunkId}:${wrapper.replace(/\n+/g, '%n%')}`;
+    return `${chunkId}:${wrapper.replace(/\n+/g, "%n%")}`;
   });
 }
 
@@ -226,13 +226,13 @@ function createBaseOutputWrapper(
   isRoot: boolean
 ): string {
   let wrapper = wrapperMarker;
-  if (entryConfig['output-wrapper']) {
-    wrapper = entryConfig['output-wrapper'];
+  if (entryConfig["output-wrapper"]) {
+    wrapper = entryConfig["output-wrapper"];
   }
-  if (entryConfig['global-scope-name'] && level !== 'WHITESPACE') {
-    const globalScope = entryConfig['global-scope-name'];
+  if (entryConfig["global-scope-name"] && level !== "WHITESPACE") {
+    const globalScope = entryConfig["global-scope-name"];
     const globalScopeWrapper = stripIndents`
-        ${isRoot ? `var ${globalScope}={};` : ''}
+        ${isRoot ? `var ${globalScope}={};` : ""}
         (function(${GLOBAL_NAMESPACE}){
         ${wrapperMarker}
         }).call(this,${globalScope});`;
@@ -244,7 +244,7 @@ function createBaseOutputWrapper(
 function findTransitiveDeps(
   sortedChunkIds: readonly string[],
   dependencies: readonly depGraph.Dependency[],
-  modules: {[id: string]: {inputs: readonly string[]; deps: readonly string[]}}
+  modules: { [id: string]: { inputs: readonly string[]; deps: readonly string[] } }
 ): Map<string, Set<string>> {
   const pathToDep = new Map(
     dependencies.map(dep => [dep.path, dep] as [string, depGraph.Dependency])
@@ -292,14 +292,14 @@ function splitDepsIntoChunks(
 export function convertModuleInfos(
   entryConfig: EntryConfig,
   createModuleUris: (id: string) => string[]
-): {moduleInfo: {[id: string]: string[]}; moduleUris: {[id: string]: string[]}} {
+): { moduleInfo: { [id: string]: string[] }; moduleUris: { [id: string]: string[] } } {
   const modules = assertNonNullable(entryConfig.modules);
-  const moduleInfo: {[id: string]: string[]} = {};
-  const moduleUris: {[id: string]: string[]} = {};
+  const moduleInfo: { [id: string]: string[] } = {};
+  const moduleUris: { [id: string]: string[] } = {};
   for (const id in modules) {
     const module = modules[id];
     moduleInfo[id] = module.deps.slice();
     moduleUris[id] = createModuleUris(id);
   }
-  return {moduleInfo, moduleUris};
+  return { moduleInfo, moduleUris };
 }

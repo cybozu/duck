@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
-import stripJsonComments from 'strip-json-comments';
-import util from 'util';
-import {Dag, Node} from './dag';
+import fs from "fs";
+import path from "path";
+import stripJsonComments from "strip-json-comments";
+import util from "util";
+import { Dag, Node } from "./dag";
 
 export interface EntryConfig {
   id: string;
@@ -19,36 +19,36 @@ export interface EntryConfig {
     };
   };
   // like "../compiled/modules/%s.js",
-  'module-output-path'?: string;
+  "module-output-path"?: string;
   // like "/js/compiled/modules/%s.js"
-  'module-production-uri'?: string;
+  "module-production-uri"?: string;
   define?: {
     [key: string]: boolean | number | string;
   };
   externs?: readonly string[];
-  'language-in'?: string;
-  'language-out'?: string;
-  level?: 'QUIET' | 'DEFAULT' | 'VERBOSE';
+  "language-in"?: string;
+  "language-out"?: string;
+  level?: "QUIET" | "DEFAULT" | "VERBOSE";
   debug?: boolean;
-  'pretty-print'?: boolean;
-  'print-input-delimiter'?: boolean;
-  'test-excludes'?: readonly string[];
-  'output-file'?: string;
+  "pretty-print"?: boolean;
+  "print-input-delimiter"?: boolean;
+  "test-excludes"?: readonly string[];
+  "output-file"?: string;
   checks?: {
-    [error: string]: 'OFF' | 'WARNING' | 'ERROR';
+    [error: string]: "OFF" | "WARNING" | "ERROR";
   };
-  'global-scope-name'?: string;
-  'output-wrapper'?: string;
+  "global-scope-name"?: string;
+  "output-wrapper"?: string;
 
   // TODO
   // * experimental-compiler-options: Object<string, any>
 }
 
 export enum PlovrMode {
-  RAW = 'RAW',
-  WHITESPACE = 'WHITESPACE',
-  SIMPLE = 'SIMPLE',
-  ADVANCED = 'ADVANCED',
+  RAW = "RAW",
+  WHITESPACE = "WHITESPACE",
+  SIMPLE = "SIMPLE",
+  ADVANCED = "ADVANCED",
 }
 /**
  * Load entry config JSON
@@ -60,9 +60,9 @@ export enum PlovrMode {
 export async function loadEntryConfigById(
   id: string,
   entryConfigDir: string,
-  {mode}: {mode?: PlovrMode} = {}
+  { mode }: { mode?: PlovrMode } = {}
 ): Promise<EntryConfig> {
-  return loadEntryConfig(path.join(entryConfigDir, `${id}.json`), {mode});
+  return loadEntryConfig(path.join(entryConfigDir, `${id}.json`), { mode });
 }
 
 /**
@@ -74,9 +74,9 @@ export async function loadEntryConfigById(
  */
 export async function loadEntryConfig(
   entryConfigPath: string,
-  {mode}: {mode?: PlovrMode} = {}
+  { mode }: { mode?: PlovrMode } = {}
 ): Promise<EntryConfig> {
-  const {json: entryConfig, basedir} = await loadInheritedJson(entryConfigPath);
+  const { json: entryConfig, basedir } = await loadInheritedJson(entryConfigPath);
   // change relative paths to abs paths
   entryConfig.paths = entryConfig.paths.map(p => path.resolve(basedir, p));
   if (entryConfig.inputs) {
@@ -85,19 +85,19 @@ export async function loadEntryConfig(
   if (entryConfig.externs) {
     entryConfig.externs = entryConfig.externs.map(extern => path.resolve(basedir, extern));
   }
-  if (entryConfig['output-file']) {
-    entryConfig['output-file'] = path.resolve(basedir, entryConfig['output-file']);
+  if (entryConfig["output-file"]) {
+    entryConfig["output-file"] = path.resolve(basedir, entryConfig["output-file"]);
   }
   if (entryConfig.modules) {
     Object.values(entryConfig.modules).forEach(mod => {
       mod.inputs = mod.inputs.map(input => path.resolve(basedir, input));
     });
   }
-  if (entryConfig['test-excludes']) {
-    entryConfig['test-excludes'] = entryConfig['test-excludes'].map(p => path.resolve(basedir, p));
+  if (entryConfig["test-excludes"]) {
+    entryConfig["test-excludes"] = entryConfig["test-excludes"].map(p => path.resolve(basedir, p));
   }
-  if (entryConfig['module-output-path']) {
-    entryConfig['module-output-path'] = path.resolve(basedir, entryConfig['module-output-path']);
+  if (entryConfig["module-output-path"]) {
+    entryConfig["module-output-path"] = path.resolve(basedir, entryConfig["module-output-path"]);
   }
   if (mode) {
     entryConfig.mode = mode;
@@ -109,7 +109,7 @@ export async function loadEntryConfig(
  * Load and normalize an EntryConfig JSON file including comments
  */
 async function loadJson(jsonPath: string): Promise<EntryConfig> {
-  const content = await util.promisify(fs.readFile)(path.join(jsonPath), 'utf8');
+  const content = await util.promisify(fs.readFile)(path.join(jsonPath), "utf8");
   return normalize(JSON.parse(stripJsonComments(content)));
 }
 
@@ -119,17 +119,17 @@ async function loadJson(jsonPath: string): Promise<EntryConfig> {
 async function loadInheritedJson(
   jsonPath: string,
   json: EntryConfig | null = null
-): Promise<{json: EntryConfig; basedir: string}> {
+): Promise<{ json: EntryConfig; basedir: string }> {
   if (!json) {
     json = await loadJson(jsonPath);
   }
   if (!json.inherits) {
-    return {json, basedir: path.dirname(jsonPath)};
+    return { json, basedir: path.dirname(jsonPath) };
   }
   const parentPath = path.resolve(path.dirname(jsonPath), json.inherits);
   const parent = await loadJson(parentPath);
   delete json.inherits;
-  json = {...parent, ...json};
+  json = { ...parent, ...json };
   return loadInheritedJson(parentPath, json);
 }
 
@@ -149,8 +149,8 @@ function normalize(json: any): EntryConfig {
       }
     }
   }
-  if (json['test-excludes'] && !Array.isArray(json['test-excludes'])) {
-    json['test-excludes'] = [json['test-excludes']];
+  if (json["test-excludes"] && !Array.isArray(json["test-excludes"])) {
+    json["test-excludes"] = [json["test-excludes"]];
   }
   return json;
 }

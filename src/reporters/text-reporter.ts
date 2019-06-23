@@ -1,5 +1,5 @@
-import {CompileErrorCase, ErrorReason} from '../report';
-import {BaseReporter} from './base-reporter';
+import { CompileErrorCase, ErrorReason } from "../report";
+import { BaseReporter } from "./base-reporter";
 
 export interface TextReporterOptions {
   stderr?: boolean;
@@ -11,24 +11,24 @@ export class TextReporter extends BaseReporter {
     super({
       stderr: options.stderr || true,
       outputDir: options.outputDir || null,
-      resultFilename: 'results.txt',
+      resultFilename: "results.txt",
     });
   }
 
-  format({entryConfigPath, command, items}: ErrorReason): string {
+  format({ entryConfigPath, command, items }: ErrorReason): string {
     return `# Compile Errors in ${entryConfigPath}:
 
 ${command}
 
 ${items
-  .map(item => (item.level === 'info' ? item.description : this.formatErrorCase(item)))
-  .join('\n\n')}`;
+  .map(item => (item.level === "info" ? item.description : this.formatErrorCase(item)))
+  .join("\n\n")}`;
   }
 
   private formatErrorCase(item: CompileErrorCase): string {
-    const {source, line, column, level, key, description, context} = item;
+    const { source, line, column, level, key, description, context } = item;
     return `${source}:${line}:${column} ${level.toUpperCase()} - [${key}] ${description}${
-      context ? `\n${context}` : ''
+      context ? `\n${context}` : ""
     }`;
   }
 }

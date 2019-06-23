@@ -27,12 +27,12 @@ export namespace parser {
       /**
        * Scanned from an actual source file.
        */
-      SOURCE_FILE = 'f',
+      SOURCE_FILE = "f",
 
       /**
        * A goog.addDependency statement.
        */
-      GOOG_ADD_DEPENDENCY = 'd',
+      GOOG_ADD_DEPENDENCY = "d",
     }
   }
 
@@ -69,13 +69,13 @@ export namespace parser {
 export namespace depGraph {
   export enum DependencyType {
     /** A file containing goog.provide statements. */
-    CLOSURE_PROVIDE = 'closure provide',
+    CLOSURE_PROVIDE = "closure provide",
     /** A file containing a goog.module statement. */
-    CLOSURE_MODULE = 'closure module',
+    CLOSURE_MODULE = "closure module",
     /** An ES6 module file. */
-    ES6_MODULE = 'es6 module',
+    ES6_MODULE = "es6 module",
     /** A JavaScript file that has no goog.provide/module and is not an ES6 module. */
-    SCRIPT = 'script',
+    SCRIPT = "script",
   }
 
   /**

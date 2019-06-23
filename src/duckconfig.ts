@@ -1,9 +1,9 @@
-import path from 'path';
-import {assertString} from './assert';
-import {JsonReporterOptions} from './reporters/json-reporter';
-import {TextReporterOptions} from './reporters/text-reporter';
-import {XUnitReporterOptions} from './reporters/xunit-reporter';
-import {SoyToJsOptions} from './soy';
+import path from "path";
+import { assertString } from "./assert";
+import { JsonReporterOptions } from "./reporters/json-reporter";
+import { TextReporterOptions } from "./reporters/text-reporter";
+import { XUnitReporterOptions } from "./reporters/xunit-reporter";
+import { SoyToJsOptions } from "./soy";
 
 export interface DuckConfig {
   closureLibraryDir: string;
@@ -16,9 +16,9 @@ export interface DuckConfig {
   soyOptions?: SoyToJsOptions;
   soyFileRoots?: readonly string[];
   concurrency?: number;
-  batch?: 'aws' | 'local';
-  batchOptions?: import('faastjs').AwsOptions | import('faastjs').LocalOptions;
-  reporters?: ('text' | 'xunit')[];
+  batch?: "aws" | "local";
+  batchOptions?: import("faastjs").AwsOptions | import("faastjs").LocalOptions;
+  reporters?: ("text" | "xunit")[];
   reportersOutputDir?: string;
   reporterOptions?: {
     json?: JsonReporterOptions;
@@ -38,7 +38,7 @@ export interface DuckConfig {
  * @param opts opts.config is path to duck.config.js
  */
 export function loadConfig(opts: any = {}): DuckConfig {
-  let configPath = path.join(process.cwd(), 'duck.config');
+  let configPath = path.join(process.cwd(), "duck.config");
   if (opts.config) {
     configPath = assertString(opts.config);
   }
@@ -48,19 +48,19 @@ export function loadConfig(opts: any = {}): DuckConfig {
     const config: DuckConfig = require(configPath);
     const configDir = path.dirname(configPath);
     // resolve relative path to absolute
-    toAbsPath(config, configDir, 'closureLibraryDir');
-    toAbsPath(config, configDir, 'inputsRoot');
-    toAbsPath(config, configDir, 'entryConfigDir');
-    toAbsPath(config, configDir, 'soyJarPath');
-    toAbsPath(config, configDir, 'depsJs');
-    toAbsPath(config, configDir, 'reportersOutputDir');
-    toAbsPathArray(config, configDir, 'depsJsIgnoreDirs');
+    toAbsPath(config, configDir, "closureLibraryDir");
+    toAbsPath(config, configDir, "inputsRoot");
+    toAbsPath(config, configDir, "entryConfigDir");
+    toAbsPath(config, configDir, "soyJarPath");
+    toAbsPath(config, configDir, "depsJs");
+    toAbsPath(config, configDir, "reportersOutputDir");
+    toAbsPathArray(config, configDir, "depsJsIgnoreDirs");
     config.depsJsIgnoreDirs = config.depsJsIgnoreDirs || [];
-    toAbsPathArray(config, configDir, 'soyFileRoots');
+    toAbsPathArray(config, configDir, "soyFileRoots");
     if (config.soyOptions) {
-      const {inputPrefix} = config.soyOptions;
+      const { inputPrefix } = config.soyOptions;
       if (inputPrefix) {
-        toAbsPath(config.soyOptions, configDir, 'inputPrefix');
+        toAbsPath(config.soyOptions, configDir, "inputPrefix");
         // path.resolve() removes a trailing separator,
         // but it's important for `inputPrefix`.
         if (inputPrefix.endsWith(path.sep)) {
@@ -71,17 +71,17 @@ export function loadConfig(opts: any = {}): DuckConfig {
     if (config.https) {
       assertString(config.https.keyPath, `"https.keyPath" is required in duck.config`);
       assertString(config.https.certPath, `"https.certPath" is required in duck.config`);
-      toAbsPath(config.https, configDir, 'keyPath');
-      toAbsPath(config.https, configDir, 'certPath');
+      toAbsPath(config.https, configDir, "keyPath");
+      toAbsPath(config.https, configDir, "certPath");
     }
-    result = {...config, ...opts};
+    result = { ...config, ...opts };
   } catch {
     if (opts.config) {
       throw new Error(`duck.config not found: ${opts.config}`);
     }
   }
 
-  if (result.batch === 'aws' && !result.concurrency) {
+  if (result.batch === "aws" && !result.concurrency) {
     // 1000 is the max concurrency of AWS Lambda
     result.concurrency = 1000;
   }
@@ -91,7 +91,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
 
 function toAbsPath<T>(config: T, baseDir: string, key: PickKeysByValue<Required<T>, string>) {
   const value = config[key];
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     // "as any": TypeScript can not handle conditional type
     config[key] = path.resolve(baseDir, value) as any;
   }
