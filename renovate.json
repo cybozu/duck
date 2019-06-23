@@ -2,7 +2,7 @@
   "extends": ["@teppeis:anytime"],
   "packageRules": [
     {
-      "packageName": ["google-closure-deps"],
+      "packageNames": ["google-closure-deps"],
       "rangeStrategy": "update-lockfile"
     }
   ]
