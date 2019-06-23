@@ -10,6 +10,7 @@ export interface DuckConfig {
   inputsRoot: string;
   depsJs?: string;
   depsJsIgnoreDirs: readonly string[];
+  depsWorkers?: number;
   entryConfigDir: string;
   soyJarPath?: string;
   soyOptions?: SoyToJsOptions;

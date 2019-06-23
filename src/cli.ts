@@ -73,7 +73,7 @@ const noTTY = {
 } as const;
 
 const closureLibraryDir = {
-  desc: 'Closure Library directory',
+  desc: 'A root directory of Closure Library',
   type: 'string',
   coerce: path.resolve,
 } as const;
@@ -110,13 +110,6 @@ const skipDepsJs = {
   default: false,
 } as const;
 
-const concurrency = {
-  desc: 'Concurrency of compiler and deps analyzer',
-  alias: 'c',
-  type: 'number',
-  default: Math.min(4, Math.max(os.cpus().length, 1)),
-} as const;
-
 const buildJsOptions = {
   entryConfigDir,
   entryConfigs: {
@@ -127,7 +120,11 @@ const buildJsOptions = {
   },
   closureLibraryDir,
   config,
-  concurrency,
+  concurrency: {
+    desc: 'Concurrency limit of Closure Compiler',
+    alias: 'c',
+    type: 'number',
+  },
   batch: {
     desc: 'Build in batch mode (on AWS or local for debug)',
     choices: ['aws', 'local'],
@@ -169,7 +166,11 @@ const buildSoyOptions = {
 
 const buildDepsOptions = {
   depsJs,
-  concurrency,
+  depsWorkers: {
+    desc: 'The number of workers to analyze deps',
+    type: 'number',
+    default: Math.min(4, Math.max(os.cpus().length, 1)),
+  },
   config,
   noTTY,
 } as const;
@@ -188,6 +189,7 @@ export function run(processArgv: readonly string[]): void {
         },
         closureLibraryDir,
         depsJs,
+        ...buildDepsOptions,
         skipInitialBuild: {
           desc: "Don't build Soy and deps.js before serving",
           alias: 's',
@@ -237,6 +239,7 @@ export function run(processArgv: readonly string[]): void {
       'Build Soy, deps.js and JS',
       {
         ...buildJsOptions,
+        ...buildDepsOptions,
         skipDepsJs,
         ...buildSoyOptions,
         noTTY,

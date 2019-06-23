@@ -242,7 +242,7 @@ export async function serve(config: DuckConfig, watch = true) {
       entryConfig,
       config.inputsRoot,
       config.depsJsIgnoreDirs.concat(config.closureLibraryDir),
-      config.concurrency
+      config.depsWorkers
     );
     reply
       .code(200)

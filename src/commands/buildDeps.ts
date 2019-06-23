@@ -13,7 +13,7 @@ export async function buildDeps(config: DuckConfig): Promise<void> {
   const deps = await getDependencies(
     {paths},
     config.depsJsIgnoreDirs.concat(config.closureLibraryDir),
-    config.concurrency
+    config.depsWorkers
   );
   logger.info(`Generating deps.js`);
   const fileText = await generateDepFileTextFromDeps(deps, googBaseDir);

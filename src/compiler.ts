@@ -165,7 +165,7 @@ export async function createCompilerOptionsForChunks(
   const ignoreDirs = config.depsJsIgnoreDirs.concat(config.closureLibraryDir);
   const dependencies = flat(
     await Promise.all([
-      getDependencies(entryConfig, ignoreDirs, config.concurrency),
+      getDependencies(entryConfig, ignoreDirs, config.depsWorkers),
       getClosureLibraryDependencies(config.closureLibraryDir),
     ])
   );
