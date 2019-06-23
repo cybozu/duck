@@ -1,6 +1,5 @@
 import fs from "fs";
 import { compiler as ClosureCompiler } from "google-closure-compiler";
-import { getNativeImagePath } from "google-closure-compiler/lib/utils";
 import { dirname } from "path";
 import * as tempy from "tempy";
 import { logger } from "./logger";
@@ -70,7 +69,7 @@ export async function compileToJson(
   }
 }
 
-export function compile(opts: CompilerOptions, batchMode?: "aws" | "local"): Promise<string> {
+export async function compile(opts: CompilerOptions, batchMode?: "aws" | "local"): Promise<string> {
   if (isInAwsLambda()) {
     rewriteNodePathForAwsLambda(opts);
   }
@@ -81,7 +80,12 @@ export function compile(opts: CompilerOptions, batchMode?: "aws" | "local"): Pro
   const compiler = new ClosureCompiler(opts as any);
   if (batchMode) {
     compiler.JAR_PATH = null;
-    compiler.javaPath = getNativeImagePath();
+    try {
+      const { getNativeImagePath } = await import("google-closure-compiler/lib/utils");
+      compiler.javaPath = getNativeImagePath();
+    } catch {
+      throw new Error("Installed google-closure-compiler is too old for batch mode.");
+    }
   }
   return new Promise((resolve, reject) => {
     compiler.run((exitCode: number, stdout: string, stderr?: string) => {

@@ -1,4 +1,6 @@
+import compilerPakageJson from "google-closure-compiler/package.json";
 import path from "path";
+import semver from "semver";
 import { assertString } from "./assert";
 import { JsonReporterOptions } from "./reporters/json-reporter";
 import { TextReporterOptions } from "./reporters/text-reporter";
@@ -84,6 +86,15 @@ export function loadConfig(opts: any = {}): DuckConfig {
   if (result.batch === "aws" && !result.concurrency) {
     // 1000 is the max concurrency of AWS Lambda
     result.concurrency = 1000;
+  }
+
+  if (result.batch) {
+    const { version } = compilerPakageJson;
+    if (!semver.satisfies(version, ">=20180716")) {
+      throw new Error(
+        `Installed google-closure-compiler@${version} is too old for batch mode. Use v20180716 or later.`
+      );
+    }
   }
 
   return result;
