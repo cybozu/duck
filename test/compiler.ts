@@ -17,7 +17,7 @@ describe("compiler", () => {
         false
       );
       const expected: CompilerOptions = {
-        dependency_mode: "PRUNE",
+        dependency_mode: "STRICT",
         json_streams: "OUT",
         compilation_level: "WHITESPACE",
         js: ["/path/to/path1"],
@@ -57,7 +57,7 @@ describe("compiler", () => {
         true
       );
       const expected: CompilerOptions = {
-        dependency_mode: "PRUNE",
+        dependency_mode: "STRICT",
         compilation_level: "SIMPLE",
         js: ["/path/to/path1", "!/extern1.js"],
         entry_point: ["/input1.js"],

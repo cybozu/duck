@@ -7,8 +7,11 @@ import { logger } from "./logger";
 
 export interface CompilerOptions {
   [idx: string]: any;
-  // 'LOOSE' and 'STRICT' are deprecated. Use 'PRUNE_LEGACY' and 'PRUNE' respectedly.
-  dependency_mode?: "NONE" | "SORT_ONLY" | "PRUNE_LEGACY" | "PRUNE";
+  /**
+   * `LOOSE` and `STRICT` are deprecated. Use `PRUNE_LEGACY` and `PRUNE` respectedly.
+   * See https://github.com/google/closure-compiler/commit/bab8ee8274abc162f72aa64ebe573c83ed38bb20
+   */
+  dependency_mode?: "NONE" | "SORT_ONLY" | "PRUNE_LEGACY" | "PRUNE" | "LOOSE" | "STRICT";
   entry_point?: readonly string[];
   compilation_level?: CompilationLevel;
   js?: readonly string[];

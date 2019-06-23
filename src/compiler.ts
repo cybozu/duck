@@ -61,7 +61,9 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
     }
   } else {
     // for pages
-    opts.dependency_mode = "PRUNE";
+    // `STRICT` is deprecated in google-closure-compiler@20181205.
+    // TODO: use `PRUNE` instead and drop support earlier than v20181205.
+    opts.dependency_mode = "STRICT";
     const js = entryConfig.paths.slice();
     if (entryConfig.externs) {
       js.push(...entryConfig.externs.map(extern => `!${extern}`));
