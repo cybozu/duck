@@ -50,13 +50,14 @@ Start dev server
 
 Options:
   --inputsRoot            A root directory to serve                                       [string]
-  --closureLibraryDir     Closure Library directory                                       [string]
+  --closureLibraryDir     A root directory of Closure Library                             [string]
   --depsJs                A path to deps.js to save and load                              [string]
+  --depsWorkers           The number of workers to analyze deps              [number] [default: 4]
+  --config                A path to duck.config.js, the extension can be ommited          [string]
+  --noTTY                 Output in noTTY mode                          [boolean] [default: false]
   --skipInitialBuild, -s  Don't build Soy and deps.js before serving    [boolean] [default: false]
   --port                  A port number to listen                         [number] [default: 9810]
   --host                  A host to listen                         [string] [default: "localhost"]
-  --config                A path to duck.config.js, the extension can be ommited          [string]
-  --noTTY                 Output in noTTY mode                          [boolean] [default: false]
   -v, --version           Show version number                                            [boolean]
   -h, --help              Show help                                                      [boolean]
 ```
@@ -70,15 +71,16 @@ Build Soy, deps.js and JS
 
 Options:
   --entryConfigs, -e   Entry config files (this option ignores entryConfigDir)             [array]
-  --closureLibraryDir  Closure Library directory                                          [string]
+  --closureLibraryDir  A root directory of Closure Library                                [string]
   --config             A path to duck.config.js, the extension can be ommited             [string]
-  --concurrency, -c    Concurrency of compiler and deps analyzer             [number] [default: 4]
+  --concurrency, -c    Concurrency limit of Closure Compiler                              [number]
   --batch              Build in batch mode (on AWS or local for debug)   [choices: "aws", "local"]
   --reporters          Test reporters ("text", "xunit" or "json")      [array] [default: ["text"]]
   --reporterOptions    Test reporter options
   --printConfig, -p    Print effective configs for compilers            [boolean] [default: false]
   --depsJs             A path to deps.js to save and load                                 [string]
   --noTTY              Output in noTTY mode                             [boolean] [default: false]
+  --depsWorkers        The number of workers to analyze deps                 [number] [default: 4]
   --skipDepsJs         Skip generating deps.js                          [boolean] [default: false]
   --soyJarPath         A path to Soy.jar                                                  [string]
   --soyFileRoots       Root directories of soy files                                       [array]
