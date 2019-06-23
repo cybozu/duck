@@ -1,17 +1,17 @@
-import fs from 'fs';
-import path from 'path';
-import util from 'util';
-import {resultInfoLogType} from '../cli';
-import {DuckConfig} from '../duckconfig';
-import {generateDepFileTextFromDeps, getDependencies} from '../gendeps';
-import {logger} from '../logger';
+import fs from "fs";
+import path from "path";
+import util from "util";
+import { resultInfoLogType } from "../cli";
+import { DuckConfig } from "../duckconfig";
+import { generateDepFileTextFromDeps, getDependencies } from "../gendeps";
+import { logger } from "../logger";
 
 export async function buildDeps(config: DuckConfig): Promise<void> {
   const paths = [config.inputsRoot];
-  const googBaseDir = path.join(config.closureLibraryDir, 'closure', 'goog');
+  const googBaseDir = path.join(config.closureLibraryDir, "closure", "goog");
   logger.info(`Analyzing dependencies`);
   const deps = await getDependencies(
-    {paths},
+    { paths },
     config.depsJsIgnoreDirs.concat(config.closureLibraryDir),
     config.depsWorkers
   );
@@ -22,9 +22,9 @@ export async function buildDeps(config: DuckConfig): Promise<void> {
     logger.info(`Generated: ${config.depsJs}`);
   } else {
     logger.info({
-      msg: 'Generated to stdout',
+      msg: "Generated to stdout",
       type: resultInfoLogType,
-      title: 'Generated deps.js',
+      title: "Generated deps.js",
       bodyString: fileText,
     });
   }

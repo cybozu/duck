@@ -1,55 +1,55 @@
-import assert = require('assert');
-import {depGraph} from 'google-closure-deps';
-import path from 'path';
-import {parseDependency} from '../src/dependency-parser';
-import {DependencyParserWithWorkers} from '../src/dependency-parser-wrapper';
+import assert = require("assert");
+import { depGraph } from "google-closure-deps";
+import path from "path";
+import { parseDependency } from "../src/dependency-parser";
+import { DependencyParserWithWorkers } from "../src/dependency-parser-wrapper";
 
-const fixturesBaseDir = path.join(__dirname, 'fixtures');
+const fixturesBaseDir = path.join(__dirname, "fixtures");
 
-const variousModulesFixturesDir = path.join(fixturesBaseDir, 'various-modules');
+const variousModulesFixturesDir = path.join(fixturesBaseDir, "various-modules");
 const expectedVariousModulesDeps = [
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_MODULE,
     `${variousModulesFixturesDir}/closuremodule.js`,
-    ['closuremodule'],
-    [new depGraph.GoogRequire('goog'), new depGraph.GoogRequire('goog.array')]
+    ["closuremodule"],
+    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_PROVIDE,
     `${variousModulesFixturesDir}/closureprovide.js`,
-    ['closureprovide'],
-    [new depGraph.GoogRequire('goog'), new depGraph.GoogRequire('goog.array')]
+    ["closureprovide"],
+    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.ES6_MODULE,
     `${variousModulesFixturesDir}/esm-moduleid.js`,
-    ['esm'],
-    [new depGraph.Es6Import('./foo.js'), new depGraph.GoogRequire('goog')],
-    'es6'
+    ["esm"],
+    [new depGraph.Es6Import("./foo.js"), new depGraph.GoogRequire("goog")],
+    "es6"
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.ES6_MODULE,
     `${variousModulesFixturesDir}/esm.js`,
     [],
-    [new depGraph.Es6Import('./foo.js')],
-    'es6'
+    [new depGraph.Es6Import("./foo.js")],
+    "es6"
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.SCRIPT,
     `${variousModulesFixturesDir}/script.js`,
     [],
-    [new depGraph.GoogRequire('goog'), new depGraph.GoogRequire('goog.array')]
+    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
   ),
 ] as const;
 
-describe('DependencyParser()', () => {
-  it('parses closure provide script', async () => {
-    const actual = await parseDependency(path.join(variousModulesFixturesDir, 'closureprovide.js'));
+describe("DependencyParser()", () => {
+  it("parses closure provide script", async () => {
+    const actual = await parseDependency(path.join(variousModulesFixturesDir, "closureprovide.js"));
     assertDependencyEquals(actual, expectedVariousModulesDeps[1]);
   });
 });
 
-describe('DependencyParserWithWorkers()', () => {
+describe("DependencyParserWithWorkers()", () => {
   let parser: DependencyParserWithWorkers;
   beforeEach(() => {
     parser = new DependencyParserWithWorkers();
@@ -59,9 +59,9 @@ describe('DependencyParserWithWorkers()', () => {
       parser.terminate();
     }
   });
-  it('parses closure provide script with worker', async () => {
+  it("parses closure provide script with worker", async () => {
     // This requires tsc compiling before testing
-    const dep = await parser.parse(path.join(variousModulesFixturesDir, 'closureprovide.js'));
+    const dep = await parser.parse(path.join(variousModulesFixturesDir, "closureprovide.js"));
     assertDependencyEquals(dep, expectedVariousModulesDeps[1]);
   });
 });

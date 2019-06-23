@@ -1,11 +1,11 @@
-import flat from 'array.prototype.flat';
-import recursive from 'recursive-readdir';
-import {DuckConfig} from '../duckconfig';
-import {logger} from '../logger';
-import {compileSoy} from '../soy';
+import flat from "array.prototype.flat";
+import recursive from "recursive-readdir";
+import { DuckConfig } from "../duckconfig";
+import { logger } from "../logger";
+import { compileSoy } from "../soy";
 
 export type BuildSoyConfig = Required<
-  Pick<DuckConfig, 'soyFileRoots' | 'soyJarPath' | 'soyOptions'>
+  Pick<DuckConfig, "soyFileRoots" | "soyJarPath" | "soyOptions">
 >;
 
 /**
@@ -14,7 +14,7 @@ export type BuildSoyConfig = Required<
  * @return An array of input Soy template filepaths
  */
 export async function buildSoy(config: BuildSoyConfig, printConfig = false): Promise<string[]> {
-  logger.info('Finding soy templates');
+  logger.info("Finding soy templates");
   const soyFiles = await findSoyFiles(config);
   await compileSoy(soyFiles, config, printConfig);
   return soyFiles;

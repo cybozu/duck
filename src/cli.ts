@@ -1,22 +1,22 @@
-import streamToObservable from '@teppeis/stream-to-observable';
-import Listr from 'listr';
-import os from 'os';
-import path from 'path';
-import pino from 'pino';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
-import split from 'split2';
-import yargs from 'yargs';
-import {assertNodeVersionGte, assertNonNullable, assertString} from './assert';
-import {buildDeps} from './commands/buildDeps';
-import {buildJs, BuildJsCompilationError} from './commands/buildJs';
-import {buildSoy, BuildSoyConfig} from './commands/buildSoy';
-import {cleanDeps} from './commands/cleanDeps';
-import {cleanSoy, CleanSoyConfig} from './commands/cleanSoy';
-import {serve} from './commands/serve';
-import {DuckConfig, loadConfig} from './duckconfig';
-import {setGlobalLogger} from './logger';
-import {reportTestResults} from './report';
+import streamToObservable from "@teppeis/stream-to-observable";
+import Listr from "listr";
+import os from "os";
+import path from "path";
+import pino from "pino";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import split from "split2";
+import yargs from "yargs";
+import { assertNodeVersionGte, assertNonNullable, assertString } from "./assert";
+import { buildDeps } from "./commands/buildDeps";
+import { buildJs, BuildJsCompilationError } from "./commands/buildJs";
+import { buildSoy, BuildSoyConfig } from "./commands/buildSoy";
+import { cleanDeps } from "./commands/cleanDeps";
+import { cleanSoy, CleanSoyConfig } from "./commands/cleanSoy";
+import { serve } from "./commands/serve";
+import { DuckConfig, loadConfig } from "./duckconfig";
+import { setGlobalLogger } from "./logger";
+import { reportTestResults } from "./report";
 
 assertNodeVersionGte(process.version, 10);
 
@@ -36,7 +36,7 @@ function wrap(task: () => Promise<any>): () => Observable<string> {
   return () => {
     // Run the task in the next tick to register the observable to listr before the first logging.
     const await = Promise.resolve().then(task);
-    return streamToObservable(logStream, {await, endEvent: false}).pipe(
+    return streamToObservable(logStream, { await, endEvent: false }).pipe(
       map<any, string>(obj => {
         if (obj.msg) {
           return String(obj.msg);
@@ -48,9 +48,9 @@ function wrap(task: () => Promise<any>): () => Observable<string> {
   };
 }
 
-export const resultInfoLogType = 'resultInfo';
+export const resultInfoLogType = "resultInfo";
 const resultInfos: ResultInfo[] = [];
-logStream.on('data', (data: any) => {
+logStream.on("data", (data: any) => {
   if (data.type === resultInfoLogType) {
     resultInfos.push({
       title: assertString(data.title),
@@ -67,75 +67,75 @@ interface ResultInfo {
 }
 
 const noTTY = {
-  desc: 'Output in noTTY mode',
-  type: 'boolean',
+  desc: "Output in noTTY mode",
+  type: "boolean",
   default: false,
 } as const;
 
 const closureLibraryDir = {
-  desc: 'A root directory of Closure Library',
-  type: 'string',
+  desc: "A root directory of Closure Library",
+  type: "string",
   coerce: path.resolve,
 } as const;
 
 const config = {
-  desc: 'A path to duck.config.js, the extension can be ommited',
-  type: 'string',
+  desc: "A path to duck.config.js, the extension can be ommited",
+  type: "string",
   coerce: path.resolve,
 } as const;
 
 const entryConfigDir = {
-  type: 'string',
+  type: "string",
   // only for typing, the value is loaded from args
   hidden: true,
   coerce: path.resolve,
 } as const;
 
 const printConfig = {
-  desc: 'Print effective configs for compilers',
-  alias: 'p',
-  type: 'boolean',
+  desc: "Print effective configs for compilers",
+  alias: "p",
+  type: "boolean",
   default: false,
 } as const;
 
 const depsJs = {
-  desc: 'A path to deps.js to save and load',
-  type: 'string',
+  desc: "A path to deps.js to save and load",
+  type: "string",
   coerce: path.resolve,
 } as const;
 
 const skipDepsJs = {
-  desc: 'Skip generating deps.js',
-  type: 'boolean',
+  desc: "Skip generating deps.js",
+  type: "boolean",
   default: false,
 } as const;
 
 const buildJsOptions = {
   entryConfigDir,
   entryConfigs: {
-    desc: 'Entry config files (this option ignores entryConfigDir)',
-    alias: 'e',
-    type: 'array',
+    desc: "Entry config files (this option ignores entryConfigDir)",
+    alias: "e",
+    type: "array",
     coerce: (arr: any[]) => arr.map(item => path.resolve(String(item))),
   },
   closureLibraryDir,
   config,
   concurrency: {
-    desc: 'Concurrency limit of Closure Compiler',
-    alias: 'c',
-    type: 'number',
+    desc: "Concurrency limit of Closure Compiler",
+    alias: "c",
+    type: "number",
   },
   batch: {
-    desc: 'Build in batch mode (on AWS or local for debug)',
-    choices: ['aws', 'local'],
+    desc: "Build in batch mode (on AWS or local for debug)",
+    choices: ["aws", "local"],
   },
   reporters: {
     desc: 'Test reporters ("text", "xunit" or "json")',
-    type: 'array',
-    default: ['text'],
+    type: "array",
+    default: ["text"],
   },
   reporterOptions: {
-    desc: 'Test reporter options',
+    desc: "Test reporter options",
   },
   printConfig,
   depsJs,
@@ -144,20 +144,20 @@ const buildJsOptions = {
 
 const buildSoyOptions = {
   soyJarPath: {
-    desc: 'A path to Soy.jar',
-    type: 'string',
+    desc: "A path to Soy.jar",
+    type: "string",
     coerce: path.resolve,
   },
   soyFileRoots: {
-    desc: 'Root directories of soy files',
-    type: 'array',
+    desc: "Root directories of soy files",
+    type: "array",
     coerce: path.resolve,
   },
   config,
   watch: {
-    desc: 'Re-compile incrementally when files change',
-    alias: 'w',
-    type: 'boolean',
+    desc: "Re-compile incrementally when files change",
+    alias: "w",
+    type: "boolean",
     default: false,
   },
   printConfig,
@@ -167,8 +167,8 @@ const buildSoyOptions = {
 const buildDepsOptions = {
   depsJs,
   depsWorkers: {
-    desc: 'The number of workers to analyze deps',
-    type: 'number',
+    desc: "The number of workers to analyze deps",
+    type: "number",
     default: Math.min(4, Math.max(os.cpus().length, 1)),
   },
   config,
@@ -178,13 +178,13 @@ const buildDepsOptions = {
 export function run(processArgv: readonly string[]): void {
   yargs
     .command(
-      'serve [entryConfigDir]',
-      'Start dev server',
+      "serve [entryConfigDir]",
+      "Start dev server",
       {
         entryConfigDir,
         inputsRoot: {
-          desc: 'A root directory to serve',
-          type: 'string',
+          desc: "A root directory to serve",
+          type: "string",
           coerce: path.resolve,
         },
         closureLibraryDir,
@@ -192,19 +192,19 @@ export function run(processArgv: readonly string[]): void {
         ...buildDepsOptions,
         skipInitialBuild: {
           desc: "Don't build Soy and deps.js before serving",
-          alias: 's',
-          type: 'boolean',
+          alias: "s",
+          type: "boolean",
           default: false,
         },
         port: {
-          desc: 'A port number to listen',
-          type: 'number',
+          desc: "A port number to listen",
+          type: "number",
           default: 9810,
         },
         host: {
-          desc: 'A host to listen',
-          type: 'string',
-          default: 'localhost',
+          desc: "A host to listen",
+          type: "string",
+          default: "localhost",
         },
         config,
         noTTY,
@@ -230,13 +230,13 @@ export function run(processArgv: readonly string[]): void {
           argv
         );
         await tasks.run();
-        console.log(''); // a blank line
+        console.log(""); // a blank line
         await serve(config);
       }
     )
     .command(
-      'build [entryConfigDir]',
-      'Build Soy, deps.js and JS',
+      "build [entryConfigDir]",
+      "Build Soy, deps.js and JS",
       {
         ...buildJsOptions,
         ...buildDepsOptions,
@@ -269,7 +269,7 @@ export function run(processArgv: readonly string[]): void {
         printResultInfo();
       }
     )
-    .command('build:js [entryConfigDir]', 'Compile JS files', buildJsOptions, async argv => {
+    .command("build:js [entryConfigDir]", "Compile JS files", buildJsOptions, async argv => {
       const config = loadConfig(argv);
       const tasks = listr(
         [
@@ -283,7 +283,7 @@ export function run(processArgv: readonly string[]): void {
       await tasks.run().catch(printOnlyCompilationError(config));
       printResultInfo();
     })
-    .command('build:soy', 'Compile Soy templates', buildSoyOptions, async argv => {
+    .command("build:soy", "Compile Soy templates", buildSoyOptions, async argv => {
       const config = loadConfig(argv);
       assertString(config.soyJarPath);
       assertNonNullable(config.soyFileRoots);
@@ -300,7 +300,7 @@ export function run(processArgv: readonly string[]): void {
       await tasks.run();
       printResultInfo();
     })
-    .command('build:deps', 'Generate deps.js', buildDepsOptions, async argv => {
+    .command("build:deps", "Generate deps.js", buildDepsOptions, async argv => {
       const config = loadConfig(argv);
       const tasks = listr(
         [
@@ -314,7 +314,7 @@ export function run(processArgv: readonly string[]): void {
       await tasks.run();
       printResultInfo();
     })
-    .command('clean:soy', 'Remove all compiled .soy.js', buildSoyOptions, async argv => {
+    .command("clean:soy", "Remove all compiled .soy.js", buildSoyOptions, async argv => {
       const config = loadConfig(argv);
       assertNonNullable(config.soyOptions);
       const tasks = listr(
@@ -328,7 +328,7 @@ export function run(processArgv: readonly string[]): void {
       );
       await tasks.run();
     })
-    .command('clean:deps', 'Remove generated deps.js', buildDepsOptions, async argv => {
+    .command("clean:deps", "Remove generated deps.js", buildDepsOptions, async argv => {
       const config = loadConfig(argv);
       const tasks = listr(
         [
@@ -341,29 +341,29 @@ export function run(processArgv: readonly string[]): void {
       );
       await tasks.run();
     })
-    .completion('completion', 'Generate completion script for bash/zsh')
+    .completion("completion", "Generate completion script for bash/zsh")
     .demandCommand(1, 1)
-    .scriptName('duck')
-    .locale('en')
-    .epilog('CLI options overwrite config file')
+    .scriptName("duck")
+    .locale("en")
+    .epilog("CLI options overwrite config file")
     // default 80 is too short for command usage lines
     .wrap(98)
     .strict()
     .help()
-    .showHelpOnFail(false, 'Specify --help or -h for available options')
-    .alias('v', 'version')
-    .alias('h', 'help')
+    .showHelpOnFail(false, "Specify --help or -h for available options")
+    .alias("v", "version")
+    .alias("h", "help")
     .parse(processArgv);
 }
 
 function listr(
   tasks: readonly Listr.ListrTask[],
-  argv: {noTTY: boolean},
+  argv: { noTTY: boolean },
   options: Listr.ListrOptions = {}
 ): Listr {
   return new Listr(tasks, {
     ...options,
-    renderer: argv.noTTY ? 'verbose' : 'default',
+    renderer: argv.noTTY ? "verbose" : "default",
   });
 }
 
@@ -371,7 +371,7 @@ function printOnlyCompilationError(config: DuckConfig) {
   return async (e: any) => {
     if (e instanceof BuildJsCompilationError) {
       await reportTestResults(e.reasons, config);
-      console.log('');
+      console.log("");
       return Promise.reject();
     }
     return Promise.reject(e);

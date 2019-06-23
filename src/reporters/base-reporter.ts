@@ -1,7 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import {promisify} from 'util';
-import {ErrorReason} from '../report';
+import fs from "fs";
+import path from "path";
+import { promisify } from "util";
+import { ErrorReason } from "../report";
 
 const mkdir = promisify(fs.mkdir);
 const writeFile = promisify(fs.writeFile);
@@ -35,8 +35,8 @@ export abstract class BaseReporter {
         console.error(content);
       }
       if (this.outputDir) {
-        const subDir = path.join(this.outputDir, path.basename(reason.entryConfigPath, '.json'));
-        await mkdir(subDir, {recursive: true});
+        const subDir = path.join(this.outputDir, path.basename(reason.entryConfigPath, ".json"));
+        await mkdir(subDir, { recursive: true });
         await writeFile(path.join(subDir, this.resultFilename), content);
       }
     });

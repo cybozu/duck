@@ -1,4 +1,4 @@
-import Zet from 'zet';
+import Zet from "zet";
 
 export class Node {
   id: string;
@@ -29,7 +29,7 @@ export class Dag {
   constructor(nodes: readonly Node[]) {
     let root: Node | null = null;
     if (nodes.length < 1) {
-      throw new Error('The `nodes` is empty');
+      throw new Error("The `nodes` is empty");
     }
     // populate idToNode
     nodes.forEach(node => {
@@ -47,7 +47,7 @@ export class Dag {
       this.lcaCache.set(node.id, new Map());
     });
     if (!root) {
-      throw new Error('Root not found');
+      throw new Error("Root not found");
     }
     this.root = root;
     // populate children (inverting deps)
@@ -108,7 +108,7 @@ export class Dag {
    */
   getLcaNode(...nodeIds: readonly string[]): Node {
     if (nodeIds.length < 1) {
-      throw new Error('Specify one node at least');
+      throw new Error("Specify one node at least");
     } else if (nodeIds.length < 2) {
       const lca = this.idToNode.get(nodeIds[0]);
       if (!lca) {
@@ -144,7 +144,7 @@ export class Dag {
     }
     const commonAncestors = Zet.intersection(nodeU.ancestors, nodeV.ancestors);
     if (commonAncestors.size < 1) {
-      throw new Error('Common ancestor not found');
+      throw new Error("Common ancestor not found");
     }
     let least: string | null = null;
     for (const ancestor of commonAncestors) {
@@ -153,7 +153,7 @@ export class Dag {
       }
     }
     if (!least) {
-      throw new Error('LCA not found');
+      throw new Error("LCA not found");
     }
     result = this.idToNode.get(least)!;
     this.setLcaCache(u, v, result);

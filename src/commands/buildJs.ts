@@ -1,23 +1,23 @@
-import fs from 'fs';
-import pLimit from 'p-limit';
-import pSettled from 'p-settle';
-import path from 'path';
-import recursive from 'recursive-readdir';
-import {promisify} from 'util';
-import {assertString} from '../assert';
-import {resultInfoLogType} from '../cli';
+import fs from "fs";
+import pLimit from "p-limit";
+import pSettled from "p-settle";
+import path from "path";
+import recursive from "recursive-readdir";
+import { promisify } from "util";
+import { assertString } from "../assert";
+import { resultInfoLogType } from "../cli";
 import {
   CompilerOptions,
   compileToJson,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
-} from '../compiler';
-import * as compilerCoreFunctions from '../compiler-core';
-import {DuckConfig} from '../duckconfig';
-import {EntryConfig, loadEntryConfig} from '../entryconfig';
-import {restoreDepsJs} from '../gendeps';
-import {logger} from '../logger';
-import {CompileErrorItem} from '../report';
+} from "../compiler";
+import * as compilerCoreFunctions from "../compiler-core";
+import { DuckConfig } from "../duckconfig";
+import { EntryConfig, loadEntryConfig } from "../entryconfig";
+import { restoreDepsJs } from "../gendeps";
+import { logger } from "../logger";
+import { CompileErrorItem } from "../report";
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
@@ -31,9 +31,9 @@ export async function buildJs(
   printConfig = false
 ): Promise<any> {
   let compileFn = compileToJson;
-  let faastModule: import('faastjs').FaastModule<typeof compilerCoreFunctions> | null = null;
+  let faastModule: import("faastjs").FaastModule<typeof compilerCoreFunctions> | null = null;
   if (config.batch) {
-    const {getFaastCompiler} = await import('../batch');
+    const { getFaastCompiler } = await import("../batch");
     faastModule = await getFaastCompiler(config);
     compileFn = faastModule.functions.compileToJson;
   }
@@ -63,9 +63,9 @@ export async function buildJs(
 
         if (printConfig) {
           logger.info({
-            msg: 'Print config only',
+            msg: "Print config only",
             type: resultInfoLogType,
-            title: 'Compiler config',
+            title: "Compiler config",
             bodyObject: options,
           });
           return;
@@ -74,16 +74,16 @@ export async function buildJs(
         if (config.batch) {
           convertCompilerOptionsToRelative(options, process.cwd());
         }
-        logWithCount(entryConfigPath, runningJobCount++, 'Compiling');
+        logWithCount(entryConfigPath, runningJobCount++, "Compiling");
         const outputs = await compileFn(options, config.batch);
         const promises = outputs.map(async output => {
-          await mkdir(path.dirname(output.path), {recursive: true});
+          await mkdir(path.dirname(output.path), { recursive: true });
           return writeFile(output.path, output.src);
         });
         await Promise.all(promises);
-        logWithCount(entryConfigPath, completedJobCount++, 'Compiled');
+        logWithCount(entryConfigPath, completedJobCount++, "Compiled");
       } catch (e) {
-        logWithCount(entryConfigPath, completedJobCount++, 'Failed');
+        logWithCount(entryConfigPath, completedJobCount++, "Failed");
         throw e;
       }
     })
@@ -127,11 +127,11 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
     .filter(result => result.isRejected)
     .map(result => {
       if (!result.isRejected) {
-        throw new Error('Unexpected state');
+        throw new Error("Unexpected state");
       }
-      const {message: stderr} = result.reason as Error;
-      const [command, , ...messages] = stderr.split('\n');
-      const items: CompileErrorItem[] = JSON.parse(messages.join('\n'));
+      const { message: stderr } = result.reason as Error;
+      const [command, , ...messages] = stderr.split("\n");
+      const items: CompileErrorItem[] = JSON.parse(messages.join("\n"));
       return {
         entryConfigPath: result.entryConfigPath,
         command,
@@ -152,7 +152,7 @@ export class BuildJsCompilationError extends Error {
   reasons: readonly ErrorReason[];
   constructor(reasons: readonly ErrorReason[], totalSize: number) {
     super(`Failed to compile (${reasons.length}/${totalSize})`);
-    this.name = 'BuildJsCompilationError';
+    this.name = "BuildJsCompilationError";
     this.reasons = reasons;
   }
 }
@@ -167,10 +167,10 @@ async function createCompilerOptionsForChunks_(
   config: DuckConfig
 ): Promise<CompilerOptions> {
   function createModuleUris(chunkId: string): string[] {
-    const moduleProductionUri = assertString(entryConfig['module-production-uri']);
+    const moduleProductionUri = assertString(entryConfig["module-production-uri"]);
     return [moduleProductionUri.replace(/%s/g, chunkId)];
   }
-  const {options} = await createCompilerOptionsForChunks(
+  const { options } = await createCompilerOptionsForChunks(
     entryConfig,
     config,
     true,
@@ -182,7 +182,7 @@ async function createCompilerOptionsForChunks_(
 function convertCompilerOptionsToRelative(options: CompilerOptions, basepath: string): void {
   if (options.js) {
     options.js = options.js.map(file => {
-      if (file.startsWith('!')) {
+      if (file.startsWith("!")) {
         return `!${path.relative(basepath, file.slice(1))}`;
       } else {
         return path.relative(basepath, file);

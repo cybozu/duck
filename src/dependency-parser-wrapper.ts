@@ -1,8 +1,8 @@
-import {depGraph} from 'google-closure-deps';
-import path from 'path';
-import workerpool from 'workerpool';
+import { depGraph } from "google-closure-deps";
+import path from "path";
+import workerpool from "workerpool";
 
-const script = path.join(__dirname, '../lib/dependency-parser-worker.js');
+const script = path.join(__dirname, "../lib/dependency-parser-worker.js");
 
 export class DependencyParserWithWorkers {
   private pool: workerpool.WorkerPool;
@@ -13,11 +13,11 @@ export class DependencyParserWithWorkers {
     this.pool = workerpool.pool(script, {
       minWorkers: numOfWorkers,
       maxWorkers: numOfWorkers,
-      nodeWorker: 'auto',
+      nodeWorker: "auto",
     } as any);
   }
   async parse(filepath: string): Promise<depGraph.Dependency> {
-    const depData = await this.pool.exec('parseDependency', [filepath]);
+    const depData = await this.pool.exec("parseDependency", [filepath]);
     return this.deserialize(depData);
   }
 

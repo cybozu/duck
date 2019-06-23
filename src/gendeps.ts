@@ -1,12 +1,12 @@
-import flat from 'array.prototype.flat';
-import fs from 'fs';
-import {depFile, depGraph, parser} from 'google-closure-deps';
-import path from 'path';
-import recursive from 'recursive-readdir';
-import {promisify} from 'util';
-import {DependencyParserWithWorkers} from './dependency-parser-wrapper';
-import {EntryConfig} from './entryconfig';
-import {googBaseUrlPath, inputsUrlPath} from './urls';
+import flat from "array.prototype.flat";
+import fs from "fs";
+import { depFile, depGraph, parser } from "google-closure-deps";
+import path from "path";
+import recursive from "recursive-readdir";
+import { promisify } from "util";
+import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
+import { EntryConfig } from "./entryconfig";
+import { googBaseUrlPath, inputsUrlPath } from "./urls";
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -17,7 +17,7 @@ const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> = new Map
  * The result excludes deps of Closure Library.
  */
 export async function generateDepFileText(
-  entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
+  entryConfig: Pick<EntryConfig, "paths" | "test-excludes">,
   inputsRoot: string,
   ignoreDirs: readonly string[] = [],
   workers?: number
@@ -52,7 +52,7 @@ export function generateDepFileTextFromDeps(
  * NOTE: This doesn't support ES Modules, because a bug of google-closure-deps.
  */
 export async function writeCachedDepsOnDisk(depsJsPath: string, closureLibraryDir: string) {
-  const closureBaseDir = path.join(closureLibraryDir, 'closure', 'goog');
+  const closureBaseDir = path.join(closureLibraryDir, "closure", "goog");
   const deps = await Promise.all(Array.from(pathToDependencyCache.values()));
   const content = generateDepFileTextFromDeps(deps, closureBaseDir);
   return writeFile(depsJsPath, content);
@@ -65,9 +65,9 @@ export async function writeCachedDepsOnDisk(depsJsPath: string, closureLibraryDi
  * @throws if deps.js doesn't exist.
  */
 export async function restoreDepsJs(depsJsPath: string, closureLibraryDir: string): Promise<void> {
-  let depsText = '';
+  let depsText = "";
   try {
-    depsText = await readFile(depsJsPath, 'utf8');
+    depsText = await readFile(depsJsPath, "utf8");
   } catch (e) {
     throw new Error(`${depsJsPath} doesn't exist. Run \`duck build:deps\`. ${e}`);
   }
@@ -75,7 +75,7 @@ export async function restoreDepsJs(depsJsPath: string, closureLibraryDir: strin
   if (result.hasFatalError) {
     throw new Error(`Fatal parse error in ${depsJsPath}: ${result.errors}`);
   }
-  appendGoogImport(result.dependencies, path.join(closureLibraryDir, 'closure', 'goog'));
+  appendGoogImport(result.dependencies, path.join(closureLibraryDir, "closure", "goog"));
   result.dependencies.forEach(dep => {
     pathToDependencyCache.set(dep.path, Promise.resolve(dep));
   });
@@ -86,18 +86,18 @@ export async function restoreDepsJs(depsJsPath: string, closureLibraryDir: strin
  * This ignores filename `deps.js`.
  */
 export async function getDependencies(
-  entryConfig: Pick<EntryConfig, 'paths' | 'test-excludes'>,
+  entryConfig: Pick<EntryConfig, "paths" | "test-excludes">,
   ignoreDirs: readonly string[] = [],
   numOfWorkers?: number
 ): Promise<depGraph.Dependency[]> {
-  const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, '*'));
+  const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, "*"));
   const parser = new DependencyParserWithWorkers(numOfWorkers);
   try {
     // TODO: uniq
     const parseResultPromises = entryConfig.paths.map(async p => {
       let testExcludes: readonly string[] = [];
-      if (entryConfig['test-excludes']) {
-        testExcludes = entryConfig['test-excludes'];
+      if (entryConfig["test-excludes"]) {
+        testExcludes = entryConfig["test-excludes"];
       }
       const files = await recursive(p, ignoreDirPatterns);
       return Promise.all(
@@ -134,11 +134,11 @@ export async function getDependencies(
 export async function getClosureLibraryDependencies(
   closureLibraryDir: string
 ): Promise<depGraph.Dependency[]> {
-  const googDepsPath = path.join(closureLibraryDir, 'closure', 'goog', 'deps.js');
-  const depsContent = await readFile(googDepsPath, 'utf8');
+  const googDepsPath = path.join(closureLibraryDir, "closure", "goog", "deps.js");
+  const depsContent = await readFile(googDepsPath, "utf8");
   const result = parser.parseDependencyFile(depsContent, googDepsPath);
   if (result.errors.length > 0) {
-    throw new Error(`Fail to parse deps.js of Closure Library: ${result.errors.join(', ')}`);
+    throw new Error(`Fail to parse deps.js of Closure Library: ${result.errors.join(", ")}`);
   }
   appendGoogImport(result.dependencies, path.dirname(googDepsPath));
   return result.dependencies;
@@ -156,7 +156,7 @@ function appendGoogImport(dependencies: readonly depGraph.Dependency[], googBase
   dependencies.forEach(dep => {
     dep.setClosurePath(googBaseDir);
     if (dep.closureSymbols.length > 0 || dep.imports.find(i => i.isGoogRequire())) {
-      const goog = new depGraph.GoogRequire('goog');
+      const goog = new depGraph.GoogRequire("goog");
       goog.from = dep;
       dep.imports.push(goog);
     }

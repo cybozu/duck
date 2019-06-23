@@ -1,25 +1,25 @@
-import assert = require('assert');
-import {oneLineTrim} from 'common-tags';
-import fs from 'fs';
-import path from 'path';
-import tempy from 'tempy';
-import {promisify} from 'util';
-import {XUnitReporter} from '../src/reporters/xunit-reporter';
+import assert = require("assert");
+import { oneLineTrim } from "common-tags";
+import fs from "fs";
+import path from "path";
+import tempy from "tempy";
+import { promisify } from "util";
+import { XUnitReporter } from "../src/reporters/xunit-reporter";
 
 const readFile = promisify(fs.readFile);
 
-describe('XUnitReporter', () => {
-  const entryConfigPath = '/path/to/entry.json';
-  const command = 'java -jar compiler.jar';
+describe("XUnitReporter", () => {
+  const entryConfigPath = "/path/to/entry.json";
+  const command = "java -jar compiler.jar";
 
-  describe('output()', () => {
+  describe("output()", () => {
     let reporter: XUnitReporter;
     let outputDir: string;
     let actualMessage: string | undefined;
     const originalConsoleError = console.error;
     beforeEach(() => {
       outputDir = tempy.directory();
-      reporter = new XUnitReporter({outputDir});
+      reporter = new XUnitReporter({ outputDir });
       actualMessage = undefined;
       console.error = (message: string) => (actualMessage = message);
     });
@@ -31,7 +31,7 @@ describe('XUnitReporter', () => {
       {
         entryConfigPath,
         command,
-        items: [{level: 'info', description: '89 error(s), 5 warning(s), 98.4% typed'}],
+        items: [{ level: "info", description: "89 error(s), 5 warning(s), 98.4% typed" }],
       },
     ] as const;
     const expected = oneLineTrim`
@@ -40,38 +40,38 @@ describe('XUnitReporter', () => {
           <testsuite name="${entryConfigPath}"/>
         </testsuites>`;
 
-    it('makes a directory and a result file', async () => {
+    it("makes a directory and a result file", async () => {
       await reporter.output(reasons);
-      const actual = await readFile(path.join(outputDir, 'entry', 'results.xml'), 'utf8');
+      const actual = await readFile(path.join(outputDir, "entry", "results.xml"), "utf8");
       assert.equal(actual, expected);
       assert.equal(actualMessage, undefined);
     });
 
-    it('does not make any dirs or files', async () => {
-      reporter = new XUnitReporter({outputDir: null});
+    it("does not make any dirs or files", async () => {
+      reporter = new XUnitReporter({ outputDir: null });
       await reporter.output(reasons);
-      assert(!fs.existsSync(path.join(process.cwd(), 'test-results')));
+      assert(!fs.existsSync(path.join(process.cwd(), "test-results")));
       assert.equal(actualMessage, undefined);
     });
 
-    it('outputs to stderr', async () => {
-      reporter = new XUnitReporter({outputDir: null, stderr: true});
+    it("outputs to stderr", async () => {
+      reporter = new XUnitReporter({ outputDir: null, stderr: true });
       await reporter.output(reasons);
       assert.equal(actualMessage, expected);
     });
   });
 
-  describe('format()', () => {
+  describe("format()", () => {
     let reporter: XUnitReporter;
     beforeEach(() => {
       reporter = new XUnitReporter();
     });
 
-    it('success', async () => {
+    it("success", async () => {
       const actual = reporter.format({
         entryConfigPath,
         command,
-        items: [{level: 'info', description: '89 error(s), 5 warning(s), 98.4% typed'}],
+        items: [{ level: "info", description: "89 error(s), 5 warning(s), 98.4% typed" }],
       });
       assert.equal(
         actual,
@@ -82,21 +82,21 @@ describe('XUnitReporter', () => {
       );
     });
 
-    it('error', async () => {
+    it("error", async () => {
       const actual = reporter.format({
         entryConfigPath,
         command,
         items: [
           {
-            level: 'error',
+            level: "error",
             description:
-              'Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.',
-            key: 'JSC_DEPRECATED_CLASS_REASON',
-            source: '/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js',
+              "Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.",
+            key: "JSC_DEPRECATED_CLASS_REASON",
+            source: "/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js",
             line: 57,
             column: 32,
             context:
-              '  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^',
+              "  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^",
           },
         ],
       });
@@ -111,21 +111,21 @@ describe('XUnitReporter', () => {
             </failure>
           </testcase>
         </testsuite>
-      </testsuites>`.replace(/%%newline%%/g, '\n')
+      </testsuites>`.replace(/%%newline%%/g, "\n")
       );
     });
 
-    it('error without context', async () => {
+    it("error without context", async () => {
       const actual = reporter.format({
         entryConfigPath,
         command,
         items: [
           {
-            level: 'error',
+            level: "error",
             description:
-              'Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.',
-            key: 'JSC_DEPRECATED_CLASS_REASON',
-            source: '/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js',
+              "Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.",
+            key: "JSC_DEPRECATED_CLASS_REASON",
+            source: "/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js",
             line: 57,
             column: 32,
           },
@@ -140,7 +140,7 @@ describe('XUnitReporter', () => {
             <failure message="Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead. (line 57, col 32)"/>
           </testcase>
         </testsuite>
-      </testsuites>`.replace(/%%newline%%/g, '\n')
+      </testsuites>`.replace(/%%newline%%/g, "\n")
       );
     });
   });

@@ -1,11 +1,11 @@
-import {DuckConfig} from './duckconfig';
-import {JsonReporter} from './reporters/json-reporter';
-import {TextReporter} from './reporters/text-reporter';
-import {XUnitReporter} from './reporters/xunit-reporter';
+import { DuckConfig } from "./duckconfig";
+import { JsonReporter } from "./reporters/json-reporter";
+import { TextReporter } from "./reporters/text-reporter";
+import { XUnitReporter } from "./reporters/xunit-reporter";
 
 export type CompileErrorItem = CompileErrorCase | CompileErrorInfo;
 export interface CompileErrorCase {
-  level: 'warning' | 'error';
+  level: "warning" | "error";
   description: string;
   key: string;
   source: string;
@@ -14,7 +14,7 @@ export interface CompileErrorCase {
   context?: string;
 }
 export interface CompileErrorInfo {
-  level: 'info';
+  level: "info";
   description: string;
 }
 
@@ -34,7 +34,7 @@ export async function reportTestResults(
   reasons: readonly ErrorReason[],
   config: DuckConfig
 ): Promise<void> {
-  const reporters = config.reporters || ['text'];
+  const reporters = config.reporters || ["text"];
   const promises = reporters.map(name => {
     const options = (config.reporterOptions || {})[name];
     const reporter = new reporterClasses[name](options);
