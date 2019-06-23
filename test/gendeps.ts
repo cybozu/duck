@@ -1,8 +1,9 @@
 import assert = require('assert');
-import {promises as fs} from 'fs';
+import fs from 'fs';
 import {depGraph} from 'google-closure-deps';
 import path from 'path';
 import tempy from 'tempy';
+import {promisify} from 'util';
 import {
   clearDepCache,
   countDepCache,
@@ -14,6 +15,8 @@ import {
   writeCachedDepsOnDisk,
 } from '../src/gendeps';
 
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
 const fixturesBaseDir = path.join(__dirname, 'fixtures');
 
 const variousModulesFixturesDir = path.join(fixturesBaseDir, 'various-modules');
@@ -167,7 +170,7 @@ describe('gendeps', () => {
           deps,
           path.join(fixturesDir, 'closure', 'goog')
         );
-        await fs.writeFile(variousModulesDepsJsPath, text, 'utf8');
+        await writeFile(variousModulesDepsJsPath, text, 'utf8');
       }
     });
   });
@@ -182,8 +185,8 @@ describe('gendeps', () => {
         name: 'writeCachedDepsOnDisk-deps.js',
       });
       await writeCachedDepsOnDisk(actualDepsJsPath, closureLibraryDir);
-      const actual = await fs.readFile(actualDepsJsPath, 'utf8');
-      const expected = await fs.readFile(originalDepsJs, 'utf8');
+      const actual = await readFile(actualDepsJsPath, 'utf8');
+      const expected = await readFile(originalDepsJs, 'utf8');
       assert.equal(actual, expected);
     });
   });
