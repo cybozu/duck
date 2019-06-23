@@ -6,13 +6,5 @@
     "teppeis/+prettier",
     "teppeis/+mocha"
   ],
-  "rules": {
-    "require-await": 0,
-    "@typescript-eslint/no-object-literal-type-assertion": 0,
-    "@typescript-eslint/no-unnecessary-type-assertion": 0,
-    "@typescript-eslint/restrict-plus-operands": 0
-  },
-  "parserOptions": {
-    "project": null
-  }
+  "rules": {}
 }
