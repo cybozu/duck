@@ -39,9 +39,7 @@ export interface EntryConfig {
   };
   "global-scope-name"?: string;
   "output-wrapper"?: string;
-
-  // TODO
-  // * experimental-compiler-options: Object<string, any>
+  "experimental-compiler-options"?: { [index: string]: any };
 }
 
 export enum PlovrMode {
