@@ -14,7 +14,7 @@ export class DependencyParserWithWorkers {
       minWorkers: numOfWorkers,
       maxWorkers: numOfWorkers,
       nodeWorker: "auto",
-    } as any);
+    });
   }
   async parse(filepath: string): Promise<depGraph.Dependency> {
     const depData = await this.pool.exec("parseDependency", [filepath]);
