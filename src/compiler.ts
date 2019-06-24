@@ -17,7 +17,8 @@ export { compile, CompilerOptions, compileToJson, convertToFlagfile } from "./co
 const GLOBAL_NAMESPACE = "z";
 
 function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
-  const opts: CompilerOptions = {};
+  const opts: CompilerOptions = { ...entryConfig["experimental-compiler-options"] };
+
   if (!outputToFile) {
     opts.json_streams = "OUT";
   }

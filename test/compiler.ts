@@ -25,6 +25,29 @@ describe("compiler", () => {
       };
       assert.deepEqual(actual, expected);
     });
+    it("experimental-compiler-options", async () => {
+      const actual = createCompilerOptionsForPage(
+        {
+          id: "simple",
+          mode: PlovrMode.RAW,
+          paths: ["/path/to/path1"],
+          inputs: ["/input1.js"],
+          "experimental-compiler-options": {
+            hide_warnings_for: ["foo/bar"],
+          },
+        },
+        false
+      );
+      const expected = {
+        dependency_mode: "STRICT",
+        json_streams: "OUT",
+        compilation_level: "WHITESPACE",
+        js: ["/path/to/path1"],
+        entry_point: ["/input1.js"],
+        hide_warnings_for: ["foo/bar"],
+      };
+      assert.deepEqual(actual, expected);
+    });
     it("full", async () => {
       const actual = createCompilerOptionsForPage(
         {
