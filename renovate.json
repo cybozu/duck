@@ -1,5 +1,5 @@
 {
-  "extends": ["@teppeis:anytime"],
+  "extends": ["@teppeis"],
   "packageRules": [
     {
       "packageNames": ["google-closure-deps"],
