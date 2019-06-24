@@ -33,7 +33,7 @@ describe("compiler", () => {
           paths: ["/path/to/path1"],
           inputs: ["/input1.js"],
           "experimental-compiler-options": {
-            hide_warnings_for: ["foo/bar"],
+            hideWarningsFor: ["foo/bar"],
           },
         },
         false
