@@ -16,8 +16,18 @@ export { compile, CompilerOptions, compileToJson, convertToFlagfile } from "./co
  */
 const GLOBAL_NAMESPACE = "z";
 
+function snakeCase(key: string): string {
+  return key.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`);
+}
+
 function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
-  const opts: CompilerOptions = { ...entryConfig["experimental-compiler-options"] };
+  const opts: CompilerOptions = {};
+  if (entryConfig["experimental-compiler-options"]) {
+    const expOpts = entryConfig["experimental-compiler-options"];
+    for (const key in expOpts) {
+      opts[snakeCase(key)] = expOpts[key];
+    }
+  }
 
   if (!outputToFile) {
     opts.json_streams = "OUT";
