@@ -1,8 +1,8 @@
+import execa from "execa";
 import path from "path";
 import { resultInfoLogType } from "./cli";
 import { DuckConfig } from "./duckconfig";
 import { logger } from "./logger";
-import execa = require("execa");
 
 export interface SoyToJsOptions {
   outputPathFormat: string;
