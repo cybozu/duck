@@ -8,6 +8,7 @@ import {
   log,
 } from "faastjs";
 import mergeOptions from "merge-options";
+import semver from "semver";
 import { assertNonNullable } from "./assert";
 import * as compilerFaastFunctions from "./compiler-core";
 import { DuckConfig } from "./duckconfig";
@@ -41,12 +42,13 @@ function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
 
 function defaultBatchOptions(config: DuckConfig): AwsOptions {
   const closureVersion = require("google-closure-compiler/package.json").version;
+  const major = semver.major(closureVersion);
   return {
     packageJson: {
       // To suppress npm warnings
       private: true,
       dependencies: {
-        [`google-closure-compiler-${getOsForNativeImage(config)}`]: closureVersion,
+        [`google-closure-compiler-${getOsForNativeImage(config)}`]: `^${major}.0.0`,
       },
     },
     webpackOptions: {
