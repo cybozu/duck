@@ -68,7 +68,7 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
           `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
         );
       }
-      opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
+      opts.module_output_path_prefix = outputPath.slice(0, suffix.length * -1);
     }
   } else {
     // for pages
@@ -188,11 +188,11 @@ export async function createCompilerOptionsForChunks(
   const chunkToInputPathSet = splitDepsIntoChunks(sortedChunkIds, chunkToTransitiveDepPathSet, dag);
   const options = createBaseOptions(entryConfig, outputToFile);
   options.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
-  options.chunk = sortedChunkIds.map(id => {
+  options.module = sortedChunkIds.map(id => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;
   });
-  options.chunk_wrapper = createChunkWrapper(
+  options.module_wrapper = createChunkWrapper(
     entryConfig,
     sortedChunkIds,
     assertNonNullable(options.compilation_level),
