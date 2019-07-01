@@ -8,7 +8,13 @@ import { DuckConfig } from "./duckconfig";
 import { createDag, EntryConfig, PlovrMode } from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
 
-export { compile, CompilerOptions, compileToJson, convertToFlagfile } from "./compiler-core";
+export {
+  compile,
+  CompilerError,
+  CompilerOptions,
+  compileToJson,
+  convertToFlagfile,
+} from "./compiler-core";
 
 /**
  * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.

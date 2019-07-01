@@ -7,6 +7,7 @@ import { promisify } from "util";
 import { assertString } from "../assert";
 import { resultInfoLogType } from "../cli";
 import {
+  CompilerError,
   CompilerOptions,
   compileToJson,
   createCompilerOptionsForChunks,
@@ -129,7 +130,7 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
       if (!result.isRejected) {
         throw new Error("Unexpected state");
       }
-      const { message: stderr } = result.reason as Error;
+      const { message: stderr } = result.reason as CompilerError;
       const [command, , ...messages] = stderr.split("\n");
       try {
         const items: CompileErrorItem[] = JSON.parse(messages.join("\n"));

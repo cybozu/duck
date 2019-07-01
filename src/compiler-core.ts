@@ -90,8 +90,8 @@ export async function compile(opts: CompilerOptions, batchMode?: "aws" | "local"
   }
   return new Promise((resolve, reject) => {
     compiler.run((exitCode: number, stdout: string, stderr?: string) => {
-      if (stderr) {
-        return reject(new CompilerError(stderr, exitCode));
+      if (exitCode !== 0) {
+        return reject(new CompilerError(stderr || "No stderr", exitCode));
       }
       resolve(stdout);
     });
@@ -120,7 +120,7 @@ function rewriteNodePathForAwsLambda(options: CompilerOptions): void {
   }
 }
 
-class CompilerError extends Error {
+export class CompilerError extends Error {
   exitCode: number;
   constructor(msg: string, exitCode: number) {
     super(msg);
