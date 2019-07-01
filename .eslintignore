@@ -3,3 +3,5 @@
 /test/bin-test
 /test/fixtures/**/*-deps.js
 deps.js
+node_modules
+build

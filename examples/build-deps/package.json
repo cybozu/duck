@@ -1,0 +1,18 @@
+{
+  "name": "closure-scripts",
+  "version": "1.0.0",
+  "author": "Teppei Sato <teppeis@gmail.com>",
+  "main": "index.js",
+  "scripts": {
+    "deps": "duck build:deps",
+    "closure-make-deps": "closure-make-deps --root . --exclude node_modules --exclude build --closure-path node_modules/google-closure-library/closure/goog --no-validate > build/closure-make-deps.deps.js",
+    "closure-make-deps:validate": "closure-make-deps --root . --exclude build --closure-path node_modules/google-closure-library/closure/goog"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "devDependencies": {
+    "@teppeis/duck": "file:../..",
+    "google-closure-deps": "^20190325.0.0",
+    "google-closure-library": "^20190325.0.0"
+  }
+}
