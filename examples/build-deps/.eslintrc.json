@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "teppeis/+closure"
+  ],
+  "globals": {
+    "app": true
+  },
+  "overrides": [
+    {
+      "files": [
+        "./esm*.js"
+      ],
+      "parserOptions": {
+        "sourceType": "module"
+      }
+    }
+  ]
+}
