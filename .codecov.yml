@@ -1,2 +1,7 @@
 comment:
   layout: "diff, files"
+coverage:
+  range: "30...90"
+  status:
+    project: no
+    patch: no
