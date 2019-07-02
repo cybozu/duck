@@ -1,18 +1,18 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
-const path = require('path');
-const {execFile} = require('child_process');
-const {promisify} = require('util');
+const assert = require("assert").strict;
+const path = require("path");
+const { execFile } = require("child_process");
+const { promisify } = require("util");
 
 const execFileP = promisify(execFile);
-const bin = path.resolve(__dirname, '..', '..', 'bin', 'duck.js');
+const bin = path.resolve(__dirname, "..", "..", "bin", "duck.js");
 
 // Run this test after tsc
-describe('bin/duck.js', () => {
-  it('is executable', async function() {
+describe("bin/duck.js", () => {
+  it("is executable", async function() {
     this.timeout(5000);
-    const {stderr} = await execFileP(bin, ['--help']);
-    assert.equal(stderr, '');
+    const { stderr } = await execFileP(bin, ["--help"]);
+    assert.equal(stderr, "");
   });
 });
