@@ -62,7 +62,7 @@ describe("compiler", () => {
         },
         false
       );
-      assert(typeof actual.warnings_whitelist_file === "string");
+      assert(actual.warnings_whitelist_file);
       const whitelist = readFileSync(actual.warnings_whitelist_file!, "utf8");
       assert.equal(whitelist, "/path/to/file1.js:1  Error1\n/path/to/file2.js:  Error2");
     });

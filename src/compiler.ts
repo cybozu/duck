@@ -2,13 +2,13 @@ import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
 import fs from "fs";
 import { depGraph } from "google-closure-deps";
+import tempy from "tempy";
 import { assertNonNullable } from "./assert";
 import { CompilationLevel, CompilerOptions, CompilerOptionsFormattingType } from "./compiler-core";
 import { Dag } from "./dag";
 import { DuckConfig } from "./duckconfig";
 import { createDag, EntryConfig, PlovrMode, WarningsWhitelistItem } from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
-import tempy = require("tempy");
 
 export {
   compile,
@@ -165,7 +165,7 @@ function createWarningsWhitelistFile(whitelist: WarningsWhitelistItem[]): string
   const content = whitelist
     .map(({ file, line, description }) => `${file}:${line ? line : ""}  ${description}`)
     .join("\n");
-  const file = tempy.file();
+  const file = tempy.file({ name: "warnings-whitelist.txt" });
   fs.writeFileSync(file, content);
   return file;
 }
