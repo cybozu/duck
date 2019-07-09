@@ -48,6 +48,24 @@ describe("compiler", () => {
       };
       assert.deepEqual(actual, expected);
     });
+    it("warningsWhitelist", async () => {
+      const actual = createCompilerOptionsForPage(
+        {
+          id: "simple",
+          mode: PlovrMode.RAW,
+          paths: ["/path/to/path1"],
+          inputs: ["/input1.js"],
+          warningsWhitelist: [
+            { file: "/path/to/file1.js", line: 1, description: "Error1" },
+            { file: "/path/to/file2.js", description: "Error2" },
+          ],
+        },
+        false
+      );
+      assert(actual.warnings_whitelist_file);
+      const whitelist = readFileSync(actual.warnings_whitelist_file!, "utf8");
+      assert.equal(whitelist, "/path/to/file1.js:1  Error1\n/path/to/file2.js:  Error2");
+    });
     it("full", async () => {
       const actual = createCompilerOptionsForPage(
         {

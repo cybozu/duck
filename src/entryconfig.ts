@@ -39,7 +39,14 @@ export interface EntryConfig {
   };
   "global-scope-name"?: string;
   "output-wrapper"?: string;
+  warningsWhitelist?: WarningsWhitelistItem[];
   "experimental-compiler-options"?: { [index: string]: any };
+}
+
+export interface WarningsWhitelistItem {
+  file: string;
+  line?: number;
+  description: string;
 }
 
 export enum PlovrMode {
@@ -89,6 +96,11 @@ export async function loadEntryConfig(
   if (entryConfig.modules) {
     Object.values(entryConfig.modules).forEach(mod => {
       mod.inputs = mod.inputs.map(input => path.resolve(basedir, input));
+    });
+  }
+  if (entryConfig.warningsWhitelist) {
+    Object.values(entryConfig.warningsWhitelist).forEach(item => {
+      item.file = path.resolve(basedir, item.file);
     });
   }
   if (entryConfig["test-excludes"]) {

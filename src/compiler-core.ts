@@ -26,6 +26,7 @@ export interface CompilerOptions {
   json_streams?: "IN" | "OUT" | "BOTH";
   error_format?: "STANDARD" | "JSON";
   warning_level?: "QUIET" | "DEFAULT" | "VERBOSE";
+  warnings_whitelist_file?: string;
   debug?: boolean;
   formatting?: readonly CompilerOptionsFormattingType[];
   define?: readonly string[];

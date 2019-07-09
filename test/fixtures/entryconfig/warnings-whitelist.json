@@ -1,0 +1,21 @@
+{
+  "id": "warnings-whitelist",
+  "mode": "RAW",
+  "inputs": [
+    "../js/foo.js"
+  ],
+  "paths": [
+    "../path1"
+  ],
+  "warningsWhitelist": [
+    {
+      "file": "path/to/file1.js",
+      "line": 1,
+      "description": "Error1"
+    },
+    {
+      "file": "path/to/file2.js",
+      "description": "Error2"
+    }
+  ]
+}
