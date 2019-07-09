@@ -40,7 +40,6 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   if (entryConfig.warningsWhitelist) {
     opts.warnings_whitelist_file = createWarningsWhitelistFile(entryConfig.warningsWhitelist);
   }
-  console.log(opts);
 
   if (!outputToFile) {
     opts.json_streams = "OUT";
