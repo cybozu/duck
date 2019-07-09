@@ -89,7 +89,6 @@ describe("entryconfig", () => {
     });
     it("warningsWhitelist", async () => {
       const config = await loadEntryConfigById("warnings-whitelist", fixturesDir);
-      assert(config.warningsWhitelist);
       assert.deepEqual(config.warningsWhitelist, [
         {
           file: `${fixturesDir}/path/to/file1.js`,

@@ -99,7 +99,7 @@ export async function loadEntryConfig(
     });
   }
   if (entryConfig.warningsWhitelist) {
-    Object.values(entryConfig.warningsWhitelist).forEach(item => {
+    entryConfig.warningsWhitelist.forEach(item => {
       item.file = path.resolve(basedir, item.file);
     });
   }

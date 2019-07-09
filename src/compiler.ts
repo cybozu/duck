@@ -161,6 +161,9 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   return opts;
 }
 
+/**
+ * Create a warnings whitelist file and return the file path
+ */
 function createWarningsWhitelistFile(whitelist: WarningsWhitelistItem[]): string {
   const content = whitelist
     .map(({ file, line, description }) => `${file}:${line ? line : ""}  ${description}`)
