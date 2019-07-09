@@ -87,5 +87,20 @@ describe("entryconfig", () => {
         "test-excludes": [fixturesBaseDir],
       });
     });
+    it("warningsWhitelist", async () => {
+      const config = await loadEntryConfigById("warnings-whitelist", fixturesDir);
+      assert(config.warningsWhitelist);
+      assert.deepEqual(config.warningsWhitelist, [
+        {
+          file: `${fixturesDir}/path/to/file1.js`,
+          line: 1,
+          description: "Error1",
+        },
+        {
+          file: `${fixturesDir}/path/to/file2.js`,
+          description: "Error2",
+        },
+      ]);
+    });
   });
 });

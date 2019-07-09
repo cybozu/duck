@@ -1,12 +1,14 @@
 import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
+import fs from "fs";
 import { depGraph } from "google-closure-deps";
 import { assertNonNullable } from "./assert";
 import { CompilationLevel, CompilerOptions, CompilerOptionsFormattingType } from "./compiler-core";
 import { Dag } from "./dag";
 import { DuckConfig } from "./duckconfig";
-import { createDag, EntryConfig, PlovrMode } from "./entryconfig";
+import { createDag, EntryConfig, PlovrMode, WarningsWhitelistItem } from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
+import tempy = require("tempy");
 
 export {
   compile,
@@ -34,6 +36,11 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
       opts[snakeCase(key)] = expOpts[key];
     }
   }
+
+  if (entryConfig.warningsWhitelist) {
+    opts.warnings_whitelist_file = createWarningsWhitelistFile(entryConfig.warningsWhitelist);
+  }
+  console.log(opts);
 
   if (!outputToFile) {
     opts.json_streams = "OUT";
@@ -153,6 +160,15 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   }
 
   return opts;
+}
+
+function createWarningsWhitelistFile(whitelist: WarningsWhitelistItem[]): string {
+  const content = whitelist
+    .map(({ file, line, description }) => `${file}:${line ? line : ""}  ${description}`)
+    .join("\n");
+  const file = tempy.file();
+  fs.writeFileSync(file, content);
+  return file;
 }
 
 export interface CompilerOutput {
