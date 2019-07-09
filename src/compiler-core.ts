@@ -2,6 +2,7 @@ import fs from "fs";
 import { compiler as ClosureCompiler } from "google-closure-compiler";
 import { dirname } from "path";
 import * as tempy from "tempy";
+import { WarningsWhitelistItem } from "./entryconfig";
 import { logger } from "./logger";
 
 export interface CompilerOptions {
@@ -52,16 +53,21 @@ export interface CompilerOutput {
   source_map: string;
 }
 
+export interface ExtraOptions {
+  batch?: "aws" | "local";
+  warningsWhitelist?: WarningsWhitelistItem[];
+}
+
 /**
  * @throws If compiler throws errors
  */
 export async function compileToJson(
   opts: CompilerOptions,
-  batchMode?: "aws" | "local"
+  extraOpts: ExtraOptions = {}
 ): Promise<CompilerOutput[]> {
   opts = { ...opts, json_streams: "OUT", error_format: "JSON" };
-  const outputs: CompilerOutput[] = JSON.parse(await compile(opts, batchMode));
-  if (batchMode) {
+  const outputs: CompilerOutput[] = JSON.parse(await compile(opts, extraOpts));
+  if (extraOpts.batch) {
     // Reduce transfer size in batch mode.
     // The maximum request/response size of AWS Lambda is 6MB each.
     // See https://faastjs.org/docs/aws#queue-vs-https-mode
@@ -71,7 +77,7 @@ export async function compileToJson(
   }
 }
 
-export async function compile(opts: CompilerOptions, batchMode?: "aws" | "local"): Promise<string> {
+async function compile(opts: CompilerOptions, extraOpts: ExtraOptions = {}): Promise<string> {
   if (isInAwsLambda()) {
     rewriteNodePathForAwsLambda(opts);
   }
@@ -79,8 +85,11 @@ export async function compile(opts: CompilerOptions, batchMode?: "aws" | "local"
   if (opts.js && opts.js.length > 100) {
     opts = convertToFlagfile(opts);
   }
+  if (extraOpts.warningsWhitelist) {
+    opts.warnings_whitelist_file = createWarningsWhitelistFile(extraOpts.warningsWhitelist);
+  }
   const compiler = new ClosureCompiler(opts as any);
-  if (batchMode) {
+  if (extraOpts.batch) {
     compiler.JAR_PATH = null;
     try {
       const { getNativeImagePath } = await import("google-closure-compiler/lib/utils");
@@ -164,4 +173,16 @@ export function convertToFlagfile(opts: CompilerOptions): { flagfile: string } {
  */
 function escape(str: string): string {
   return str.replace(/"/g, '\\"');
+}
+
+/**
+ * Create a warnings whitelist file and return the file path
+ */
+function createWarningsWhitelistFile(whitelist: WarningsWhitelistItem[]): string {
+  const content = whitelist
+    .map(({ file, line, description }) => `${file}:${line ? line : ""}  ${description}`)
+    .join("\n");
+  const file = tempy.file({ name: "warnings-whitelist.txt" });
+  fs.writeFileSync(file, content);
+  return file;
 }

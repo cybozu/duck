@@ -75,8 +75,9 @@ export async function buildJs(
         if (config.batch) {
           convertCompilerOptionsToRelative(options, process.cwd());
         }
+        const extra = createExtraOptions(config, entryConfig, process.cwd());
         logWithCount(entryConfigPath, runningJobCount++, "Compiling");
-        const outputs = await compileFn(options, config.batch);
+        const outputs = await compileFn(options, extra);
         const promises = outputs.map(async output => {
           await mkdir(path.dirname(output.path), { recursive: true });
           return writeFile(output.path, output.src);
@@ -201,4 +202,23 @@ function convertCompilerOptionsToRelative(options: CompilerOptions, basepath: st
   if (options.entry_point) {
     options.entry_point = options.entry_point.map(file => path.relative(basepath, file));
   }
+}
+
+function createExtraOptions(
+  duckConfig: DuckConfig,
+  entryConfig: EntryConfig,
+  basepath: string
+): compilerCoreFunctions.ExtraOptions {
+  const { batch } = duckConfig;
+  const warningsWhitelist = (entryConfig.warningsWhitelist || []).map(
+    ({ file, line, description }) => ({
+      file: duckConfig.batch === "aws" ? path.relative(basepath, file) : file,
+      line,
+      description,
+    })
+  );
+  return {
+    batch,
+    warningsWhitelist,
+  };
 }

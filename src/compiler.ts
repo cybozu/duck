@@ -1,22 +1,14 @@
 import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
-import fs from "fs";
 import { depGraph } from "google-closure-deps";
-import tempy from "tempy";
 import { assertNonNullable } from "./assert";
 import { CompilationLevel, CompilerOptions, CompilerOptionsFormattingType } from "./compiler-core";
 import { Dag } from "./dag";
 import { DuckConfig } from "./duckconfig";
-import { createDag, EntryConfig, PlovrMode, WarningsWhitelistItem } from "./entryconfig";
+import { createDag, EntryConfig, PlovrMode } from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
 
-export {
-  compile,
-  CompilerError,
-  CompilerOptions,
-  compileToJson,
-  convertToFlagfile,
-} from "./compiler-core";
+export { CompilerError, CompilerOptions, compileToJson, convertToFlagfile } from "./compiler-core";
 
 /**
  * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.
@@ -35,10 +27,6 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
     for (const key in expOpts) {
       opts[snakeCase(key)] = expOpts[key];
     }
-  }
-
-  if (entryConfig.warningsWhitelist) {
-    opts.warnings_whitelist_file = createWarningsWhitelistFile(entryConfig.warningsWhitelist);
   }
 
   if (!outputToFile) {
@@ -159,18 +147,6 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
   }
 
   return opts;
-}
-
-/**
- * Create a warnings whitelist file and return the file path
- */
-function createWarningsWhitelistFile(whitelist: WarningsWhitelistItem[]): string {
-  const content = whitelist
-    .map(({ file, line, description }) => `${file}:${line ? line : ""}  ${description}`)
-    .join("\n");
-  const file = tempy.file({ name: "warnings-whitelist.txt" });
-  fs.writeFileSync(file, content);
-  return file;
 }
 
 export interface CompilerOutput {
