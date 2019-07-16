@@ -53,7 +53,7 @@
     "tempy": "^0.3.0",
     "workerpool": "^3.1.2",
     "xmlbuilder": "^13.0.2",
-    "yargs": "^13.2.4",
+    "yargs": "^13.3.0",
     "zet": "^1.0.5"
   },
   "peerDependencies": {
