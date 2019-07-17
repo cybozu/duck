@@ -2,6 +2,7 @@ import fs from "fs";
 import { compiler as ClosureCompiler } from "google-closure-compiler";
 import { dirname } from "path";
 import * as tempy from "tempy";
+import { WarningsWhitelistItem } from "./entryconfig";
 import { logger } from "./logger";
 
 export interface CompilerOptions {
@@ -46,6 +47,12 @@ export type CompilerOptionsFormattingType =
   | "PRINT_INPUT_DELIMITER"
   | "SINGLE_QUOTES";
 
+export interface ExtendedCompilerOptions {
+  compilerOptions: CompilerOptions;
+  batch?: "aws" | "local";
+  warningsWhitelist?: WarningsWhitelistItem[];
+}
+
 export interface CompilerOutput {
   path: string;
   src: string;
@@ -56,12 +63,15 @@ export interface CompilerOutput {
  * @throws If compiler throws errors
  */
 export async function compileToJson(
-  opts: CompilerOptions,
-  batchMode?: "aws" | "local"
+  extendedOpts: ExtendedCompilerOptions
 ): Promise<CompilerOutput[]> {
-  opts = { ...opts, json_streams: "OUT", error_format: "JSON" };
-  const outputs: CompilerOutput[] = JSON.parse(await compile(opts, batchMode));
-  if (batchMode) {
+  extendedOpts.compilerOptions = {
+    ...extendedOpts.compilerOptions,
+    json_streams: "OUT",
+    error_format: "JSON",
+  };
+  const outputs: CompilerOutput[] = JSON.parse(await compile(extendedOpts));
+  if (extendedOpts.batch) {
     // Reduce transfer size in batch mode.
     // The maximum request/response size of AWS Lambda is 6MB each.
     // See https://faastjs.org/docs/aws#queue-vs-https-mode
@@ -71,7 +81,8 @@ export async function compileToJson(
   }
 }
 
-export async function compile(opts: CompilerOptions, batchMode?: "aws" | "local"): Promise<string> {
+async function compile(extendedOpts: ExtendedCompilerOptions): Promise<string> {
+  let opts = extendedOpts.compilerOptions;
   if (isInAwsLambda()) {
     rewriteNodePathForAwsLambda(opts);
   }
@@ -79,8 +90,11 @@ export async function compile(opts: CompilerOptions, batchMode?: "aws" | "local"
   if (opts.js && opts.js.length > 100) {
     opts = convertToFlagfile(opts);
   }
+  if (extendedOpts.warningsWhitelist) {
+    opts.warnings_whitelist_file = createWarningsWhitelistFile(extendedOpts.warningsWhitelist);
+  }
   const compiler = new ClosureCompiler(opts as any);
-  if (batchMode) {
+  if (extendedOpts.batch) {
     compiler.JAR_PATH = null;
     try {
       const { getNativeImagePath } = await import("google-closure-compiler/lib/utils");
@@ -164,4 +178,16 @@ export function convertToFlagfile(opts: CompilerOptions): { flagfile: string } {
  */
 function escape(str: string): string {
   return str.replace(/"/g, '\\"');
+}
+
+/**
+ * Create a warnings whitelist file and return the file path
+ */
+function createWarningsWhitelistFile(whitelist: WarningsWhitelistItem[]): string {
+  const content = whitelist
+    .map(({ file, line, description }) => `${file}:${line ? line : ""}  ${description}`)
+    .join("\n");
+  const file = tempy.file({ name: "warnings-whitelist.txt" });
+  fs.writeFileSync(file, content);
+  return file;
 }

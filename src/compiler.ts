@@ -1,22 +1,20 @@
 import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
-import fs from "fs";
 import { depGraph } from "google-closure-deps";
-import tempy from "tempy";
+import path from "path";
 import { assertNonNullable } from "./assert";
-import { CompilationLevel, CompilerOptions, CompilerOptionsFormattingType } from "./compiler-core";
+import {
+  CompilationLevel,
+  CompilerOptions,
+  CompilerOptionsFormattingType,
+  ExtendedCompilerOptions,
+} from "./compiler-core";
 import { Dag } from "./dag";
 import { DuckConfig } from "./duckconfig";
 import { createDag, EntryConfig, PlovrMode, WarningsWhitelistItem } from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
 
-export {
-  compile,
-  CompilerError,
-  CompilerOptions,
-  compileToJson,
-  convertToFlagfile,
-} from "./compiler-core";
+export { CompilerError, CompilerOptions, compileToJson, convertToFlagfile } from "./compiler-core";
 
 /**
  * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.
@@ -28,17 +26,17 @@ function snakeCase(key: string): string {
   return key.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`);
 }
 
-function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): CompilerOptions {
+function createBaseOptions(
+  entryConfig: EntryConfig,
+  duckConfig: DuckConfig,
+  outputToFile: boolean
+): CompilerOptions {
   const opts: CompilerOptions = {};
   if (entryConfig["experimental-compiler-options"]) {
     const expOpts = entryConfig["experimental-compiler-options"];
     for (const key in expOpts) {
       opts[snakeCase(key)] = expOpts[key];
     }
-  }
-
-  if (entryConfig.warningsWhitelist) {
-    opts.warnings_whitelist_file = createWarningsWhitelistFile(entryConfig.warningsWhitelist);
   }
 
   if (!outputToFile) {
@@ -158,19 +156,11 @@ function createBaseOptions(entryConfig: EntryConfig, outputToFile: boolean): Com
     }
   }
 
-  return opts;
-}
+  if (duckConfig.batch === "aws") {
+    convertCompilerOptionsToRelative(opts);
+  }
 
-/**
- * Create a warnings whitelist file and return the file path
- */
-function createWarningsWhitelistFile(whitelist: WarningsWhitelistItem[]): string {
-  const content = whitelist
-    .map(({ file, line, description }) => `${file}:${line ? line : ""}  ${description}`)
-    .join("\n");
-  const file = tempy.file({ name: "warnings-whitelist.txt" });
-  fs.writeFileSync(file, content);
-  return file;
+  return opts;
 }
 
 export interface CompilerOutput {
@@ -181,47 +171,70 @@ export interface CompilerOutput {
 
 export function createCompilerOptionsForPage(
   entryConfig: EntryConfig,
+  duckConfig: DuckConfig,
   outputToFile: boolean
-): CompilerOptions {
-  const opts = createBaseOptions(entryConfig, outputToFile);
-  const wrapper = createOutputWrapper(entryConfig, assertNonNullable(opts.compilation_level));
+): ExtendedCompilerOptions {
+  const compilerOptions = createBaseOptions(entryConfig, duckConfig, outputToFile);
+  const wrapper = createOutputWrapper(
+    entryConfig,
+    assertNonNullable(compilerOptions.compilation_level)
+  );
   if (wrapper && wrapper !== wrapperMarker) {
-    opts.output_wrapper = wrapper;
+    compilerOptions.output_wrapper = wrapper;
   }
-  return opts;
+  const extendedOpts: ExtendedCompilerOptions = { compilerOptions };
+  if (entryConfig.warningsWhitelist) {
+    extendedOpts.warningsWhitelist = createWarningsWhitelist(
+      entryConfig.warningsWhitelist,
+      duckConfig
+    );
+  }
+  if (duckConfig.batch) {
+    extendedOpts.batch = duckConfig.batch;
+  }
+  return extendedOpts;
 }
 
 export async function createCompilerOptionsForChunks(
   entryConfig: EntryConfig,
-  config: DuckConfig,
+  duckConfig: DuckConfig,
   outputToFile: boolean,
   createModuleUris: (chunkId: string) => string[]
-): Promise<{ options: CompilerOptions; sortedChunkIds: string[]; rootChunkId: string }> {
+): Promise<{ options: ExtendedCompilerOptions; sortedChunkIds: string[]; rootChunkId: string }> {
   // TODO: separate EntryConfigChunks from EntryConfig
   const modules = assertNonNullable(entryConfig.modules);
-  const ignoreDirs = config.depsJsIgnoreDirs.concat(config.closureLibraryDir);
+  const ignoreDirs = duckConfig.depsJsIgnoreDirs.concat(duckConfig.closureLibraryDir);
   const dependencies = flat(
     await Promise.all([
-      getDependencies(entryConfig, ignoreDirs, config.depsWorkers),
-      getClosureLibraryDependencies(config.closureLibraryDir),
+      getDependencies(entryConfig, ignoreDirs, duckConfig.depsWorkers),
+      getClosureLibraryDependencies(duckConfig.closureLibraryDir),
     ])
   );
   const dag = createDag(entryConfig);
   const sortedChunkIds = dag.getSortedIds();
   const chunkToTransitiveDepPathSet = findTransitiveDeps(sortedChunkIds, dependencies, modules);
   const chunkToInputPathSet = splitDepsIntoChunks(sortedChunkIds, chunkToTransitiveDepPathSet, dag);
-  const options = createBaseOptions(entryConfig, outputToFile);
-  options.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
-  options.module = sortedChunkIds.map(id => {
+  const compilerOptions = createBaseOptions(entryConfig, duckConfig, outputToFile);
+  compilerOptions.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
+  compilerOptions.module = sortedChunkIds.map(id => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;
   });
-  options.module_wrapper = createChunkWrapper(
+  compilerOptions.module_wrapper = createChunkWrapper(
     entryConfig,
     sortedChunkIds,
-    assertNonNullable(options.compilation_level),
+    assertNonNullable(compilerOptions.compilation_level),
     createModuleUris
   );
+  const options: ExtendedCompilerOptions = {
+    compilerOptions,
+  };
+  if (entryConfig.warningsWhitelist) {
+    options.warningsWhitelist = createWarningsWhitelist(entryConfig.warningsWhitelist, duckConfig);
+  }
+  if (duckConfig.batch) {
+    options.batch = duckConfig.batch;
+  }
   return { options, sortedChunkIds, rootChunkId: sortedChunkIds[0] };
 }
 
@@ -302,11 +315,14 @@ function findTransitiveDeps(
   return chunkToTransitiveDepPathSet;
 }
 
+/**
+ * @return a map of chunkId to a set of transitive dependencies
+ */
 function splitDepsIntoChunks(
   sortedChunkIds: readonly string[],
   chunkToTransitiveDepPathSet: Map<string, Set<string>>,
   dag: Dag
-) {
+): Map<string, Set<string>> {
   const chunkToInputPathSet: Map<string, Set<string>> = new Map();
   sortedChunkIds.forEach(chunk => {
     chunkToInputPathSet.set(chunk, new Set());
@@ -339,4 +355,39 @@ export function convertModuleInfos(
     moduleUris[id] = createModuleUris(id);
   }
   return { moduleInfo, moduleUris };
+}
+
+function createWarningsWhitelist(
+  warningsWhitelist: WarningsWhitelistItem[],
+  duckConfig: DuckConfig,
+  basepath: string = process.cwd()
+): WarningsWhitelistItem[] {
+  return warningsWhitelist.map(item => {
+    const newItem = { ...item };
+    if (duckConfig.batch === "aws") {
+      newItem.file = path.relative(basepath, item.file);
+    }
+    return newItem;
+  });
+}
+
+function convertCompilerOptionsToRelative(
+  options: CompilerOptions,
+  basepath: string = process.cwd()
+): void {
+  if (options.js) {
+    options.js = options.js.map(file => {
+      if (file.startsWith("!")) {
+        return `!${path.relative(basepath, file.slice(1))}`;
+      } else {
+        return path.relative(basepath, file);
+      }
+    });
+  }
+  if (options.externs) {
+    options.externs = options.externs.map(file => path.relative(basepath, file));
+  }
+  if (options.entry_point) {
+    options.entry_point = options.entry_point.map(file => path.relative(basepath, file));
+  }
 }

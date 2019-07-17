@@ -8,7 +8,6 @@ import { assertString } from "../assert";
 import { resultInfoLogType } from "../cli";
 import {
   CompilerError,
-  CompilerOptions,
   compileToJson,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
@@ -49,7 +48,7 @@ export async function buildJs(
     limit(async () => {
       try {
         const entryConfig = await loadEntryConfig(entryConfigPath);
-        let options: CompilerOptions;
+        let options: compilerCoreFunctions.ExtendedCompilerOptions;
         if (entryConfig.modules) {
           if (config.depsJs) {
             if (!restoringDepsJs) {
@@ -59,7 +58,7 @@ export async function buildJs(
           }
           options = await createCompilerOptionsForChunks_(entryConfig, config);
         } else {
-          options = createCompilerOptionsForPage(entryConfig, true);
+          options = createCompilerOptionsForPage(entryConfig, config, true);
         }
 
         if (printConfig) {
@@ -72,11 +71,8 @@ export async function buildJs(
           return;
         }
 
-        if (config.batch) {
-          convertCompilerOptionsToRelative(options, process.cwd());
-        }
         logWithCount(entryConfigPath, runningJobCount++, "Compiling");
-        const outputs = await compileFn(options, config.batch);
+        const outputs = await compileFn(options);
         const promises = outputs.map(async output => {
           await mkdir(path.dirname(output.path), { recursive: true });
           return writeFile(output.path, output.src);
@@ -171,7 +167,7 @@ async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
 async function createCompilerOptionsForChunks_(
   entryConfig: EntryConfig,
   config: DuckConfig
-): Promise<CompilerOptions> {
+): Promise<compilerCoreFunctions.ExtendedCompilerOptions> {
   function createModuleUris(chunkId: string): string[] {
     const moduleProductionUri = assertString(entryConfig["module-production-uri"]);
     return [moduleProductionUri.replace(/%s/g, chunkId)];
@@ -183,22 +179,4 @@ async function createCompilerOptionsForChunks_(
     createModuleUris
   );
   return options;
-}
-
-function convertCompilerOptionsToRelative(options: CompilerOptions, basepath: string): void {
-  if (options.js) {
-    options.js = options.js.map(file => {
-      if (file.startsWith("!")) {
-        return `!${path.relative(basepath, file.slice(1))}`;
-      } else {
-        return path.relative(basepath, file);
-      }
-    });
-  }
-  if (options.externs) {
-    options.externs = options.externs.map(file => path.relative(basepath, file));
-  }
-  if (options.entry_point) {
-    options.entry_point = options.entry_point.map(file => path.relative(basepath, file));
-  }
 }
