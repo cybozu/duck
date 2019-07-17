@@ -47,27 +47,31 @@ export type CompilerOptionsFormattingType =
   | "PRINT_INPUT_DELIMITER"
   | "SINGLE_QUOTES";
 
+export interface ExtendedCompilerOptions {
+  compilerOptions: CompilerOptions;
+  batch?: "aws" | "local";
+  warningsWhitelist?: WarningsWhitelistItem[];
+}
+
 export interface CompilerOutput {
   path: string;
   src: string;
   source_map: string;
 }
 
-export interface ExtraOptions {
-  batch?: "aws" | "local";
-  warningsWhitelist?: WarningsWhitelistItem[];
-}
-
 /**
  * @throws If compiler throws errors
  */
 export async function compileToJson(
-  opts: CompilerOptions,
-  extraOpts: ExtraOptions = {}
+  extendedOpts: ExtendedCompilerOptions
 ): Promise<CompilerOutput[]> {
-  opts = { ...opts, json_streams: "OUT", error_format: "JSON" };
-  const outputs: CompilerOutput[] = JSON.parse(await compile(opts, extraOpts));
-  if (extraOpts.batch) {
+  extendedOpts.compilerOptions = {
+    ...extendedOpts.compilerOptions,
+    json_streams: "OUT",
+    error_format: "JSON",
+  };
+  const outputs: CompilerOutput[] = JSON.parse(await compile(extendedOpts));
+  if (extendedOpts.batch) {
     // Reduce transfer size in batch mode.
     // The maximum request/response size of AWS Lambda is 6MB each.
     // See https://faastjs.org/docs/aws#queue-vs-https-mode
@@ -77,7 +81,8 @@ export async function compileToJson(
   }
 }
 
-async function compile(opts: CompilerOptions, extraOpts: ExtraOptions = {}): Promise<string> {
+async function compile(extendedOpts: ExtendedCompilerOptions): Promise<string> {
+  let opts = extendedOpts.compilerOptions;
   if (isInAwsLambda()) {
     rewriteNodePathForAwsLambda(opts);
   }
@@ -85,11 +90,11 @@ async function compile(opts: CompilerOptions, extraOpts: ExtraOptions = {}): Pro
   if (opts.js && opts.js.length > 100) {
     opts = convertToFlagfile(opts);
   }
-  if (extraOpts.warningsWhitelist) {
-    opts.warnings_whitelist_file = createWarningsWhitelistFile(extraOpts.warningsWhitelist);
+  if (extendedOpts.warningsWhitelist) {
+    opts.warnings_whitelist_file = createWarningsWhitelistFile(extendedOpts.warningsWhitelist);
   }
   const compiler = new ClosureCompiler(opts as any);
-  if (extraOpts.batch) {
+  if (extendedOpts.batch) {
     compiler.JAR_PATH = null;
     try {
       const { getNativeImagePath } = await import("google-closure-compiler/lib/utils");

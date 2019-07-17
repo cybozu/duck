@@ -6,5 +6,7 @@
     "teppeis/+prettier",
     "teppeis/+mocha"
   ],
-  "rules": {}
+  "rules": {
+    "@typescript-eslint/no-object-literal-type-assertion": "off"
+  }
 }
