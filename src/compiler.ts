@@ -226,6 +226,10 @@ export async function createCompilerOptionsForChunks(
     assertNonNullable(compilerOptions.compilation_level),
     createModuleUris
   );
+  if (duckConfig.batch === "aws") {
+    convertCompilerOptionsToRelative(compilerOptions);
+  }
+
   const options: ExtendedCompilerOptions = {
     compilerOptions,
   };
