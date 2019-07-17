@@ -361,7 +361,7 @@ function createWarningsWhitelist(
   warningsWhitelist: WarningsWhitelistItem[],
   duckConfig: DuckConfig,
   basepath: string = process.cwd()
-): WarningsWhitelistItem[] | undefined {
+): WarningsWhitelistItem[] {
   return warningsWhitelist.map(item => {
     const newItem = { ...item };
     if (duckConfig.batch === "aws") {
