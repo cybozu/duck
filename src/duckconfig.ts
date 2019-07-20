@@ -20,7 +20,7 @@ export interface DuckConfig {
   concurrency?: number;
   batch?: "aws" | "local";
   batchOptions?: import("faastjs").AwsOptions | import("faastjs").LocalOptions;
-  reporters?: ("text" | "xunit")[];
+  reporters?: ("json" | "text" | "xunit")[];
   reportersOutputDir?: string;
   reporterOptions?: {
     json?: JsonReporterOptions;
