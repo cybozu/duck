@@ -66,9 +66,10 @@ interface ResultInfo {
   bodyObject?: any;
 }
 
-const noTTY = {
-  desc: "Output in noTTY mode",
+const nonTTY = {
+  desc: "Output in nonTTY mode",
   type: "boolean",
+  alias: ["noTTY", "n"],
   default: false,
 } as const;
 
@@ -140,7 +141,7 @@ const buildJsOptions = {
   },
   printConfig,
   depsJs,
-  noTTY,
+  nonTTY,
 } as const;
 
 const buildSoyOptions = {
@@ -162,7 +163,7 @@ const buildSoyOptions = {
     default: false,
   },
   printConfig,
-  noTTY,
+  nonTTY,
 } as const;
 
 const buildDepsOptions = {
@@ -173,7 +174,7 @@ const buildDepsOptions = {
     default: Math.min(4, Math.max(os.cpus().length, 1)),
   },
   config,
-  noTTY,
+  nonTTY,
 } as const;
 
 export function run(processArgv: readonly string[]): void {
@@ -203,7 +204,7 @@ export function run(processArgv: readonly string[]): void {
           default: "localhost",
         },
         config,
-        noTTY,
+        nonTTY,
       },
       async argv => {
         const config = loadConfig(argv);
@@ -238,7 +239,7 @@ export function run(processArgv: readonly string[]): void {
         ...buildDepsOptions,
         skipInitialBuild,
         ...buildSoyOptions,
-        noTTY,
+        nonTTY,
       },
       async argv => {
         const config = loadConfig(argv);
@@ -356,12 +357,12 @@ export function run(processArgv: readonly string[]): void {
 
 function listr<T>(
   tasks: readonly Listr.ListrTask<T>[],
-  argv: { noTTY: boolean },
+  argv: { nonTTY: boolean },
   options: Listr.ListrOptions<T> = {}
 ): Listr<T> {
   return new Listr<T>(tasks, {
     ...options,
-    renderer: argv.noTTY ? "verbose" : "default",
+    renderer: argv.nonTTY ? "verbose" : "default",
   });
 }
 
