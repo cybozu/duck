@@ -354,12 +354,12 @@ export function run(processArgv: readonly string[]): void {
     .parse(processArgv);
 }
 
-function listr(
-  tasks: readonly Listr.ListrTask[],
+function listr<T>(
+  tasks: readonly Listr.ListrTask<T>[],
   argv: { noTTY: boolean },
-  options: Listr.ListrOptions = {}
-): Listr {
-  return new Listr(tasks, {
+  options: Listr.ListrOptions<T> = {}
+): Listr<T> {
+  return new Listr<T>(tasks, {
     ...options,
     renderer: argv.noTTY ? "verbose" : "default",
   });
