@@ -105,7 +105,7 @@ const closureVersion = require('google-closure-compiler/package.json').version;
 module.exports = {
   batchOptions: {
     region: 'ap-northeast-1',
-    lamdaOptions: {
+    awsLambdaOptions: {
       Runtime: 'nodejs10.x',
     },
     include: ['path/to/your/source/**/*.js'],
