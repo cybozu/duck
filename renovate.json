@@ -4,6 +4,11 @@
     {
       "packageNames": ["google-closure-deps"],
       "rangeStrategy": "update-lockfile"
+    },
+    {
+      "packageNames": ["google-closure-compiler"],
+      "depTypeList": ["peerDependencies"],
+      "enabled": false
     }
   ]
 }
