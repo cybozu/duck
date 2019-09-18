@@ -2,7 +2,7 @@ import flat from "array.prototype.flat";
 import fs from "fs";
 import { depFile, depGraph, parser } from "google-closure-deps";
 import path from "path";
-import recursive from "recursive-readdir";
+import glob from "glob";
 import { promisify } from "util";
 import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
 import { EntryConfig } from "./entryconfig";
@@ -11,6 +11,7 @@ import { googBaseUrlPath, inputsUrlPath } from "./urls";
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> = new Map();
+const globPromise = promisify(glob);
 
 /**
  * Generate deps.js source text for RAW mode.
@@ -90,7 +91,7 @@ export async function getDependencies(
   ignoreDirs: readonly string[] = [],
   numOfWorkers?: number
 ): Promise<depGraph.Dependency[]> {
-  const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, "*"));
+  const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, "**/*"));
   const parser = new DependencyParserWithWorkers(numOfWorkers);
   try {
     // TODO: uniq
@@ -99,7 +100,7 @@ export async function getDependencies(
       if (entryConfig["test-excludes"]) {
         testExcludes = entryConfig["test-excludes"];
       }
-      const files = await recursive(p, ignoreDirPatterns);
+      const files = await globPromise(path.join(p, "**/*.js"), { ignore: ignoreDirPatterns });
       return Promise.all(
         files
           .filter(file => /\.js$/.test(file))
