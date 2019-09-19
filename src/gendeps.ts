@@ -103,7 +103,6 @@ export async function getDependencies(
       const files = await globPromise(path.join(p, "**/*.js"), { ignore: ignoreDirPatterns });
       return Promise.all(
         files
-          .filter(file => /\.js$/.test(file))
           // TODO: load deps.js path from config
           .filter(file => !/\bdeps\.js$/.test(file))
           .filter(file => {
