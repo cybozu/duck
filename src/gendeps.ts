@@ -1,8 +1,8 @@
 import flat from "array.prototype.flat";
 import fs from "fs";
+import glob from "glob";
 import { depFile, depGraph, parser } from "google-closure-deps";
 import path from "path";
-import glob from "glob";
 import { promisify } from "util";
 import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
 import { EntryConfig } from "./entryconfig";
