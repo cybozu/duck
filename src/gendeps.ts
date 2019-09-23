@@ -100,7 +100,7 @@ export async function getDependencies(
       if (entryConfig["test-excludes"]) {
         testExcludes = entryConfig["test-excludes"];
       }
-      const files = await globPromise(path.join(p, "**/*.js"), { ignore: ignoreDirPatterns });
+      const files = await globPromise(path.join(p, "**/*.js"), { ignore: ignoreDirPatterns, follow: true });
       return Promise.all(
         files
           // TODO: load deps.js path from config
