@@ -76,7 +76,7 @@
     "@types/yargs": "^13.0.2",
     "codecov": "^3.6.1",
     "eslint": "^6.4.0",
-    "eslint-config-teppeis": "^10.1.3",
+    "eslint-config-teppeis": "^10.2.0",
     "espower-typescript": "^9.0.2",
     "google-closure-compiler": "^20190909.0.0",
     "mocha": "^6.2.0",
