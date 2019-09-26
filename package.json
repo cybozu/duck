@@ -73,7 +73,7 @@
     "@types/serve-static": "^1.13.3",
     "@types/split2": "^2.1.6",
     "@types/workerpool": "^3.1.0",
-    "@types/yargs": "^13.0.2",
+    "@types/yargs": "^13.0.3",
     "codecov": "^3.6.1",
     "eslint": "^6.4.0",
     "eslint-config-teppeis": "^10.2.0",
