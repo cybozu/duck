@@ -32,9 +32,9 @@ import { watchJsAndSoy } from "../watch";
 const entryIdToChunkCache: Map<string, Map<string, { [id: string]: CompilerOutput }>> = new Map();
 
 export async function serve(config: DuckConfig, watch = true) {
-  const PORT = config.port;
-  const HOST = config.host;
-  const baseUrl = new URL(`http://${HOST}:${PORT}/`);
+  const { host, port } = config;
+  const scheme = config.https ? "https" : "http";
+  const baseUrl = new URL(`${scheme}://${host}:${port}/`);
   const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
   const depsUrlBase = new URL(depsUrlPath, baseUrl);
 
@@ -254,7 +254,7 @@ export async function serve(config: DuckConfig, watch = true) {
   // start server
   const start = async () => {
     try {
-      await server.listen(PORT, HOST);
+      await server.listen(port, host);
     } catch (err) {
       server.log.error(err);
       process.exit(1);
