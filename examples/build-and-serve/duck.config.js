@@ -4,4 +4,9 @@ module.exports = {
   depsJs: "build/deps.js",
   depsJsIgnoreDirs: ["node_modules", "build"],
   entryConfigDir: "entry-config/entries",
+  // http2: true,
+  // https: {
+  //   keyPath: "./duck-key.pem",
+  //   certPath: "./duck-cert.pem",
+  // },
 };
