@@ -11,9 +11,8 @@ export class DependencyParserWithWorkers {
       throw new TypeError(`numOfWorkers must be an integer >= 1, but "${numOfWorkers}"`);
     }
     this.pool = workerpool.pool(script, {
-      minWorkers: numOfWorkers,
+      minWorkers: "max",
       maxWorkers: numOfWorkers,
-      nodeWorker: "auto",
     });
   }
   async parse(filepath: string): Promise<depGraph.Dependency> {
