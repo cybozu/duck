@@ -31,13 +31,26 @@ import { watchJsAndSoy } from "../watch";
 
 const entryIdToChunkCache: Map<string, Map<string, { [id: string]: CompilerOutput }>> = new Map();
 
-export async function serve(config: DuckConfig, watch = true) {
-  const { host, port } = config;
-  const scheme = config.https ? "https" : "http";
-  const baseUrl = new URL(`${scheme}://${host}:${port}/`);
-  const googBaseUrl = new URL(googBaseUrlPath, baseUrl);
-  const depsUrlBase = new URL(depsUrlPath, baseUrl);
+function getScriptBaseUrl(reply: fastify.FastifyReply<ServerResponse>, isHttps: boolean): URL {
+  const { host } = reply.request.headers;
+  if (typeof host !== "string") {
+    throw new TypeError(`Host header of request doesn't exist: ${host}`);
+  }
+  const scheme = isHttps ? "https" : "http";
+  return new URL(`${scheme}://${host}/`);
+}
 
+function getGoogBaseUrl(baseUrl: URL): URL {
+  return new URL(googBaseUrlPath, baseUrl);
+}
+
+function getDepsUrl(baseUrl: URL, entryConfigId: string): URL {
+  const depsUrl = new URL(depsUrlPath, baseUrl);
+  depsUrl.searchParams.set("id", entryConfigId);
+  return depsUrl;
+}
+
+export async function serve(config: DuckConfig, watch = true) {
   setGlobalLogger(
     pino({
       prettyPrint: { translateTime: "SYS:HH:MM:ss.l", ignore: "hostname,pid" },
@@ -118,16 +131,17 @@ export async function serve(config: DuckConfig, watch = true) {
     }
   });
 
-  function inputsToUrisForRaw(inputs: readonly string[]): string[] {
+  function inputsToUrisForRaw(inputs: readonly string[], baseUrl: URL): string[] {
     return inputs
       .map(input => path.relative(config.inputsRoot, input))
       .map(input => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
   }
 
   function replyChunksRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
+    const baseUrl = getScriptBaseUrl(reply, !!config.https);
     const modules = assertNonNullable(entryConfig.modules);
     const { moduleInfo, moduleUris } = convertModuleInfos(entryConfig, id => {
-      return inputsToUrisForRaw(modules[id].inputs);
+      return inputsToUrisForRaw(modules[id].inputs, baseUrl);
     });
     // The root chunk loads all chunks in RAW mode
     const sortedChunkIds = createDag(entryConfig).getSortedIds();
@@ -139,11 +153,9 @@ export async function serve(config: DuckConfig, watch = true) {
       }
     }
     const rootModuleUris = moduleUris[rootId];
-    const depsUrl = new URL(depsUrlBase.toString());
-    depsUrl.search = `id=${entryConfig.id}`;
     reply.code(200).type("application/javascript").send(stripIndents`
-    document.write('<script src="${googBaseUrl}"></script>');
-    document.write('<script src="${depsUrl}"></script>');
+    document.write('<script src="${getGoogBaseUrl(baseUrl)}"></script>');
+    document.write('<script src="${getDepsUrl(baseUrl, entryConfig.id)}"></script>');
     document.write('<script>var PLOVR_MODULE_INFO = ${JSON.stringify(moduleInfo)};</script>');
     document.write('<script>var PLOVR_MODULE_URIS = ${JSON.stringify(moduleUris)};</script>');
     document.write('<script>var PLOVR_MODULE_USE_DEBUG_MODE = ${!!entryConfig.debug};</script>');
@@ -172,7 +184,7 @@ export async function serve(config: DuckConfig, watch = true) {
       }
       return parentChunkCache[requestedChunkId].src;
     }
-
+    const baseUrl = getScriptBaseUrl(reply, !!config.https);
     function createModuleUris(chunkId: string): string[] {
       const uri = new URL(url, baseUrl);
       const params = uri.searchParams;
@@ -204,12 +216,11 @@ export async function serve(config: DuckConfig, watch = true) {
   function replyPageRaw(reply: fastify.FastifyReply<ServerResponse>, entryConfig: EntryConfig) {
     // TODO: separate EntryConfigPage from EntryConfig
     const inputs = assertNonNullable(entryConfig.inputs);
-    const uris = inputsToUrisForRaw(inputs);
-    const depsUrl = new URL(depsUrlBase.toString());
-    depsUrl.search = `id=${entryConfig.id}`;
+    const baseUrl = getScriptBaseUrl(reply, !!config.https);
+    const uris = inputsToUrisForRaw(inputs, baseUrl);
     reply.code(200).type("application/javascript").send(stripIndents`
-    document.write('<script src="${googBaseUrl}"></script>');
-    document.write('<script src="${depsUrl}"></script>');
+    document.write('<script src="${getGoogBaseUrl(baseUrl)}"></script>');
+    document.write('<script src="${getDepsUrl(baseUrl, entryConfig.id)}"></script>');
     ${uris.map(uri => `document.write('<script>goog.require("${uri}")</script>');`).join("\n")}
   `);
   }
@@ -253,6 +264,7 @@ export async function serve(config: DuckConfig, watch = true) {
 
   // start server
   const start = async () => {
+    const { host, port } = config;
     try {
       await server.listen(port, host);
     } catch (err) {

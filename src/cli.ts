@@ -201,7 +201,7 @@ export function run(processArgv: readonly string[]): void {
         host: {
           desc: "A host to listen",
           type: "string",
-          default: "localhost",
+          default: "0.0.0.0",
         },
         config,
         nonTTY,
