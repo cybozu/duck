@@ -35,7 +35,7 @@
     "common-tags": "^1.8.0",
     "cors": "^2.8.5",
     "execa": "^3.2.0",
-    "faastjs": "^3.0.10",
+    "faastjs": "^3.0.11",
     "fastify": "^2.10.0",
     "glob": "^7.1.5",
     "google-closure-deps": ">=20190325.0.0",
