@@ -74,7 +74,7 @@
     "@types/workerpool": "^5.0.0",
     "@types/yargs": "^13.0.3",
     "codecov": "^3.6.1",
-    "eslint": "^6.5.1",
+    "eslint": "^6.6.0",
     "eslint-config-teppeis": "^10.2.2",
     "espower-typescript": "^9.0.2",
     "google-closure-compiler": "^20190909.0.0",
