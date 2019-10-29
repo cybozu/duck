@@ -89,7 +89,7 @@ Options:
   -h, --help              Show help                                                      [boolean]
 ```
 
-Also see [`examples/chunks`](examples/chunks).
+Also see [`examples`](examples).
 
 ## Tips
 
