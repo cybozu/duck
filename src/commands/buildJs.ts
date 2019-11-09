@@ -126,8 +126,18 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
       if (!result.isRejected) {
         throw new Error("Unexpected state");
       }
+      const compilerError = result.reason as CompilerError;
       const { message: stderr } = result.reason as CompilerError;
-      const [command, , ...messages] = stderr.split("\n");
+      let command = "";
+      let messages: string[] = [];
+      if (compilerError.level === "error") {
+        [command, , ...messages] = stderr.split("\n");
+        // TODO: How can I get a command with a warning error
+      } else if (compilerError.level === "warning") {
+        messages = stderr.split("\n");
+      } else {
+        throw new Error(`Found an unknown compiler error level: ${compilerError.level}`);
+      }
       try {
         const items: CompileErrorItem[] = JSON.parse(messages.join("\n"));
         return {

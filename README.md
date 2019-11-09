@@ -75,6 +75,7 @@ Options:
   --config                A path to duck.config.js, the extension can be ommited          [string]
   --concurrency, -c       Concurrency limit of Closure Compiler                           [number]
   --batch                 Build in batch mode (on AWS or local for debug)[choices: "aws", "local"]
+  --strict                Treat an warning as an error                  [boolean] [default: false]
   --reporters             Test reporters ("text", "xunit" or "json")   [array] [default: ["text"]]
   --reporterOptions       Test reporter options
   --printConfig, -p       Print effective configs for compilers         [boolean] [default: false]
@@ -129,7 +130,7 @@ $ duck build --batch aws
 - Use `--batch local` for [local debugging](https://faastjs.org/docs/local)
 - Use `DEBUG=faast:info` or [other log level](https://faastjs.org/docs/workflow#debug-environment-variable) to get more debug information
 - Get `logUrl` from debug info and view it in CloudWatch logs
-- Use `FAAST_PACKAGE_DIR=foo/bar` to investigate a package sent to Lambda 
+- Use `FAAST_PACKAGE_DIR=foo/bar` to investigate a package sent to Lambda
 
 Also see [faast.js document](https://faastjs.org/docs/api/faastjs.awsoptions) for more information.
 

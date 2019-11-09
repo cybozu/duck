@@ -50,6 +50,7 @@ export type CompilerOptionsFormattingType =
 export interface ExtendedCompilerOptions {
   compilerOptions: CompilerOptions;
   batch?: "aws" | "local";
+  strict?: boolean;
   warningsWhitelist?: WarningsWhitelistItem[];
 }
 
@@ -106,7 +107,9 @@ async function compile(extendedOpts: ExtendedCompilerOptions): Promise<string> {
   return new Promise((resolve, reject) => {
     compiler.run((exitCode: number, stdout: string, stderr?: string) => {
       if (exitCode !== 0) {
-        return reject(new CompilerError(stderr || "No stderr", exitCode));
+        return reject(new CompilerError(stderr || "No stderr", exitCode, "error"));
+      } else if (extendedOpts.strict && stderr) {
+        return reject(new CompilerError(stderr, exitCode, "warning"));
       }
       resolve(stdout);
     });
@@ -135,12 +138,16 @@ function rewriteNodePathForAwsLambda(options: CompilerOptions): void {
   }
 }
 
+type ErrorLevel = "error" | "warning";
+
 export class CompilerError extends Error {
+  level: ErrorLevel;
   exitCode: number;
-  constructor(msg: string, exitCode: number) {
+  constructor(msg: string, exitCode: number, level: ErrorLevel) {
     super(msg);
     this.name = "CompilerError";
     this.exitCode = exitCode;
+    this.level = level;
   }
 }
 

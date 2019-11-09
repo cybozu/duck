@@ -192,6 +192,9 @@ export function createCompilerOptionsForPage(
   if (duckConfig.batch) {
     extendedOpts.batch = duckConfig.batch;
   }
+  if (duckConfig.strict) {
+    extendedOpts.strict = duckConfig.strict;
+  }
   return extendedOpts;
 }
 
@@ -238,6 +241,9 @@ export async function createCompilerOptionsForChunks(
   }
   if (duckConfig.batch) {
     options.batch = duckConfig.batch;
+  }
+  if (duckConfig.strict) {
+    options.strict = duckConfig.strict;
   }
   return { options, sortedChunkIds, rootChunkId: sortedChunkIds[0] };
 }

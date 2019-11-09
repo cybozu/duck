@@ -131,6 +131,11 @@ const buildJsOptions = {
     desc: "Build in batch mode (on AWS or local for debug)",
     choices: ["aws", "local"],
   },
+  strict: {
+    desc: "Treat warning as error",
+    type: "boolean",
+    default: false,
+  },
   reporters: {
     desc: 'Test reporters ("text", "xunit" or "json")',
     type: "array",

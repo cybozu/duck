@@ -19,6 +19,7 @@ export interface DuckConfig {
   soyFileRoots?: readonly string[];
   concurrency?: number;
   batch?: "aws" | "local";
+  strict?: boolean;
   batchOptions?: import("faastjs").AwsOptions | import("faastjs").LocalOptions;
   reporters?: ("json" | "text" | "xunit")[];
   reporterOptions?: {
