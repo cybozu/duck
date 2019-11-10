@@ -20,7 +20,7 @@ describe("TextReporter", () => {
       assert.equal(
         actual,
         stripIndent`
-# Compile Errors in /path/to/entryConfig.json:
+# /path/to/entryConfig.json:
 
 ${command}
 
@@ -49,7 +49,7 @@ ${command}
       assert.equal(
         actual,
         stripIndent`
-# Compile Errors in /path/to/entryConfig.json:
+# /path/to/entryConfig.json:
 
 ${command}
 
@@ -77,7 +77,7 @@ ${command}
       assert.equal(
         actual,
         stripIndent`
-# Compile Errors in /path/to/entryConfig.json:
+# /path/to/entryConfig.json:
 
 ${command}
 
@@ -103,7 +103,7 @@ ${command}
       assert.equal(
         actual,
         stripIndent`
-# Compile Errors in /path/to/entryConfig.json:
+# /path/to/entryConfig.json:
 
 ${command}
 

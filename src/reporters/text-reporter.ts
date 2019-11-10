@@ -16,7 +16,7 @@ export class TextReporter extends BaseReporter {
   }
 
   format({ entryConfigPath, command, items }: ErrorReason): string {
-    return `# Compile Errors in ${entryConfigPath}:
+    return `# ${entryConfigPath}:
 
 ${command}
 

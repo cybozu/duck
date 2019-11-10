@@ -204,7 +204,7 @@ export async function serve(config: DuckConfig, watch = true) {
       createModuleUris
     );
     updateDepsJsCache(config);
-    const chunkOutputs = await compileToJson(options);
+    const [chunkOutputs] = await compileToJson(options);
     const chunkIdToOutput: { [id: string]: CompilerOutput } = {};
     sortedChunkIds.forEach((id, index) => {
       chunkIdToOutput[id] = chunkOutputs[index];
@@ -234,7 +234,7 @@ export async function serve(config: DuckConfig, watch = true) {
     duckConfig: DuckConfig
   ) {
     const options = createCompilerOptionsForPage(entryConfig, duckConfig, false);
-    const compileOutputs = await compileToJson(options);
+    const [compileOutputs] = await compileToJson(options);
     if (compileOutputs.length !== 1) {
       throw new Error(
         `Unexpectedly chunkOutputs.length must be 1, but actual ${compileOutputs.length}`
