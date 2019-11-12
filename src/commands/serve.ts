@@ -70,10 +70,13 @@ export async function serve(config: DuckConfig, watch = true) {
   const server = await createServer(config);
 
   // static assets
-  server.use(closureLibraryUrlPath, serveStatic(config.closureLibraryDir, {
-    maxAge: "1d",
-    immutable: true,
-  }) as any);
+  server.use(
+    closureLibraryUrlPath,
+    serveStatic(config.closureLibraryDir, {
+      maxAge: "1d",
+      immutable: true,
+    }) as any
+  );
   server.use(inputsUrlPath, serveStatic(config.inputsRoot) as any);
 
   // route
