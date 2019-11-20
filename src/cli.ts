@@ -276,17 +276,23 @@ export function run(processArgv: readonly string[]): void {
     )
     .command("build:js [entryConfigDir]", "Compile JS files", buildJsOptions, async argv => {
       const config = loadConfig(argv);
+      let warnings: ErrorReason[] = [];
       const tasks = listr(
         [
           {
             title: `Compile JS files`,
-            task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+            task: wrap(async () => {
+              warnings = await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
+            }),
           },
         ],
         argv
       );
       await tasks.run().catch(printOnlyCompilationError(config));
       printResultInfo();
+      if (warnings.length > 0 && !argv.printConfig) {
+        reportTestResults(warnings, config);
+      }
     })
     .command("build:soy", "Compile Soy templates", buildSoyOptions, async argv => {
       const config = loadConfig(argv);
