@@ -1,5 +1,4 @@
 import assert = require("assert");
-import { stripIndent } from "common-tags";
 import { TextReporter } from "../src/reporters/text-reporter";
 
 describe("TextReporter", () => {
@@ -49,13 +48,13 @@ describe("TextReporter", () => {
       });
       assert.equal(
         actual,
-        stripIndent`
-# /path/to/entryConfig.json:
+        `# /path/to/entryConfig.json:
 
 ${command}
 
 /path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - [JSC_DEPRECATED_CLASS_REASON] Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.
-  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^`
+  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^
+`
       );
     });
 
@@ -77,12 +76,12 @@ ${command}
       });
       assert.equal(
         actual,
-        stripIndent`
-# /path/to/entryConfig.json:
+        `# /path/to/entryConfig.json:
 
 ${command}
 
-/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - [JSC_DEPRECATED_CLASS_REASON] Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.`
+/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - [JSC_DEPRECATED_CLASS_REASON] Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.
+`
       );
     });
 
@@ -103,12 +102,12 @@ ${command}
       });
       assert.equal(
         actual,
-        stripIndent`
-# /path/to/entryConfig.json:
+        `# /path/to/entryConfig.json:
 
 ${command}
 
-/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.`
+/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.
+`
       );
     });
   });

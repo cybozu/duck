@@ -23,12 +23,10 @@ export class TextReporter extends BaseReporter {
       return "";
     }
     return `# ${entryConfigPath}:
-
-${command}
-
+${command ? `\n${command}\n` : ""}
 ${items
   .map(item => (item.level === "info" ? item.description : this.formatErrorCase(item)))
-  .join("\n\n")}`;
+  .join("\n\n")}\n`;
   }
 
   private formatErrorCase(item: CompileErrorCase): string {

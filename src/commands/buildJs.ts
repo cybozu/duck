@@ -17,7 +17,7 @@ import { DuckConfig } from "../duckconfig";
 import { EntryConfig, loadEntryConfig } from "../entryconfig";
 import { restoreDepsJs } from "../gendeps";
 import { logger } from "../logger";
-import { CompileErrorItem } from "../report";
+import { CompileErrorItem, ErrorReason } from "../report";
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
@@ -125,7 +125,7 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
         // no errors, but it may contain warnings
         return {
           entryConfigPath: result.entryConfigPath,
-          command: "",
+          command: null,
           items: result.value || [],
         };
       } else {
@@ -151,12 +151,6 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
   }
   return reasons;
 }
-interface ErrorReason {
-  entryConfigPath: string;
-  command: string;
-  items: CompileErrorItem[];
-}
-
 export class BuildJsCompilationError extends Error {
   reasons: readonly ErrorReason[];
   constructor(reasons: readonly ErrorReason[], totalSize: number) {
