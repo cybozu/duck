@@ -122,7 +122,9 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
     }))
     .map(result => {
       if (result.isFulfilled) {
-        if (result.value) {
+        // if items doesn't include any warnings, we ignore the line of summary
+        // 0 error(s), 0 warning(s), xx% typed
+        if (result.value && result.value.length > 1) {
           return {
             entryConfigPath: result.entryConfigPath,
             command: "",
@@ -150,7 +152,8 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
           throw new Error(`Unexpected non-JSON error: ${stderr}`);
         }
       }
-    });
+    })
+    .filter(result => result.items.length > 0);
   if (results.filter(result => result.isRejected).length > 0) {
     throw new BuildJsCompilationError(reasons, results.length);
   }

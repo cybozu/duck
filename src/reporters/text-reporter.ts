@@ -16,6 +16,9 @@ export class TextReporter extends BaseReporter {
   }
 
   format({ entryConfigPath, command, items }: ErrorReason): string {
+    if (items.length === 0) {
+      return "";
+    }
     return `# ${entryConfigPath}:
 
 ${command}
