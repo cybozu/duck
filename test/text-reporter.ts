@@ -10,22 +10,23 @@ describe("TextReporter", () => {
     beforeEach(() => {
       reporter = new TextReporter();
     });
-    it("success", async () => {
-      // TODO: don't report as errors
+
+    it("success (no items)", async () => {
       const actual = reporter.format({
         entryConfigPath,
         command,
-        items: [{ level: "info", description: "89 error(s), 5 warning(s), 98.4% typed" }],
+        items: [],
       });
-      assert.equal(
-        actual,
-        stripIndent`
-# /path/to/entryConfig.json:
+      assert.equal(actual, "");
+    });
 
-${command}
-
-89 error(s), 5 warning(s), 98.4% typed`
-      );
+    it("success (ignore only info)", async () => {
+      const actual = reporter.format({
+        entryConfigPath,
+        command,
+        items: [{ level: "info", description: "0 error(s), 0 warning(s), 98.4% typed" }],
+      });
+      assert.equal(actual, "");
     });
 
     it("error", async () => {

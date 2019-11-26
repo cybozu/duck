@@ -122,22 +122,14 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
     }))
     .map(result => {
       if (result.isFulfilled) {
-        // if items doesn't include any warnings, we ignore the line of summary
-        // 0 error(s), 0 warning(s), xx% typed
-        if (result.value && result.value.length > 1) {
-          return {
-            entryConfigPath: result.entryConfigPath,
-            command: "",
-            items: result.value,
-          };
-        } else {
-          return {
-            entryConfigPath: result.entryConfigPath,
-            command: "",
-            items: [],
-          };
-        }
+        // no errors, but it may contain warnings
+        return {
+          entryConfigPath: result.entryConfigPath,
+          command: "",
+          items: result.value || [],
+        };
       } else {
+        // has some errors
         const { message: stderr } = result.reason as CompilerError;
         const [command, , ...messages] = stderr.split("\n");
         try {

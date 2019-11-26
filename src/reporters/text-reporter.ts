@@ -16,7 +16,10 @@ export class TextReporter extends BaseReporter {
   }
 
   format({ entryConfigPath, command, items }: ErrorReason): string {
-    if (items.length === 0) {
+    // if items doesn't include any errors or warnings,
+    // we ignore "info" that includes the line of summary like:
+    // "0 error(s), 0 warning(s), xx% typed"
+    if (items.filter(i => i.level !== "info").length === 0) {
       return "";
     }
     return `# ${entryConfigPath}:
