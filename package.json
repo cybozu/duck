@@ -38,7 +38,7 @@
     "faastjs": "^3.0.13",
     "fastify": "^2.10.0",
     "glob": "^7.1.6",
-    "google-closure-deps": "<=20191111.0.0",
+    "google-closure-deps": ">=20190325.0.0 <=20191027.0.0 || >=20191111.0.0",
     "listr": "^0.14.3",
     "merge-options": "^2.0.0",
     "p-limit": "^2.2.1",
