@@ -24,7 +24,7 @@ export interface CompileErrorInfo {
 export interface ErrorReason {
   entryConfigPath: string;
   /**
-   * nullable because google-closure-compiler doesn't include command info when when it's a warning.
+   * nullable because google-closure-compiler doesn't include command info when it's a warning.
    */
   command: string | null;
   items: readonly CompileErrorItem[];
