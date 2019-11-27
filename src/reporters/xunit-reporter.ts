@@ -19,7 +19,7 @@ export class XUnitReporter extends BaseReporter {
     });
   }
 
-  format({ entryConfigPath, command, items }: ErrorReason): string {
+  format({ entryConfigPath, items }: ErrorReason): string {
     const testsuites = xmlbuilder.create("testsuites");
     const testsuite = testsuites.element("testsuite").attribute("name", entryConfigPath);
     const errors = items.filter(item => item.level === "error") as CompileErrorCase[];

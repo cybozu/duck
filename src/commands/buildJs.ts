@@ -17,7 +17,7 @@ import { DuckConfig } from "../duckconfig";
 import { EntryConfig, loadEntryConfig } from "../entryconfig";
 import { restoreDepsJs } from "../gendeps";
 import { logger } from "../logger";
-import { CompileErrorItem } from "../report";
+import { CompileErrorItem, ErrorReason } from "../report";
 
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
@@ -29,7 +29,7 @@ export async function buildJs(
   config: DuckConfig,
   entryConfigs?: readonly string[],
   printConfig = false
-): Promise<any> {
+): Promise<ErrorReason[]> {
   let compileFn = compileToJson;
   let faastModule: import("faastjs").FaastModule<typeof compilerCoreFunctions> | null = null;
   if (config.batch) {
@@ -72,13 +72,14 @@ export async function buildJs(
         }
 
         logWithCount(entryConfigPath, runningJobCount++, "Compiling");
-        const outputs = await compileFn(options);
+        const [outputs, warnings] = await compileFn(options);
         const promises = outputs.map(async output => {
           await mkdir(path.dirname(output.path), { recursive: true });
           return writeFile(output.path, output.src);
         });
         await Promise.all(promises);
         logWithCount(entryConfigPath, completedJobCount++, "Compiled");
+        return warnings;
       } catch (e) {
         logWithCount(entryConfigPath, completedJobCount++, "Failed");
         throw e;
@@ -87,7 +88,7 @@ export async function buildJs(
   );
 
   try {
-    await waitAllAndThrowIfAnyCompilationsFailed(promises, entryConfigPaths);
+    return await waitAllAndThrowIfAnyCompilationsFailed(promises, entryConfigPaths);
   } finally {
     if (faastModule) {
       await faastModule.cleanup();
@@ -110,46 +111,46 @@ export async function buildJs(
  * @throws BuildJsCompilationError
  */
 async function waitAllAndThrowIfAnyCompilationsFailed(
-  promises: readonly Promise<void>[],
+  promises: readonly Promise<CompileErrorItem[] | undefined>[],
   entryConfigPaths: readonly string[]
-): Promise<void> {
+): Promise<ErrorReason[]> {
   const results = await pSettled(promises);
   const reasons: ErrorReason[] = results
-    .map((result, idx) => {
-      return {
-        ...result,
-        entryConfigPath: entryConfigPaths[idx],
-      };
-    })
-    .filter(result => result.isRejected)
+    .map((result, idx) => ({
+      ...result,
+      entryConfigPath: entryConfigPaths[idx],
+    }))
     .map(result => {
-      if (!result.isRejected) {
-        throw new Error("Unexpected state");
-      }
-      const { message: stderr } = result.reason as CompilerError;
-      const [command, , ...messages] = stderr.split("\n");
-      try {
-        const items: CompileErrorItem[] = JSON.parse(messages.join("\n"));
+      if (result.isFulfilled) {
+        // no errors, but it may contain warnings
         return {
           entryConfigPath: result.entryConfigPath,
-          command,
-          items,
+          command: null,
+          items: result.value || [],
         };
-      } catch {
-        // for invalid compiler options errors
-        throw new Error(`Unexpected non-JSON error: ${stderr}`);
+      } else {
+        // has some errors
+        const { message: stderr } = result.reason as CompilerError;
+        const [command, , ...messages] = stderr.split("\n");
+        try {
+          const items: CompileErrorItem[] = JSON.parse(messages.join("\n"));
+          return {
+            entryConfigPath: result.entryConfigPath,
+            command,
+            items,
+          };
+        } catch {
+          // for invalid compiler options errors
+          throw new Error(`Unexpected non-JSON error: ${stderr}`);
+        }
       }
-    });
-  if (reasons.length > 0) {
+    })
+    .filter(result => result.items.length > 0);
+  if (results.filter(result => result.isRejected).length > 0) {
     throw new BuildJsCompilationError(reasons, results.length);
   }
+  return reasons;
 }
-interface ErrorReason {
-  entryConfigPath: string;
-  command: string;
-  items: CompileErrorItem[];
-}
-
 export class BuildJsCompilationError extends Error {
   reasons: readonly ErrorReason[];
   constructor(reasons: readonly ErrorReason[], totalSize: number) {

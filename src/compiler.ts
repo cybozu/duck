@@ -14,7 +14,13 @@ import { DuckConfig } from "./duckconfig";
 import { createDag, EntryConfig, PlovrMode, WarningsWhitelistItem } from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
 
-export { CompilerError, CompilerOptions, compileToJson, convertToFlagfile } from "./compiler-core";
+export {
+  CompilerError,
+  CompilerOptions,
+  CompilerOutput,
+  compileToJson,
+  convertToFlagfile,
+} from "./compiler-core";
 
 /**
  * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.
@@ -161,12 +167,6 @@ function createBaseOptions(
   }
 
   return opts;
-}
-
-export interface CompilerOutput {
-  path: string;
-  src: string;
-  source_map: string;
 }
 
 export function createCompilerOptionsForPage(

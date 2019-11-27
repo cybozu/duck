@@ -4,6 +4,7 @@ import { dirname } from "path";
 import * as tempy from "tempy";
 import { WarningsWhitelistItem } from "./entryconfig";
 import { logger } from "./logger";
+import { CompileErrorItem } from "./report";
 
 export interface CompilerOptions {
   [idx: string]: any;
@@ -56,7 +57,7 @@ export interface ExtendedCompilerOptions {
 export interface CompilerOutput {
   path: string;
   src: string;
-  source_map: string;
+  source_map?: string;
 }
 
 /**
@@ -64,24 +65,29 @@ export interface CompilerOutput {
  */
 export async function compileToJson(
   extendedOpts: ExtendedCompilerOptions
-): Promise<CompilerOutput[]> {
+): Promise<[CompilerOutput[], CompileErrorItem[]]> {
   extendedOpts.compilerOptions = {
     ...extendedOpts.compilerOptions,
     json_streams: "OUT",
     error_format: "JSON",
   };
-  const outputs: CompilerOutput[] = JSON.parse(await compile(extendedOpts));
+  const { stdout, stderr } = await compile(extendedOpts);
+  const outputs: CompilerOutput[] = JSON.parse(stdout);
+  const warnings: CompileErrorItem[] = stderr ? JSON.parse(stderr) : [];
   if (extendedOpts.batch) {
-    // Reduce transfer size in batch mode.
+    // Delete `source_map` to reduce transfer size in batch mode.
     // The maximum request/response size of AWS Lambda is 6MB each.
     // See https://faastjs.org/docs/aws#queue-vs-https-mode
-    return outputs.map(({ path, src }) => ({ path, src, source_map: "" }));
-  } else {
-    return outputs;
+    for (const output of outputs) {
+      delete output.source_map;
+    }
   }
+  return [outputs, warnings];
 }
 
-async function compile(extendedOpts: ExtendedCompilerOptions): Promise<string> {
+async function compile(
+  extendedOpts: ExtendedCompilerOptions
+): Promise<{ stdout: string; stderr: string | undefined }> {
   let opts = extendedOpts.compilerOptions;
   if (isInAwsLambda()) {
     rewriteNodePathForAwsLambda(opts);
@@ -108,7 +114,7 @@ async function compile(extendedOpts: ExtendedCompilerOptions): Promise<string> {
       if (exitCode !== 0) {
         return reject(new CompilerError(stderr || "No stderr", exitCode));
       }
-      resolve(stdout);
+      resolve({ stdout, stderr });
     });
   });
 }

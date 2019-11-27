@@ -1,5 +1,4 @@
 import assert = require("assert");
-import { stripIndent } from "common-tags";
 import { TextReporter } from "../src/reporters/text-reporter";
 
 describe("TextReporter", () => {
@@ -10,22 +9,23 @@ describe("TextReporter", () => {
     beforeEach(() => {
       reporter = new TextReporter();
     });
-    it("success", async () => {
-      // TODO: don't report as errors
+
+    it("success (no items)", async () => {
       const actual = reporter.format({
         entryConfigPath,
         command,
-        items: [{ level: "info", description: "89 error(s), 5 warning(s), 98.4% typed" }],
+        items: [],
       });
-      assert.equal(
-        actual,
-        stripIndent`
-# Compile Errors in /path/to/entryConfig.json:
+      assert.equal(actual, "");
+    });
 
-${command}
-
-89 error(s), 5 warning(s), 98.4% typed`
-      );
+    it("success (ignore only info)", async () => {
+      const actual = reporter.format({
+        entryConfigPath,
+        command,
+        items: [{ level: "info", description: "0 error(s), 0 warning(s), 98.4% typed" }],
+      });
+      assert.equal(actual, "");
     });
 
     it("error", async () => {
@@ -48,13 +48,13 @@ ${command}
       });
       assert.equal(
         actual,
-        stripIndent`
-# Compile Errors in /path/to/entryConfig.json:
+        `# /path/to/entryConfig.json:
 
 ${command}
 
 /path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - [JSC_DEPRECATED_CLASS_REASON] Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.
-  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^`
+  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^
+`
       );
     });
 
@@ -76,12 +76,12 @@ ${command}
       });
       assert.equal(
         actual,
-        stripIndent`
-# Compile Errors in /path/to/entryConfig.json:
+        `# /path/to/entryConfig.json:
 
 ${command}
 
-/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - [JSC_DEPRECATED_CLASS_REASON] Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.`
+/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - [JSC_DEPRECATED_CLASS_REASON] Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.
+`
       );
     });
 
@@ -102,12 +102,12 @@ ${command}
       });
       assert.equal(
         actual,
-        stripIndent`
-# Compile Errors in /path/to/entryConfig.json:
+        `# /path/to/entryConfig.json:
 
 ${command}
 
-/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.`
+/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.
+`
       );
     });
   });

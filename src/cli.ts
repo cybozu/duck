@@ -16,7 +16,7 @@ import { cleanSoy, CleanSoyConfig } from "./commands/cleanSoy";
 import { serve } from "./commands/serve";
 import { DuckConfig, loadConfig } from "./duckconfig";
 import { setGlobalLogger } from "./logger";
-import { reportTestResults } from "./report";
+import { ErrorReason, reportTestResults } from "./report";
 
 assertNodeVersionGte(process.version, 10);
 
@@ -243,6 +243,7 @@ export function run(processArgv: readonly string[]): void {
       },
       async argv => {
         const config = loadConfig(argv);
+        let warnings: ErrorReason[] = [];
         const tasks = listr(
           [
             {
@@ -259,28 +260,39 @@ export function run(processArgv: readonly string[]): void {
             },
             {
               title: `Compile JS files`,
-              task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+              task: wrap(async () => {
+                warnings = await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
+              }),
             },
           ],
           argv
         );
         await tasks.run().catch(printOnlyCompilationError(config));
         printResultInfo();
+        if (warnings.length > 0 && !argv.printConfig) {
+          reportTestResults(warnings, config);
+        }
       }
     )
     .command("build:js [entryConfigDir]", "Compile JS files", buildJsOptions, async argv => {
       const config = loadConfig(argv);
+      let warnings: ErrorReason[] = [];
       const tasks = listr(
         [
           {
             title: `Compile JS files`,
-            task: wrap(() => buildJs(config, argv.entryConfigs as string[], argv.printConfig)),
+            task: wrap(async () => {
+              warnings = await buildJs(config, argv.entryConfigs as string[], argv.printConfig);
+            }),
           },
         ],
         argv
       );
       await tasks.run().catch(printOnlyCompilationError(config));
       printResultInfo();
+      if (warnings.length > 0 && !argv.printConfig) {
+        reportTestResults(warnings, config);
+      }
     })
     .command("build:soy", "Compile Soy templates", buildSoyOptions, async argv => {
       const config = loadConfig(argv);

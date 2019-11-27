@@ -16,13 +16,17 @@ export class TextReporter extends BaseReporter {
   }
 
   format({ entryConfigPath, command, items }: ErrorReason): string {
-    return `# Compile Errors in ${entryConfigPath}:
-
-${command}
-
+    // if items doesn't include any errors or warnings,
+    // we ignore "info" that includes the line of summary like:
+    // "0 error(s), 0 warning(s), xx% typed"
+    if (items.filter(i => i.level !== "info").length === 0) {
+      return "";
+    }
+    return `# ${entryConfigPath}:
+${command ? `\n${command}\n` : ""}
 ${items
   .map(item => (item.level === "info" ? item.description : this.formatErrorCase(item)))
-  .join("\n\n")}`;
+  .join("\n\n")}\n`;
   }
 
   private formatErrorCase(item: CompileErrorCase): string {
