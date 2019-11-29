@@ -131,7 +131,7 @@ module.exports = {
    */
   // Concurrency of Closure Compiler (default: 1,000 if AWS batch mode, otherwise 1)
   concurrency: 4,
-  // Build in batch mode on "aws" for production or "local" for debug (default: disabled)
+  // Build in batch mode with faast.js on "aws" for production or "local" for debug (default: disabled)
   batch: "aws",
   // Options for faast.js in batch mode. See https://faastjs.org/docs/api/faastjs.awsoptions
   batchOptions: {},
@@ -151,7 +151,7 @@ module.exports = {
   /**
    * Serve
    */
-  // (Required) A root directory scanned to build deps.js and delivered as static assets in serve command
+  // (Required) A root directory scanned to build deps.js and delivered as static assets
   inputsRoot: "src/inputs",
   // Hostname for serve command (default: 0.0.0.0)
   host: "localhost",
@@ -159,7 +159,7 @@ module.exports = {
   port:  1234,
   // Use HTTP/2 in serve command (deafult: false)
   http2: true,
-  // Settings for HTTPS (HTTP/2). If this property is specified, TLS is used in serve command.
+  // Settings for HTTPS (HTTP/2) (default: not specified, HTTP is used)
   https: {
     // A path to a private key
     keyPath: "path/to/key.pem",
