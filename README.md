@@ -89,6 +89,86 @@ Options:
   -h, --help              Show help                                                      [boolean]
 ```
 
+## `duck.config.js`
+
+Create a config file `duck.config.js` or `duck.config.json` on your project root.
+Set every path as a relative path from the location of `duck.config.js`.
+
+```js
+module.exports = {
+  /**
+   * Common settings
+   */
+  // (Required) A path to Closure Library direcotry
+  closureLibraryDir: "node_modules/google-closure-library",
+  // (Required) A directory where entry config JSONs are stored flat
+  entryConfigDir: "entry-configs",
+
+  /**
+   * Generating and loading deps.js
+   */
+  // A path to deps.js to save and load in build and serve commands
+  depsJs: "build/deps.js",
+  // Directories ignored when building deps.js
+  depsJsIgnoreDirs: ["src/third_party"],
+  // The number of workers to build deps.js. Node v10 uses processes and node v12+ uses threads. (default: 4)
+  depsWorkers: 2,
+
+  /**
+   * Building Soy
+   */
+  // (Required) A path to Closure Templates JAR
+  soyJarPath: "lib/closure-templates.jar",
+  // (Required) Directories where Closure Templates .soy files are stored
+  soyFileRoots: ["src/soy"],
+  // CLI options for Closure Templates
+  soyOptions: {
+    shouldGenerateJsdoc: true,
+  },
+
+  /**
+   * Compiling JavaScript
+   */
+  // Concurrency of Closure Compiler (default: 1,000 if AWS batch mode, otherwise 1)
+  concurrency: 4,
+  // Build in batch mode on "aws" for production or "local" for debug (default: disabled)
+  batch: "aws",
+  // Options for faast.js in batch mode. See https://faastjs.org/docs/api/faastjs.awsoptions
+  batchOptions: {},
+  // Reporters (choose from "json", "text" or "xunit")
+  reporters: ["text", "xunit"],
+  // Options for each test reporter
+  reporterOptions: {
+    text: {
+      // Output errors to stderr or not
+      stderr: false,
+      // A directory where reporters output
+      outputDir: "test-results/text",
+    },
+    xunit: {},
+  },
+
+  /**
+   * Serve
+   */
+  // (Required) A root directory scanned to build deps.js and delivered as static assets in serve command
+  inputsRoot: "src/inputs",
+  // Hostname for serve command (default: 0.0.0.0)
+  host: "localhost",
+  // Port number for serve command (default: 9810)
+  port:  1234,
+  // Use HTTP/2 in serve command (deafult: false)
+  http2: true,
+  // Settings for HTTPS (HTTP/2). If this property is specified, TLS is used in serve command.
+  https: {
+    // A path to a private key
+    keyPath: "path/to/key.pem",
+    // A path to a self-signed certificate
+    certPath: "path/to/cert.pem",
+  },
+}
+```
+
 Also see [`examples`](examples).
 
 ## Tips
