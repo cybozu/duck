@@ -88,8 +88,9 @@ function createBaseOptions(
     }
   } else {
     // for pages
-    // `STRICT` is deprecated in google-closure-compiler@20181205.
-    // TODO: use `PRUNE` instead and drop support earlier than v20181205.
+    // `STRICT` was deprecated in google-closure-compiler@20181125 and removed in master at 20191203.
+    // See: https://github.com/google/closure-compiler/commit/0c8ae0ec822e89aa82f8b7604fd5a68bc30f77ea
+    // TODO: Use `PRUNE` instead for later than v20191203.
     opts.dependency_mode = "STRICT";
     const js = entryConfig.paths.slice();
     if (entryConfig.externs) {
