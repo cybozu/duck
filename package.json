@@ -58,7 +58,7 @@
     "zet": "^1.1.0"
   },
   "peerDependencies": {
-    "google-closure-compiler": ">=20180101.0.0"
+    "google-closure-compiler": ">=20180910.1.0"
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.0",

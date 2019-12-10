@@ -143,33 +143,5 @@ describe("XUnitReporter", () => {
       </testsuites>`.replace(/%%newline%%/g, "\n")
       );
     });
-
-    it("error without key", async () => {
-      const actual = reporter.format({
-        entryConfigPath,
-        command,
-        items: [
-          {
-            level: "error",
-            description:
-              "Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.",
-            source: "/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js",
-            line: 57,
-            column: 32,
-          },
-        ],
-      });
-      assert.equal(
-        actual,
-        oneLineTrim`<?xml version="1.0"?>
-      <testsuites>
-        <testsuite name="${entryConfigPath}">
-          <testcase classname="/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js" name="Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.">
-            <failure message="Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead. (line 57, col 32)"/>
-          </testcase>
-        </testsuite>
-      </testsuites>`.replace(/%%newline%%/g, "\n")
-      );
-    });
   });
 });
