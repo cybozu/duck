@@ -52,7 +52,7 @@
     "split2": "^3.1.1",
     "strip-json-comments": "^3.0.1",
     "tempy": "^0.3.0",
-    "workerpool": "^5.0.2",
+    "workerpool": "^5.0.3",
     "xmlbuilder": "^13.0.2",
     "yargs": "^15.0.2",
     "zet": "^1.1.0"
