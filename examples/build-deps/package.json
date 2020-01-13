@@ -12,7 +12,7 @@
   "license": "MIT",
   "devDependencies": {
     "@teppeis/duck": "file:../..",
-    "google-closure-deps": "^20190325.0.0",
-    "google-closure-library": "^20190325.0.0"
+    "google-closure-deps": "^20200101.0.0",
+    "google-closure-library": "^20200101.0.0"
   }
 }
