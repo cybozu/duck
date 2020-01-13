@@ -1,6 +1,5 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import path from "path";
-import util from "util";
 import { resultInfoLogType } from "../cli";
 import { DuckConfig } from "../duckconfig";
 import { generateDepFileTextFromDeps, getDependencies } from "../gendeps";
@@ -16,9 +15,9 @@ export async function buildDeps(config: DuckConfig): Promise<void> {
     config.depsWorkers
   );
   logger.info(`Generating deps.js`);
-  const fileText = await generateDepFileTextFromDeps(deps, googBaseDir);
+  const fileText = generateDepFileTextFromDeps(deps, googBaseDir);
   if (config.depsJs) {
-    await util.promisify(fs.writeFile)(config.depsJs, fileText);
+    await fs.writeFile(config.depsJs, fileText);
     logger.info(`Generated: ${config.depsJs}`);
   } else {
     logger.info({

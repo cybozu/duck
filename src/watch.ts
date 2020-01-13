@@ -1,7 +1,6 @@
 import chokidar from "chokidar";
-import fs from "fs";
+import { promises as fs } from "fs";
 import path from "path";
-import util from "util";
 import { clearEntryIdToChunkCache } from "./commands/serve";
 import { DuckConfig } from "./duckconfig";
 import { removeDepCacheByPath } from "./gendeps";
@@ -82,7 +81,7 @@ async function handleSoyUpdated(
 async function handleSoyDeleted(config: SoyConfig, filepath: string) {
   logger.info(`[SOY_DELETED]: ${path.relative(process.cwd(), filepath)}`);
   const outputPath = calcOutputPath(filepath, config);
-  await util.promisify(fs.unlink)(outputPath);
+  await fs.unlink(outputPath);
   logger.info(`Removed: ${outputPath}`);
 }
 

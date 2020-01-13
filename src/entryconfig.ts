@@ -1,7 +1,6 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import path from "path";
 import stripJsonComments from "strip-json-comments";
-import util from "util";
 import { Dag, Node } from "./dag";
 
 export interface EntryConfig {
@@ -133,10 +132,7 @@ export async function loadEntryConfig(
  * Load and normalize an EntryConfig JSON file including comments
  */
 async function loadJson(jsonPath: string): Promise<EntryConfig> {
-  const content = await util.promisify(fs.readFile)(
-    path.join(jsonPath),
-    "utf8"
-  );
+  const content = await fs.readFile(path.join(jsonPath), "utf8");
   return normalize(JSON.parse(stripJsonComments(content)));
 }
 
