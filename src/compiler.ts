@@ -1,7 +1,9 @@
 import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
+import compilerPkg from "google-closure-compiler/package.json";
 import { depGraph } from "google-closure-deps";
 import path from "path";
+import semver from "semver";
 import { assertNonNullable } from "./assert";
 import {
   CompilationLevel,
@@ -88,10 +90,9 @@ function createBaseOptions(
     }
   } else {
     // for pages
-    // `STRICT` was deprecated in google-closure-compiler@20181125 and removed in master at 20191203.
+    // `STRICT` was deprecated with `PRUNE` in google-closure-compiler@v20181125 and removed in v20200101.
     // See: https://github.com/google/closure-compiler/commit/0c8ae0ec822e89aa82f8b7604fd5a68bc30f77ea
-    // TODO: Use `PRUNE` instead for later than v20191203.
-    opts.dependency_mode = "PRUNE";
+    opts.dependency_mode = semver.lt(compilerPkg.version, "20181125.0.0") ? "STRICT" : "PRUNE";
     const js = entryConfig.paths.slice();
     if (entryConfig.externs) {
       js.push(...entryConfig.externs.map(extern => `!${extern}`));
