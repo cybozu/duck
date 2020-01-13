@@ -7,7 +7,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=10.12"
+    "node": ">=10.17"
   },
   "main": "lib/compiler.js",
   "types": "lib/compiler.d.ts",

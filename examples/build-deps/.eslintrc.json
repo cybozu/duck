@@ -1,15 +1,23 @@
 {
+  "extends": ["teppeis/+closure"],
   "globals": {
     "app": true,
     "goog": "readonly"
   },
   "overrides": [
     {
-      "files": [
-        "./esm*.js"
-      ],
+      "files": ["./esm*.js"],
       "parserOptions": {
         "sourceType": "module"
+      },
+      "rules": {
+        "node/no-unsupported-features/es-syntax": [
+          "error",
+          {
+            "version": ">=10.17.0 <11",
+            "ignores": ["modules"]
+          }
+        ]
       }
     }
   ]
