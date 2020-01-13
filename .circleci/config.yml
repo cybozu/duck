@@ -22,7 +22,7 @@ commands:
           command: |
             cd examples/build-and-serve
             npm i
-            npm run build
+            npm run build:ci
       - run:
           name: Test in the oldest Google Closure Tools
           command: |
@@ -32,7 +32,7 @@ commands:
           name: Test examples in the oldest Google Closure Tools
           command: |
             cd examples/build-and-serve
-            npm run build
+            npm run build:ci
       - run:
           name: Report coverage to codecov
           command: |
