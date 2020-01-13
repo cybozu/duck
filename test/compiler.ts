@@ -31,7 +31,7 @@ describe("compiler", () => {
       );
       const expected: ExtendedCompilerOptions = {
         compilerOptions: {
-          dependency_mode: "STRICT",
+          dependency_mode: "PRUNE",
           json_streams: "OUT",
           compilation_level: "WHITESPACE",
           js: ["/path/to/path1"],
@@ -57,7 +57,7 @@ describe("compiler", () => {
       );
       const expected: ExtendedCompilerOptions = {
         compilerOptions: {
-          dependency_mode: "STRICT",
+          dependency_mode: "PRUNE",
           json_streams: "OUT",
           compilation_level: "WHITESPACE",
           js: ["/path/to/path1"],
@@ -123,7 +123,7 @@ describe("compiler", () => {
       );
       const expected: ExtendedCompilerOptions = {
         compilerOptions: {
-          dependency_mode: "STRICT",
+          dependency_mode: "PRUNE",
           compilation_level: "SIMPLE",
           js: ["/path/to/path1", "!/extern1.js"],
           entry_point: ["/input1.js"],
@@ -163,7 +163,7 @@ describe("compiler", () => {
     );
     const expected: ExtendedCompilerOptions = {
       compilerOptions: {
-        dependency_mode: "STRICT",
+        dependency_mode: "PRUNE",
         json_streams: "OUT",
         compilation_level: "WHITESPACE",
         externs: [relative("/path/to/extern1.js")],
