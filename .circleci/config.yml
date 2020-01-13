@@ -26,6 +26,11 @@ commands:
       - run:
           name: Test in the oldest Google Closure Tools
           command: |
+            # Run npm install in the child's directory first.
+            # Otherwise, the dependencies of the referenced parent will be restored based on the package-lock.json of the child.
+            cd examples/build-and-serve
+            npm i --no-save google-closure-library@20180910
+            cd ../../
             npm i --no-save google-closure-compiler@20180910 google-closure-deps@20190325
             npm run unit
       - run:
