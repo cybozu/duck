@@ -18,10 +18,21 @@ commands:
           name: Test
           command: npm test
       - run:
+          name: Test examples
+          command: |
+            cd examples/build-and-serve
+            npm i
+            npm run build
+      - run:
           name: Test in the oldest Google Closure Tools
           command: |
             npm i --no-save google-closure-compiler@20180910 google-closure-deps@20190325
             npm run unit
+      - run:
+          name: Test examples in the oldest Google Closure Tools
+          command: |
+            cd examples/build-and-serve
+            npm run build
       - run:
           name: Report coverage to codecov
           command: |
