@@ -16,6 +16,11 @@ function relative(filepath: string): string {
   return path.relative(process.cwd(), filepath);
 }
 
+/**
+ * See https://github.com/teppeis/duck/pull/361
+ */
+const DEPS_MODE_FOR_PAGE = process.env.OLDEST_COMPILER ? "STRICT" : "PRUNE";
+
 describe("compiler", () => {
   describe("createComiplerOptionsForPage()", () => {
     it("minimum", async () => {
@@ -31,7 +36,7 @@ describe("compiler", () => {
       );
       const expected: ExtendedCompilerOptions = {
         compilerOptions: {
-          dependency_mode: "PRUNE",
+          dependency_mode: DEPS_MODE_FOR_PAGE,
           json_streams: "OUT",
           compilation_level: "WHITESPACE",
           js: ["/path/to/path1"],
@@ -57,7 +62,7 @@ describe("compiler", () => {
       );
       const expected: ExtendedCompilerOptions = {
         compilerOptions: {
-          dependency_mode: "PRUNE",
+          dependency_mode: DEPS_MODE_FOR_PAGE,
           json_streams: "OUT",
           compilation_level: "WHITESPACE",
           js: ["/path/to/path1"],
@@ -123,7 +128,7 @@ describe("compiler", () => {
       );
       const expected: ExtendedCompilerOptions = {
         compilerOptions: {
-          dependency_mode: "PRUNE",
+          dependency_mode: DEPS_MODE_FOR_PAGE,
           compilation_level: "SIMPLE",
           js: ["/path/to/path1", "!/extern1.js"],
           entry_point: ["/input1.js"],
@@ -163,7 +168,7 @@ describe("compiler", () => {
     );
     const expected: ExtendedCompilerOptions = {
       compilerOptions: {
-        dependency_mode: "PRUNE",
+        dependency_mode: DEPS_MODE_FOR_PAGE,
         json_streams: "OUT",
         compilation_level: "WHITESPACE",
         externs: [relative("/path/to/extern1.js")],

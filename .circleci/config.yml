@@ -32,7 +32,7 @@ commands:
             npm i --no-save google-closure-library@20180910
             cd ../../
             npm i --no-save google-closure-compiler@20180910 google-closure-deps@20190325
-            npm run unit
+            OLDEST_COMPILER=1 npm run unit
       - run:
           name: Test examples in the oldest Google Closure Tools
           command: |
