@@ -83,7 +83,7 @@
     "nyc": "^15.0.0",
     "power-assert": "^1.6.1",
     "rimraf": "^3.0.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "homepage": "https://github.com/teppeis/duck",
   "repository": {
