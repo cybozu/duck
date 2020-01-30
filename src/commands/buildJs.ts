@@ -161,6 +161,23 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
     throw new BuildJsCompilationError(reasons, results.length);
   }
   return reasons;
+
+  function deleteLogUrl(input: string[]) {
+    const messages = [...input];
+    const lastIndex = messages.length - 1;
+    let message = messages[lastIndex];
+    if (message.startsWith(":")) {
+      message = message.substring(1).trim();
+
+      try {
+        new URL(message); // check valid URL
+        messages.splice(lastIndex, 1); // delete logUrl
+      } catch (e) {
+        // do nothing
+      }
+    }
+    return messages;
+  }
 }
 export class BuildJsCompilationError extends Error {
   reasons: readonly ErrorReason[];
