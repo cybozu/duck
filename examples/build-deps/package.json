@@ -1,7 +1,7 @@
 {
   "name": "closure-scripts",
   "version": "1.0.0",
-  "author": "Teppei Sato <teppeis@gmail.com>",
+  "author": "Cybozu, Inc.",
   "main": "index.js",
   "scripts": {
     "deps": "duck build:deps",
@@ -11,7 +11,7 @@
   "keywords": [],
   "license": "MIT",
   "devDependencies": {
-    "@teppeis/duck": "file:../..",
+    "@cybozu/duck": "file:../..",
     "google-closure-deps": "^20200101.0.0",
     "google-closure-library": "^20200101.0.0"
   }

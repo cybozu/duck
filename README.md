@@ -1,4 +1,4 @@
-# @teppeis/duck
+# @cybozu/duck
 
 Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to [plovr](https://github.com/bolinfest/plovr).
 
@@ -16,7 +16,7 @@ Status: **_WIP_**
 ## Install
 
 ```console
-$ npm i -D @teppeis/duck
+$ npm i -D @cybozu/duck
 ```
 
 ## Usage
@@ -254,16 +254,16 @@ build:soy   -- Compile Soy templates
 
 ## License
 
-MIT License: Teppei Sato &lt;teppeis@gmail.com&gt;
+MIT License: Cybozu, Inc.
 
-[npm-image]: https://img.shields.io/npm/v/@teppeis/duck.svg
-[npm-url]: https://npmjs.org/package/@teppeis/duck
-[npm-downloads-image]: https://img.shields.io/npm/dm/@teppeis/duck.svg
-[deps-image]: https://img.shields.io/david/teppeis/duck.svg
-[deps-url]: https://david-dm.org/teppeis/duck
+[npm-image]: https://img.shields.io/npm/v/@cybozu/duck.svg
+[npm-url]: https://npmjs.org/package/@cybozu/duck
+[npm-downloads-image]: https://img.shields.io/npm/dm/@cybozu/duck.svg
+[deps-image]: https://img.shields.io/david/cybozu/duck.svg
+[deps-url]: https://david-dm.org/cybozu/duck
 [node-version]: https://img.shields.io/badge/Node.js%20support->=v10.12-brightgreen.svg
-[license]: https://img.shields.io/npm/l/@teppeis/duck.svg
-[circleci-image]: https://circleci.com/gh/teppeis/duck.svg?style=shield
-[circleci-url]: https://circleci.com/gh/teppeis/duck
-[codecov-image]: https://codecov.io/gh/teppeis/duck/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/teppeis/duck
+[license]: https://img.shields.io/npm/l/@cybozu/duck.svg
+[circleci-image]: https://circleci.com/gh/cybozu/duck.svg?style=shield
+[circleci-url]: https://circleci.com/gh/cybozu/duck
+[codecov-image]: https://codecov.io/gh/cybozu/duck/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/cybozu/duck
