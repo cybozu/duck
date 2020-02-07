@@ -1,4 +1,4 @@
-# @teppeis/duck
+# @cybozu/duck
 
 Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to [plovr](https://github.com/bolinfest/plovr).
 
