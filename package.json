@@ -84,6 +84,7 @@
     "power-assert": "^1.6.1",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.1",
+    "standard-version": "^7.1.0",
     "typescript": "^3.7.5"
   },
   "homepage": "https://github.com/teppeis/duck",
