@@ -13,8 +13,11 @@ export class JsonReporter extends BaseReporter {
   constructor(options: JsonReporterOptions = {}) {
     super({
       stderr: options.stderr || false,
-      outputDir: options.outputDir === undefined ? DEFAULT_OUTPUT_DIR : options.outputDir,
-      resultFilename: "results.json",
+      outputDir:
+        options.outputDir === undefined
+          ? DEFAULT_OUTPUT_DIR
+          : options.outputDir,
+      resultFilename: "results.json"
     });
   }
 

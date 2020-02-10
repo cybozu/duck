@@ -25,7 +25,9 @@ export function watchJsAndSoy(config: DuckConfig) {
     ignored.push(config.depsJs);
   }
   const watcher = chokidar.watch(paths, { ignored, ignoreInitial: true });
-  watcher.on("ready", () => logger.info(`Watching for ${target} file changes...`));
+  watcher.on("ready", () =>
+    logger.info(`Watching for ${target} file changes...`)
+  );
   watcher.on("error", logger.error.bind(logger));
   chokidarEvents.forEach(event => {
     watcher.on(event, handleChokidarEvent.bind(null, event, soyConfig));
@@ -47,7 +49,7 @@ function handleChokidarEvent(
 const jsHandlers = {
   add: handleJsUpdated.bind(null, "ADDED"),
   change: handleJsUpdated.bind(null, "CHANGED"),
-  unlink: handleJsUpdated.bind(null, "DELETED"),
+  unlink: handleJsUpdated.bind(null, "DELETED")
 } as const;
 
 /**
@@ -63,12 +65,16 @@ function handleJsUpdated(event: string, filepath: string) {
 const soyHandlers = {
   add: handleSoyUpdated.bind(null, "ADDED"),
   change: handleSoyUpdated.bind(null, "CHANGED"),
-  unlink: handleSoyDeleted,
+  unlink: handleSoyDeleted
 } as const;
 
 type SoyConfig = Required<Pick<DuckConfig, "soyJarPath" | "soyOptions">>;
 
-async function handleSoyUpdated(event: string, config: SoyConfig, filepath: string) {
+async function handleSoyUpdated(
+  event: string,
+  config: SoyConfig,
+  filepath: string
+) {
   logger.info(`[SOY_${event}]: ${path.relative(process.cwd(), filepath)}`);
   return compileSoy([filepath], config);
 }
@@ -84,7 +90,10 @@ async function handleSoyDeleted(config: SoyConfig, filepath: string) {
  * NOTE: This logic doesn't support {LOCALE} and {LOCALE_LOWER_CASE}.
  * This is temporary work around because the latest Closure Templates no longer has this feature.
  */
-function calcOutputPath(inputPath: string, config: Required<Pick<DuckConfig, "soyOptions">>) {
+function calcOutputPath(
+  inputPath: string,
+  config: Required<Pick<DuckConfig, "soyOptions">>
+) {
   const { outputPathFormat, inputPrefix } = config.soyOptions;
   let outputPath = outputPathFormat;
   let inputDirectory = path.dirname(inputPath);

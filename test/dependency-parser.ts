@@ -39,12 +39,14 @@ const expectedVariousModulesDeps = [
     `${variousModulesFixturesDir}/script.js`,
     [],
     [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
-  ),
+  )
 ] as const;
 
 describe("DependencyParser()", () => {
   it("parses closure provide script", async () => {
-    const actual = await parseDependency(path.join(variousModulesFixturesDir, "closureprovide.js"));
+    const actual = await parseDependency(
+      path.join(variousModulesFixturesDir, "closureprovide.js")
+    );
     assertDependencyEquals(actual, expectedVariousModulesDeps[1]);
   });
 });
@@ -61,7 +63,9 @@ describe("DependencyParserWithWorkers()", () => {
   });
   it("parses closure provide script with worker", async () => {
     // This requires tsc compiling before testing
-    const dep = await parser.parse(path.join(variousModulesFixturesDir, "closureprovide.js"));
+    const dep = await parser.parse(
+      path.join(variousModulesFixturesDir, "closureprovide.js")
+    );
     assertDependencyEquals(dep, expectedVariousModulesDeps[1]);
   });
 });
@@ -102,7 +106,10 @@ function assertDependencyEquals(
   assert.equal(actual.type, expected.type, msg);
   assert.equal(actual.path, expected.path, msg);
   assert.equal(actual.language, expected.language, msg);
-  assert.deepEqual(actual.closureSymbols.slice().sort(), expected.closureSymbols.slice().sort());
+  assert.deepEqual(
+    actual.closureSymbols.slice().sort(),
+    expected.closureSymbols.slice().sort()
+  );
   const expectedImports = expected.imports
     .slice()
     .sort((a, b) => a.symOrPath.localeCompare(b.symOrPath));

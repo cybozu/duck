@@ -12,7 +12,13 @@ export interface CompilerOptions {
    * `LOOSE` and `STRICT` are deprecated. Use `PRUNE_LEGACY` and `PRUNE` respectedly.
    * See https://github.com/google/closure-compiler/commit/bab8ee8274abc162f72aa64ebe573c83ed38bb20
    */
-  dependency_mode?: "NONE" | "SORT_ONLY" | "PRUNE_LEGACY" | "PRUNE" | "LOOSE" | "STRICT";
+  dependency_mode?:
+    | "NONE"
+    | "SORT_ONLY"
+    | "PRUNE_LEGACY"
+    | "PRUNE"
+    | "LOOSE"
+    | "STRICT";
   entry_point?: readonly string[];
   compilation_level?: CompilationLevel;
   js?: readonly string[];
@@ -69,7 +75,7 @@ export async function compileToJson(
   extendedOpts.compilerOptions = {
     ...extendedOpts.compilerOptions,
     json_streams: "OUT",
-    error_format: "JSON",
+    error_format: "JSON"
   };
   const { stdout, stderr } = await compile(extendedOpts);
   const outputs: CompilerOutput[] = JSON.parse(stdout);
@@ -97,16 +103,22 @@ async function compile(
     opts = convertToFlagfile(opts);
   }
   if (extendedOpts.warningsWhitelist) {
-    opts.warnings_whitelist_file = createWarningsWhitelistFile(extendedOpts.warningsWhitelist);
+    opts.warnings_whitelist_file = createWarningsWhitelistFile(
+      extendedOpts.warningsWhitelist
+    );
   }
   const compiler = new ClosureCompiler(opts as any);
   if (extendedOpts.batch) {
     compiler.JAR_PATH = null;
     try {
-      const { getNativeImagePath } = await import("google-closure-compiler/lib/utils");
+      const { getNativeImagePath } = await import(
+        "google-closure-compiler/lib/utils"
+      );
       compiler.javaPath = getNativeImagePath();
     } catch {
-      throw new Error("Installed google-closure-compiler is too old for batch mode.");
+      throw new Error(
+        "Installed google-closure-compiler is too old for batch mode."
+      );
     }
   }
   return new Promise((resolve, reject) => {
@@ -156,7 +168,7 @@ export class CompilerError extends Error {
  */
 export function convertToFlagfile(opts: CompilerOptions): { flagfile: string } {
   const flagfile = tempy.file({
-    name: `${new Date().toISOString().replace(/[^\w]/g, "")}.closure.conf`,
+    name: `${new Date().toISOString().replace(/[^\w]/g, "")}.closure.conf`
   });
   const lines: string[] = [];
   Object.entries(opts).forEach(([key, value]) => {
@@ -189,9 +201,14 @@ function escape(str: string): string {
 /**
  * Create a warnings whitelist file and return the file path
  */
-function createWarningsWhitelistFile(whitelist: WarningsWhitelistItem[]): string {
+function createWarningsWhitelistFile(
+  whitelist: WarningsWhitelistItem[]
+): string {
   const content = whitelist
-    .map(({ file, line, description }) => `${file}:${line ? line : ""}  ${description}`)
+    .map(
+      ({ file, line, description }) =>
+        `${file}:${line ? line : ""}  ${description}`
+    )
     .join("\n");
   const file = tempy.file({ name: "warnings-whitelist.txt" });
   fs.writeFileSync(file, content);

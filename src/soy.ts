@@ -27,7 +27,7 @@ export async function compileSoy(
       msg: "Print config only",
       type: resultInfoLogType,
       title: "Soy config",
-      bodyObject: soyArgs,
+      bodyObject: soyArgs
     });
     return;
   }
@@ -39,7 +39,11 @@ export function toSoyArgs(
   soyFiles: readonly string[],
   { soyJarPath, soyOptions }: SoyConfig
 ): string[] {
-  const args = ["-classpath", soyJarPath, "com.google.template.soy.SoyToJsSrcCompiler"];
+  const args = [
+    "-classpath",
+    soyJarPath,
+    "com.google.template.soy.SoyToJsSrcCompiler"
+  ];
   Object.entries(soyOptions).forEach(([key, value]) => {
     if (typeof value === "boolean" && value) {
       args.push(`--${key}`);

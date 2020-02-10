@@ -30,14 +30,22 @@ describe("JsonReporter", () => {
       {
         entryConfigPath,
         command,
-        items: [{ level: "info", description: "89 error(s), 5 warning(s), 98.4% typed" }],
-      },
+        items: [
+          {
+            level: "info",
+            description: "89 error(s), 5 warning(s), 98.4% typed"
+          }
+        ]
+      }
     ] as const;
     const expected = JSON.stringify(reasons[0]);
 
     it("makes a directory and a result file", async () => {
       await reporter.output(reasons);
-      const actual = await readFile(path.join(outputDir, "entry", "results.json"), "utf8");
+      const actual = await readFile(
+        path.join(outputDir, "entry", "results.json"),
+        "utf8"
+      );
       assert.equal(actual, expected);
       assert.equal(actualMessage, undefined);
     });

@@ -13,7 +13,7 @@ export abstract class BaseReporter {
   constructor({
     stderr,
     outputDir,
-    resultFilename,
+    resultFilename
   }: {
     stderr: boolean;
     outputDir: string | null;
@@ -35,7 +35,10 @@ export abstract class BaseReporter {
         console.error(content);
       }
       if (this.outputDir) {
-        const subDir = path.join(this.outputDir, path.basename(reason.entryConfigPath, ".json"));
+        const subDir = path.join(
+          this.outputDir,
+          path.basename(reason.entryConfigPath, ".json")
+        );
         await mkdir(subDir, { recursive: true });
         await writeFile(path.join(subDir, this.resultFilename), content);
       }

@@ -5,7 +5,7 @@ import {
   faastLocal,
   FaastModuleProxy,
   LocalOptions,
-  log,
+  log
 } from "faastjs";
 import mergeOptions from "merge-options";
 import semver from "semver";
@@ -19,7 +19,9 @@ log.info.log = console.log.bind(console);
 
 export async function getFaastCompiler(
   config: DuckConfig
-): Promise<FaastModuleProxy<typeof compilerFaastFunctions, CommonOptions, any>> {
+): Promise<
+  FaastModuleProxy<typeof compilerFaastFunctions, CommonOptions, any>
+> {
   logger.info("Initializing batch mode");
   const batch = assertNonNullable(config.batch);
   const batchOptions = getBatchOptions(config);
@@ -37,19 +39,26 @@ export async function getFaastCompiler(
 
 function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
   const { batchOptions = {} } = config;
-  return mergeOptions.call({ concatArrays: true }, defaultBatchOptions(config), batchOptions);
+  return mergeOptions.call(
+    { concatArrays: true },
+    defaultBatchOptions(config),
+    batchOptions
+  );
 }
 
 function defaultBatchOptions(config: DuckConfig): AwsOptions {
-  const closureVersion = require("google-closure-compiler/package.json").version;
+  const closureVersion = require("google-closure-compiler/package.json")
+    .version;
   const major = semver.major(closureVersion);
   return {
     packageJson: {
       // To suppress npm warnings
       private: true,
       dependencies: {
-        [`google-closure-compiler-${getOsForNativeImage(config)}`]: `^${major}.0.0`,
-      },
+        [`google-closure-compiler-${getOsForNativeImage(
+          config
+        )}`]: `^${major}.0.0`
+      }
     },
     webpackOptions: {
       externals: [
@@ -61,9 +70,9 @@ function defaultBatchOptions(config: DuckConfig): AwsOptions {
         "chalk",
         // used in google-closure-compiler/lib/gulp
         /^gulp($|-)/,
-        /^vinyl($|-)/,
-      ],
-    },
+        /^vinyl($|-)/
+      ]
+    }
   };
 }
 
@@ -73,7 +82,6 @@ function getOsForNativeImage(config: DuckConfig) {
     return "linux";
   } else if (platform === "darwin") {
     return "osx";
-  } else {
-    throw new Error(`Unsuported Platform: ${platform}`);
   }
+  throw new Error(`Unsuported Platform: ${platform}`);
 }

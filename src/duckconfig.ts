@@ -20,7 +20,7 @@ export interface DuckConfig {
   concurrency?: number;
   batch?: "aws" | "local";
   batchOptions?: import("faastjs").AwsOptions | import("faastjs").LocalOptions;
-  reporters?: ("json" | "text" | "xunit")[];
+  reporters?: Array<"json" | "text" | "xunit">;
   reporterOptions?: {
     json?: JsonReporterOptions;
     text?: TextReporterOptions;
@@ -69,8 +69,14 @@ export function loadConfig(opts: any = {}): DuckConfig {
       }
     }
     if (config.https) {
-      assertString(config.https.keyPath, `"https.keyPath" is required in duck.config`);
-      assertString(config.https.certPath, `"https.certPath" is required in duck.config`);
+      assertString(
+        config.https.keyPath,
+        `"https.keyPath" is required in duck.config`
+      );
+      assertString(
+        config.https.certPath,
+        `"https.certPath" is required in duck.config`
+      );
       toAbsPath(config.https, configDir, "keyPath");
       toAbsPath(config.https, configDir, "certPath");
     }
@@ -98,7 +104,11 @@ export function loadConfig(opts: any = {}): DuckConfig {
   return result;
 }
 
-function toAbsPath<T>(config: T, baseDir: string, key: PickKeysByValue<Required<T>, string>) {
+function toAbsPath<T>(
+  config: T,
+  baseDir: string,
+  key: PickKeysByValue<Required<T>, string>
+) {
   const value = config[key];
   if (typeof value === "string") {
     // "as any": TypeScript can not handle conditional type

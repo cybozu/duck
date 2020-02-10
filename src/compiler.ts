@@ -9,11 +9,16 @@ import {
   CompilationLevel,
   CompilerOptions,
   CompilerOptionsFormattingType,
-  ExtendedCompilerOptions,
+  ExtendedCompilerOptions
 } from "./compiler-core";
 import { Dag } from "./dag";
 import { DuckConfig } from "./duckconfig";
-import { createDag, EntryConfig, PlovrMode, WarningsWhitelistItem } from "./entryconfig";
+import {
+  createDag,
+  EntryConfig,
+  PlovrMode,
+  WarningsWhitelistItem
+} from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
 
 export {
@@ -21,7 +26,7 @@ export {
   CompilerOptions,
   CompilerOutput,
   compileToJson,
-  convertToFlagfile,
+  convertToFlagfile
 } from "./compiler-core";
 
 /**
@@ -51,7 +56,10 @@ function createBaseOptions(
     opts.json_streams = "OUT";
   }
 
-  function copy(entryKey: keyof EntryConfig, closureKey = entryKey.replace(/-/g, "_")) {
+  function copy(
+    entryKey: keyof EntryConfig,
+    closureKey = entryKey.replace(/-/g, "_")
+  ) {
     if (entryKey in entryConfig) {
       opts[closureKey] = entryConfig[entryKey];
     }
@@ -92,7 +100,9 @@ function createBaseOptions(
     // for pages
     // `STRICT` was deprecated with `PRUNE` in google-closure-compiler@v20181125 and removed in v20200101.
     // See: https://github.com/google/closure-compiler/commit/0c8ae0ec822e89aa82f8b7604fd5a68bc30f77ea
-    opts.dependency_mode = semver.lt(compilerPkg.version, "20181125.0.0") ? "STRICT" : "PRUNE";
+    opts.dependency_mode = semver.lt(compilerPkg.version, "20181125.0.0")
+      ? "STRICT"
+      : "PRUNE";
     const js = entryConfig.paths.slice();
     if (entryConfig.externs) {
       js.push(...entryConfig.externs.map(extern => `!${extern}`));
@@ -126,7 +136,9 @@ function createBaseOptions(
     opts.define = Object.entries(entryConfig.define).map(([key, value]) => {
       if (typeof value === "string") {
         if (value.includes("'")) {
-          throw new Error(`define value should not include single-quote: "${key}: ${value}"`);
+          throw new Error(
+            `define value should not include single-quote: "${key}: ${value}"`
+          );
         }
         value = `'${value}'`;
       }
@@ -176,7 +188,11 @@ export function createCompilerOptionsForPage(
   duckConfig: DuckConfig,
   outputToFile: boolean
 ): ExtendedCompilerOptions {
-  const compilerOptions = createBaseOptions(entryConfig, duckConfig, outputToFile);
+  const compilerOptions = createBaseOptions(
+    entryConfig,
+    duckConfig,
+    outputToFile
+  );
   const wrapper = createOutputWrapper(
     entryConfig,
     assertNonNullable(compilerOptions.compilation_level)
@@ -202,22 +218,42 @@ export async function createCompilerOptionsForChunks(
   duckConfig: DuckConfig,
   outputToFile: boolean,
   createModuleUris: (chunkId: string) => string[]
-): Promise<{ options: ExtendedCompilerOptions; sortedChunkIds: string[]; rootChunkId: string }> {
+): Promise<{
+  options: ExtendedCompilerOptions;
+  sortedChunkIds: string[];
+  rootChunkId: string;
+}> {
   // TODO: separate EntryConfigChunks from EntryConfig
   const modules = assertNonNullable(entryConfig.modules);
-  const ignoreDirs = duckConfig.depsJsIgnoreDirs.concat(duckConfig.closureLibraryDir);
+  const ignoreDirs = duckConfig.depsJsIgnoreDirs.concat(
+    duckConfig.closureLibraryDir
+  );
   const dependencies = flat(
     await Promise.all([
       getDependencies(entryConfig, ignoreDirs, duckConfig.depsWorkers),
-      getClosureLibraryDependencies(duckConfig.closureLibraryDir),
+      getClosureLibraryDependencies(duckConfig.closureLibraryDir)
     ])
   );
   const dag = createDag(entryConfig);
   const sortedChunkIds = dag.getSortedIds();
-  const chunkToTransitiveDepPathSet = findTransitiveDeps(sortedChunkIds, dependencies, modules);
-  const chunkToInputPathSet = splitDepsIntoChunks(sortedChunkIds, chunkToTransitiveDepPathSet, dag);
-  const compilerOptions = createBaseOptions(entryConfig, duckConfig, outputToFile);
-  compilerOptions.js = flat([...chunkToInputPathSet.values()].map(inputs => [...inputs]));
+  const chunkToTransitiveDepPathSet = findTransitiveDeps(
+    sortedChunkIds,
+    dependencies,
+    modules
+  );
+  const chunkToInputPathSet = splitDepsIntoChunks(
+    sortedChunkIds,
+    chunkToTransitiveDepPathSet,
+    dag
+  );
+  const compilerOptions = createBaseOptions(
+    entryConfig,
+    duckConfig,
+    outputToFile
+  );
+  compilerOptions.js = flat(
+    [...chunkToInputPathSet.values()].map(inputs => [...inputs])
+  );
   compilerOptions.module = sortedChunkIds.map(id => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;
@@ -233,10 +269,13 @@ export async function createCompilerOptionsForChunks(
   }
 
   const options: ExtendedCompilerOptions = {
-    compilerOptions,
+    compilerOptions
   };
   if (entryConfig.warningsWhitelist) {
-    options.warningsWhitelist = createWarningsWhitelist(entryConfig.warningsWhitelist, duckConfig);
+    options.warningsWhitelist = createWarningsWhitelist(
+      entryConfig.warningsWhitelist,
+      duckConfig
+    );
   }
   if (duckConfig.batch) {
     options.batch = duckConfig.batch;
@@ -246,7 +285,10 @@ export async function createCompilerOptionsForChunks(
 
 const wrapperMarker = "%output%";
 
-function createOutputWrapper(entryConfig: EntryConfig, level: CompilationLevel): string {
+function createOutputWrapper(
+  entryConfig: EntryConfig,
+  level: CompilationLevel
+): string {
   // output_wrapper doesn't support "%n%"
   return createBaseOutputWrapper(entryConfig, level, true).replace(/\n+/g, "");
 }
@@ -257,10 +299,17 @@ function createChunkWrapper(
   compilationLevel: CompilationLevel,
   createModuleUris: (id: string) => string[]
 ): string[] {
-  const { moduleInfo, moduleUris } = convertModuleInfos(entryConfig, createModuleUris);
+  const { moduleInfo, moduleUris } = convertModuleInfos(
+    entryConfig,
+    createModuleUris
+  );
   return sortedChunkIds.map((chunkId, index) => {
     const isRootChunk = index === 0;
-    let wrapper = createBaseOutputWrapper(entryConfig, compilationLevel, isRootChunk);
+    let wrapper = createBaseOutputWrapper(
+      entryConfig,
+      compilationLevel,
+      isRootChunk
+    );
     if (isRootChunk) {
       wrapper = stripIndents`
       var PLOVR_MODULE_INFO=${JSON.stringify(moduleInfo)};
@@ -300,7 +349,9 @@ function createBaseOutputWrapper(
 function findTransitiveDeps(
   sortedChunkIds: readonly string[],
   dependencies: readonly depGraph.Dependency[],
-  modules: { [id: string]: { inputs: readonly string[]; deps: readonly string[] } }
+  modules: {
+    [id: string]: { inputs: readonly string[]; deps: readonly string[] };
+  }
 ): Map<string, Set<string>> {
   const pathToDep = new Map(
     dependencies.map(dep => [dep.path, dep] as [string, depGraph.Dependency])
@@ -342,7 +393,9 @@ function splitDepsIntoChunks(
         }
       });
       const targetChunk = dag.getLcaNode(...chunkIdsWithDep);
-      assertNonNullable(chunkToInputPathSet.get(targetChunk.id)).add(targetDepPath);
+      assertNonNullable(chunkToInputPathSet.get(targetChunk.id)).add(
+        targetDepPath
+      );
     }
   }
   return chunkToInputPathSet;
@@ -351,7 +404,10 @@ function splitDepsIntoChunks(
 export function convertModuleInfos(
   entryConfig: EntryConfig,
   createModuleUris: (id: string) => string[]
-): { moduleInfo: { [id: string]: string[] }; moduleUris: { [id: string]: string[] } } {
+): {
+  moduleInfo: { [id: string]: string[] };
+  moduleUris: { [id: string]: string[] };
+} {
   const modules = assertNonNullable(entryConfig.modules);
   const moduleInfo: { [id: string]: string[] } = {};
   const moduleUris: { [id: string]: string[] } = {};
@@ -385,15 +441,18 @@ function convertCompilerOptionsToRelative(
     options.js = options.js.map(file => {
       if (file.startsWith("!")) {
         return `!${path.relative(basepath, file.slice(1))}`;
-      } else {
-        return path.relative(basepath, file);
       }
+      return path.relative(basepath, file);
     });
   }
   if (options.externs) {
-    options.externs = options.externs.map(file => path.relative(basepath, file));
+    options.externs = options.externs.map(file =>
+      path.relative(basepath, file)
+    );
   }
   if (options.entry_point) {
-    options.entry_point = options.entry_point.map(file => path.relative(basepath, file));
+    options.entry_point = options.entry_point.map(file =>
+      path.relative(basepath, file)
+    );
   }
 }

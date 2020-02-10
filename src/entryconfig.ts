@@ -53,7 +53,7 @@ export enum PlovrMode {
   RAW = "RAW",
   WHITESPACE = "WHITESPACE",
   SIMPLE = "SIMPLE",
-  ADVANCED = "ADVANCED",
+  ADVANCED = "ADVANCED"
 }
 /**
  * Load entry config JSON
@@ -81,17 +81,26 @@ export async function loadEntryConfig(
   entryConfigPath: string,
   { mode }: { mode?: PlovrMode } = {}
 ): Promise<EntryConfig> {
-  const { json: entryConfig, basedir } = await loadInheritedJson(entryConfigPath);
+  const { json: entryConfig, basedir } = await loadInheritedJson(
+    entryConfigPath
+  );
   // change relative paths to abs paths
   entryConfig.paths = entryConfig.paths.map(p => path.resolve(basedir, p));
   if (entryConfig.inputs) {
-    entryConfig.inputs = entryConfig.inputs.map(input => path.resolve(basedir, input));
+    entryConfig.inputs = entryConfig.inputs.map(input =>
+      path.resolve(basedir, input)
+    );
   }
   if (entryConfig.externs) {
-    entryConfig.externs = entryConfig.externs.map(extern => path.resolve(basedir, extern));
+    entryConfig.externs = entryConfig.externs.map(extern =>
+      path.resolve(basedir, extern)
+    );
   }
   if (entryConfig["output-file"]) {
-    entryConfig["output-file"] = path.resolve(basedir, entryConfig["output-file"]);
+    entryConfig["output-file"] = path.resolve(
+      basedir,
+      entryConfig["output-file"]
+    );
   }
   if (entryConfig.modules) {
     Object.values(entryConfig.modules).forEach(mod => {
@@ -104,10 +113,15 @@ export async function loadEntryConfig(
     });
   }
   if (entryConfig["test-excludes"]) {
-    entryConfig["test-excludes"] = entryConfig["test-excludes"].map(p => path.resolve(basedir, p));
+    entryConfig["test-excludes"] = entryConfig["test-excludes"].map(p =>
+      path.resolve(basedir, p)
+    );
   }
   if (entryConfig["module-output-path"]) {
-    entryConfig["module-output-path"] = path.resolve(basedir, entryConfig["module-output-path"]);
+    entryConfig["module-output-path"] = path.resolve(
+      basedir,
+      entryConfig["module-output-path"]
+    );
   }
   if (mode) {
     entryConfig.mode = mode;
@@ -119,7 +133,10 @@ export async function loadEntryConfig(
  * Load and normalize an EntryConfig JSON file including comments
  */
 async function loadJson(jsonPath: string): Promise<EntryConfig> {
-  const content = await util.promisify(fs.readFile)(path.join(jsonPath), "utf8");
+  const content = await util.promisify(fs.readFile)(
+    path.join(jsonPath),
+    "utf8"
+  );
   return normalize(JSON.parse(stripJsonComments(content)));
 }
 
