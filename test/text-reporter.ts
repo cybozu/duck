@@ -14,7 +14,7 @@ describe("TextReporter", () => {
       const actual = reporter.format({
         entryConfigPath,
         command,
-        items: [],
+        items: []
       });
       assert.equal(actual, "");
     });
@@ -23,7 +23,12 @@ describe("TextReporter", () => {
       const actual = reporter.format({
         entryConfigPath,
         command,
-        items: [{ level: "info", description: "0 error(s), 0 warning(s), 98.4% typed" }],
+        items: [
+          {
+            level: "info",
+            description: "0 error(s), 0 warning(s), 98.4% typed"
+          }
+        ]
       });
       assert.equal(actual, "");
     });
@@ -38,13 +43,14 @@ describe("TextReporter", () => {
             description:
               "Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.",
             key: "JSC_DEPRECATED_CLASS_REASON",
-            source: "/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js",
+            source:
+              "/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js",
             line: 57,
             column: 32,
             context:
-              "  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^",
-          },
-        ],
+              "  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^"
+          }
+        ]
       });
       assert.equal(
         actual,
@@ -68,11 +74,12 @@ ${command}
             description:
               "Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.",
             key: "JSC_DEPRECATED_CLASS_REASON",
-            source: "/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js",
+            source:
+              "/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js",
             line: 57,
-            column: 32,
-          },
-        ],
+            column: 32
+          }
+        ]
       });
       assert.equal(
         actual,

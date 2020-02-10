@@ -12,7 +12,10 @@ export function assertNumber(arg: any, msg = "Should be number"): number {
   return arg;
 }
 
-export function assertNonNullable<T>(arg: T, msg = "Should not be nullable"): NonNullable<T> {
+export function assertNonNullable<T>(
+  arg: T,
+  msg = "Should not be nullable"
+): NonNullable<T> {
   if (arg == null) {
     throw new TypeError(`${msg}: ${arg}`);
   }

@@ -8,11 +8,13 @@ export class DependencyParserWithWorkers {
   private pool: workerpool.WorkerPool;
   constructor(numOfWorkers = 1) {
     if (numOfWorkers < 1) {
-      throw new TypeError(`numOfWorkers must be an integer >= 1, but "${numOfWorkers}"`);
+      throw new TypeError(
+        `numOfWorkers must be an integer >= 1, but "${numOfWorkers}"`
+      );
     }
     this.pool = workerpool.pool(script, {
       minWorkers: "max",
-      maxWorkers: numOfWorkers,
+      maxWorkers: numOfWorkers
     });
   }
   async parse(filepath: string): Promise<depGraph.Dependency> {
@@ -26,9 +28,8 @@ export class DependencyParserWithWorkers {
         return new depGraph.Es6Import(i.symOrPath);
       } else if (!i.isEs6Import && i.isGoogRequire) {
         return new depGraph.GoogRequire(i.symOrPath);
-      } else {
-        throw new TypeError(`Unexpected import: ${i}`);
       }
+      throw new TypeError(`Unexpected import: ${i}`);
     });
     return new depGraph.Dependency(
       depData.type,
@@ -46,11 +47,11 @@ export class DependencyParserWithWorkers {
 
 export interface DependencyTransferData {
   closureSymbols: string[];
-  imports: {
+  imports: Array<{
     symOrPath: string;
     isEs6Import: boolean;
     isGoogRequire: boolean;
-  }[];
+  }>;
   path: string;
   type: depGraph.DependencyType;
   language: string;

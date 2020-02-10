@@ -32,7 +32,7 @@ export namespace parser {
       /**
        * A goog.addDependency statement.
        */
-      GOOG_ADD_DEPENDENCY = "d",
+      GOOG_ADD_DEPENDENCY = "d"
     }
   }
 
@@ -63,7 +63,10 @@ export namespace parser {
    * Parses a file that contains only goog.addDependency statements. This is regex
    * based to be lightweight and avoid addtional dependencies.
    */
-  export function parseDependencyFile(text: string, filePath: string): ParseResult;
+  export function parseDependencyFile(
+    text: string,
+    filePath: string
+  ): ParseResult;
 }
 
 export namespace depGraph {
@@ -75,7 +78,7 @@ export namespace depGraph {
     /** An ES6 module file. */
     ES6_MODULE = "es6 module",
     /** A JavaScript file that has no goog.provide/module and is not an ES6 module. */
-    SCRIPT = "script",
+    SCRIPT = "script"
   }
 
   /**
@@ -189,7 +192,10 @@ export namespace depGraph {
     /** @const */
     moduleResolver: ModuleResolver;
 
-    constructor(dependencies: readonly Dependency[], moduleResolver?: ModuleResolver);
+    constructor(
+      dependencies: readonly Dependency[],
+      moduleResolver?: ModuleResolver
+    );
 
     /**
      * Validates the dependency graph. Throws an error if the graph is invalid.

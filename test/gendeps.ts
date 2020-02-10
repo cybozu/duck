@@ -12,7 +12,7 @@ import {
   getClosureLibraryDependencies,
   getDependencies,
   restoreDepsJs,
-  writeCachedDepsOnDisk,
+  writeCachedDepsOnDisk
 } from "../src/gendeps";
 
 const readFile = promisify(fs.readFile);
@@ -20,7 +20,10 @@ const writeFile = promisify(fs.writeFile);
 const fixturesBaseDir = path.join(__dirname, "fixtures");
 
 const variousModulesFixturesDir = path.join(fixturesBaseDir, "various-modules");
-const variousModulesDepsJsPath = path.join(fixturesBaseDir, "various-modules-deps.js");
+const variousModulesDepsJsPath = path.join(
+  fixturesBaseDir,
+  "various-modules-deps.js"
+);
 const expectedVariousModulesDeps = [
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_MODULE,
@@ -53,7 +56,7 @@ const expectedVariousModulesDeps = [
     `${variousModulesFixturesDir}/script.js`,
     [],
     [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
-  ),
+  )
 ] as const;
 
 describe("gendeps", () => {
@@ -65,7 +68,7 @@ describe("gendeps", () => {
       const inputsRoot = path.join(fixturesBaseDir, "generateDepFileText");
       const closureDir = path.join(inputsRoot, "closure");
       const entryConfig = {
-        paths: [inputsRoot],
+        paths: [inputsRoot]
       };
       assert.equal(
         await generateDepFileText(entryConfig, inputsRoot, [closureDir]),
@@ -82,8 +85,15 @@ describe("gendeps", () => {
         [new depGraph.GoogRequire("goog.array")]
       );
       const text = await generateDepFileTextFromDeps([dep], "/closure/goog");
-      assert.equal(text, "goog.addDependency('../../app/foo.js', [], ['goog.array'], {});\n");
-      assert.equal(dep.type, depGraph.DependencyType.SCRIPT, "dep.type should not be changed");
+      assert.equal(
+        text,
+        "goog.addDependency('../../app/foo.js', [], ['goog.array'], {});\n"
+      );
+      assert.equal(
+        dep.type,
+        depGraph.DependencyType.SCRIPT,
+        "dep.type should not be changed"
+      );
     });
     it("does not output imported `goog`", async () => {
       const dep = new depGraph.Dependency(
@@ -93,7 +103,10 @@ describe("gendeps", () => {
         [new depGraph.GoogRequire("goog")]
       );
       const result = await generateDepFileTextFromDeps([dep], "/closure/goog");
-      assert.equal(result, "goog.addDependency('../../app/foo.js', [], [], {});\n");
+      assert.equal(
+        result,
+        "goog.addDependency('../../app/foo.js', [], [], {});\n"
+      );
     });
   });
   describe("getDependencies()", () => {
@@ -110,7 +123,7 @@ describe("gendeps", () => {
       const path1 = path.join(fixturesDir, "path1");
       const path2 = path.join(fixturesDir, "path2");
       const entryConfig = {
-        paths: [path1, path2],
+        paths: [path1, path2]
       };
       const results = await getDependencies(entryConfig);
       assert.deepEqual(
@@ -119,7 +132,7 @@ describe("gendeps", () => {
           createScriptDependency("path1/foo.js"),
           createScriptDependency("path1/foo_test.js"),
           createScriptDependency("path2/bar.js"),
-          createScriptDependency("path2/bar_test.js"),
+          createScriptDependency("path2/bar_test.js")
         ])
       );
     });
@@ -127,7 +140,7 @@ describe("gendeps", () => {
       const path1 = path.join(fixturesDir, "path1");
       const path2 = path.join(fixturesDir, "path2");
       const entryConfig = {
-        paths: [path1, path2],
+        paths: [path1, path2]
       };
       const results = await getDependencies(entryConfig, [path2]);
       assert.equal(results.length, 2);
@@ -135,7 +148,7 @@ describe("gendeps", () => {
         new Set(results),
         new Set([
           createScriptDependency("path1/foo.js"),
-          createScriptDependency("path1/foo_test.js"),
+          createScriptDependency("path1/foo_test.js")
         ])
       );
     });
@@ -144,7 +157,7 @@ describe("gendeps", () => {
       const path2 = path.join(fixturesDir, "path2");
       const entryConfig = {
         paths: [path1, path2],
-        "test-excludes": [path2],
+        "test-excludes": [path2]
       };
       const results = await getDependencies(entryConfig);
       assert.equal(results.length, 3);
@@ -153,13 +166,13 @@ describe("gendeps", () => {
         new Set([
           createScriptDependency("path1/foo.js"),
           createScriptDependency("path1/foo_test.js"),
-          createScriptDependency("path2/bar.js"),
+          createScriptDependency("path2/bar.js")
         ])
       );
     });
     it("loads various modules", async () => {
       const entryConfig = {
-        paths: [variousModulesFixturesDir],
+        paths: [variousModulesFixturesDir]
       };
       const deps = await getDependencies(entryConfig);
       deps.sort((a, b) => a.path.localeCompare(b.path));
@@ -182,7 +195,7 @@ describe("gendeps", () => {
       const closureLibraryDir = path.join(fixturesDir, "closure");
       await restoreDepsJs(originalDepsJs, closureLibraryDir);
       const actualDepsJsPath = tempy.file({
-        name: "writeCachedDepsOnDisk-deps.js",
+        name: "writeCachedDepsOnDisk-deps.js"
       });
       await writeCachedDepsOnDisk(actualDepsJsPath, closureLibraryDir);
       const actual = await readFile(actualDepsJsPath, "utf8");
@@ -197,7 +210,7 @@ describe("gendeps", () => {
       assert.equal(countDepCache(), 5);
 
       const entryConfig = {
-        paths: [variousModulesFixturesDir],
+        paths: [variousModulesFixturesDir]
       };
       const deps = await getDependencies(entryConfig);
       deps.sort((a, b) => a.path.localeCompare(b.path));
@@ -215,7 +228,10 @@ describe("gendeps", () => {
           depGraph.DependencyType.CLOSURE_PROVIDE,
           `${closureLib1}/closure/goog/a11y/aria/aria.js`,
           ["goog.a11y.aria"],
-          [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.a11y.aria.Role")]
+          [
+            new depGraph.GoogRequire("goog"),
+            new depGraph.GoogRequire("goog.a11y.aria.Role")
+          ]
         ),
         new depGraph.Dependency(
           depGraph.DependencyType.CLOSURE_MODULE,
@@ -223,7 +239,7 @@ describe("gendeps", () => {
           ["goog.collections.sets"],
           [new depGraph.GoogRequire("goog")],
           "es6"
-        ),
+        )
       ]);
     });
   });
@@ -265,7 +281,10 @@ function assertDependencyEquals(
   assert.equal(actual.type, expected.type, msg);
   assert.equal(actual.path, expected.path, msg);
   assert.equal(actual.language, expected.language, msg);
-  assert.deepEqual(actual.closureSymbols.slice().sort(), expected.closureSymbols.slice().sort());
+  assert.deepEqual(
+    actual.closureSymbols.slice().sort(),
+    expected.closureSymbols.slice().sort()
+  );
   const expectedImports = expected.imports
     .slice()
     .sort((a, b) => a.symOrPath.localeCompare(b.symOrPath));
@@ -284,7 +303,12 @@ function assertDependenciesEqual(
   brokenEs6Import = false
 ): void {
   expected.forEach((e, idx) => {
-    assertDependencyEquals(actual[idx], e, brokenEs6Import, `fail in ${e.path}`);
+    assertDependencyEquals(
+      actual[idx],
+      e,
+      brokenEs6Import,
+      `fail in ${e.path}`
+    );
   });
   assert.equal(actual.length, expected.length);
 }

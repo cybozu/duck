@@ -10,7 +10,10 @@ import { googBaseUrlPath, inputsUrlPath } from "./urls";
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
-const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> = new Map();
+const pathToDependencyCache: Map<
+  string,
+  Promise<depGraph.Dependency>
+> = new Map();
 const globPromise = promisify(glob);
 
 /**
@@ -37,7 +40,9 @@ export function generateDepFileTextFromDeps(
   // `getDepFileText()` doesn't generate addDependency() for SCRIPT,
   // so change the type to CLOSURE_PROVIDE temporally.
   // TODO: fix upstream google-closure-deps and remove this
-  const scriptDeps = dependencies.filter(dep => dep.type === depGraph.DependencyType.SCRIPT);
+  const scriptDeps = dependencies.filter(
+    dep => dep.type === depGraph.DependencyType.SCRIPT
+  );
   scriptDeps.forEach(dep => {
     dep.type = depGraph.DependencyType.CLOSURE_PROVIDE;
   });
@@ -52,7 +57,10 @@ export function generateDepFileTextFromDeps(
 /**
  * NOTE: This doesn't support ES Modules, because a bug of google-closure-deps.
  */
-export async function writeCachedDepsOnDisk(depsJsPath: string, closureLibraryDir: string) {
+export async function writeCachedDepsOnDisk(
+  depsJsPath: string,
+  closureLibraryDir: string
+) {
   const closureBaseDir = path.join(closureLibraryDir, "closure", "goog");
   const deps = await Promise.all(Array.from(pathToDependencyCache.values()));
   const content = generateDepFileTextFromDeps(deps, closureBaseDir);
@@ -65,18 +73,26 @@ export async function writeCachedDepsOnDisk(depsJsPath: string, closureLibraryDi
  *
  * @throws if deps.js doesn't exist.
  */
-export async function restoreDepsJs(depsJsPath: string, closureLibraryDir: string): Promise<void> {
+export async function restoreDepsJs(
+  depsJsPath: string,
+  closureLibraryDir: string
+): Promise<void> {
   let depsText = "";
   try {
     depsText = await readFile(depsJsPath, "utf8");
   } catch (e) {
-    throw new Error(`${depsJsPath} doesn't exist. Run \`duck build:deps\`. ${e}`);
+    throw new Error(
+      `${depsJsPath} doesn't exist. Run \`duck build:deps\`. ${e}`
+    );
   }
   const result = parser.parseDependencyFile(depsText, depsJsPath);
   if (result.hasFatalError) {
     throw new Error(`Fatal parse error in ${depsJsPath}: ${result.errors}`);
   }
-  appendGoogImport(result.dependencies, path.join(closureLibraryDir, "closure", "goog"));
+  appendGoogImport(
+    result.dependencies,
+    path.join(closureLibraryDir, "closure", "goog")
+  );
   result.dependencies.forEach(dep => {
     pathToDependencyCache.set(dep.path, Promise.resolve(dep));
   });
@@ -102,7 +118,7 @@ export async function getDependencies(
       }
       const files = await globPromise(path.join(p, "**/*.js"), {
         ignore: ignoreDirPatterns,
-        follow: true,
+        follow: true
       });
       return Promise.all(
         files
@@ -117,11 +133,10 @@ export async function getDependencies(
           .map(async file => {
             if (pathToDependencyCache.has(file)) {
               return pathToDependencyCache.get(file)!;
-            } else {
-              const promise = parser.parse(file);
-              pathToDependencyCache.set(file, promise);
-              return promise;
             }
+            const promise = parser.parse(file);
+            pathToDependencyCache.set(file, promise);
+            return promise;
           })
       );
     });
@@ -137,11 +152,18 @@ export async function getDependencies(
 export async function getClosureLibraryDependencies(
   closureLibraryDir: string
 ): Promise<depGraph.Dependency[]> {
-  const googDepsPath = path.join(closureLibraryDir, "closure", "goog", "deps.js");
+  const googDepsPath = path.join(
+    closureLibraryDir,
+    "closure",
+    "goog",
+    "deps.js"
+  );
   const depsContent = await readFile(googDepsPath, "utf8");
   const result = parser.parseDependencyFile(depsContent, googDepsPath);
   if (result.errors.length > 0) {
-    throw new Error(`Fail to parse deps.js of Closure Library: ${result.errors.join(", ")}`);
+    throw new Error(
+      `Fail to parse deps.js of Closure Library: ${result.errors.join(", ")}`
+    );
   }
   appendGoogImport(result.dependencies, path.dirname(googDepsPath));
   return result.dependencies;
@@ -155,10 +177,16 @@ export async function getClosureLibraryDependencies(
  * @param dependencies
  * @param googBaseDir A path to the directory including base.js
  */
-function appendGoogImport(dependencies: readonly depGraph.Dependency[], googBaseDir: string) {
+function appendGoogImport(
+  dependencies: readonly depGraph.Dependency[],
+  googBaseDir: string
+) {
   dependencies.forEach(dep => {
     dep.setClosurePath(googBaseDir);
-    if (dep.closureSymbols.length > 0 || dep.imports.find(i => i.isGoogRequire())) {
+    if (
+      dep.closureSymbols.length > 0 ||
+      dep.imports.find(i => i.isGoogRequire())
+    ) {
       const goog = new depGraph.GoogRequire("goog");
       goog.from = dep;
       dep.imports.push(goog);

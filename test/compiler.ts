@@ -2,7 +2,10 @@ import assert = require("assert");
 import { stripIndents } from "common-tags";
 import { readFileSync } from "fs";
 import path from "path";
-import { convertToFlagfile, createCompilerOptionsForPage } from "../src/compiler";
+import {
+  convertToFlagfile,
+  createCompilerOptionsForPage
+} from "../src/compiler";
 import { ExtendedCompilerOptions } from "../src/compiler-core";
 import { DuckConfig } from "../src/duckconfig";
 import { PlovrMode } from "../src/entryconfig";
@@ -29,7 +32,7 @@ describe("compiler", () => {
           id: "simple",
           mode: PlovrMode.RAW,
           paths: ["/path/to/path1"],
-          inputs: ["/input1.js"],
+          inputs: ["/input1.js"]
         },
         emptyDuckConfig,
         false
@@ -40,8 +43,8 @@ describe("compiler", () => {
           json_streams: "OUT",
           compilation_level: "WHITESPACE",
           js: ["/path/to/path1"],
-          entry_point: ["/input1.js"],
-        },
+          entry_point: ["/input1.js"]
+        }
       };
       assert.deepEqual(actual, expected);
     });
@@ -54,8 +57,8 @@ describe("compiler", () => {
           paths: ["/path/to/path1"],
           inputs: ["/input1.js"],
           "experimental-compiler-options": {
-            hideWarningsFor: ["foo/bar"],
-          },
+            hideWarningsFor: ["foo/bar"]
+          }
         },
         emptyDuckConfig,
         false
@@ -67,8 +70,8 @@ describe("compiler", () => {
           compilation_level: "WHITESPACE",
           js: ["/path/to/path1"],
           entry_point: ["/input1.js"],
-          hide_warnings_for: ["foo/bar"],
-        },
+          hide_warnings_for: ["foo/bar"]
+        }
       };
       assert.deepEqual(actual, expected);
     });
@@ -81,15 +84,15 @@ describe("compiler", () => {
           inputs: ["/input1.js"],
           warningsWhitelist: [
             { file: "/path/to/file1.js", line: 1, description: "Error1" },
-            { file: "/path/to/file2.js", description: "Error2" },
-          ],
+            { file: "/path/to/file2.js", description: "Error2" }
+          ]
         },
         emptyDuckConfig,
         false
       );
       assert.deepEqual(actual.warningsWhitelist, [
         { file: "/path/to/file1.js", line: 1, description: "Error1" },
-        { file: "/path/to/file2.js", description: "Error2" },
+        { file: "/path/to/file2.js", description: "Error2" }
       ]);
       // const whitelist = readFileSync(actual.warnings_whitelist_file!, "utf8");
       // assert.equal(whitelist, "/path/to/file1.js:1  Error1\n/path/to/file2.js:  Error2");
@@ -114,14 +117,14 @@ describe("compiler", () => {
           define: {
             "goog.BOOLEAN": false,
             "goog.NUMBER": 100,
-            "goog.STRING": "single-quoted",
+            "goog.STRING": "single-quoted"
           },
           checks: {
             checkRegExp: "ERROR",
             checkTypes: "OFF",
             checkVars: "WARNING",
-            deprecated: "ERROR",
-          },
+            deprecated: "ERROR"
+          }
         },
         emptyDuckConfig,
         true
@@ -140,12 +143,16 @@ describe("compiler", () => {
           formatting: ["PRETTY_PRINT", "PRINT_INPUT_DELIMITER"],
           rename_prefix_namespace: "z", // "z" is hard coded
           output_wrapper: "var GSN={};(function(z){%output%}).call(this,GSN);",
-          define: ["goog.BOOLEAN=false", "goog.NUMBER=100", "goog.STRING='single-quoted'"],
+          define: [
+            "goog.BOOLEAN=false",
+            "goog.NUMBER=100",
+            "goog.STRING='single-quoted'"
+          ],
           js_output_file: "/out.js",
           jscomp_error: ["checkRegExp", "deprecated"],
           jscomp_warning: ["checkVars"],
-          jscomp_off: ["checkTypes"],
-        },
+          jscomp_off: ["checkTypes"]
+        }
       };
       assert.deepEqual(actual, expected);
     });
@@ -160,8 +167,8 @@ describe("compiler", () => {
         inputs: ["/input1.js"],
         warningsWhitelist: [
           { file: "/path/to/file1.js", line: 1, description: "Error1" },
-          { file: "/path/to/file2.js", description: "Error2" },
-        ],
+          { file: "/path/to/file2.js", description: "Error2" }
+        ]
       },
       { batch: "aws" } as DuckConfig,
       false
@@ -173,17 +180,17 @@ describe("compiler", () => {
         compilation_level: "WHITESPACE",
         externs: [relative("/path/to/extern1.js")],
         js: [relative("/path/to/path1"), `!${relative("/path/to/extern1.js")}`],
-        entry_point: [relative("/input1.js")],
+        entry_point: [relative("/input1.js")]
       },
       batch: "aws",
       warningsWhitelist: [
         {
           file: relative("/path/to/file1.js"),
           line: 1,
-          description: "Error1",
+          description: "Error1"
         },
-        { file: relative("/path/to/file2.js"), description: "Error2" },
-      ],
+        { file: relative("/path/to/file2.js"), description: "Error2" }
+      ]
     };
     assert.deepEqual(actual, expected);
   });
@@ -205,7 +212,7 @@ describe("compiler", () => {
       const { flagfile } = convertToFlagfile({
         compilation_level: "ADVANCED",
         js_output_file: '/a b".js',
-        js: ['/a b".js', '/c d".js'],
+        js: ['/a b".js', '/c d".js']
       });
       const content = readFileSync(flagfile, "utf8");
       assert.equal(

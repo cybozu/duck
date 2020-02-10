@@ -148,7 +148,10 @@ export class Dag {
     }
     let least: string | null = null;
     for (const ancestor of commonAncestors) {
-      if (least === null || this.idToDepth.get(least)! < this.idToDepth.get(ancestor)!) {
+      if (
+        least === null ||
+        this.idToDepth.get(least)! < this.idToDepth.get(ancestor)!
+      ) {
         least = ancestor;
       }
     }

@@ -13,7 +13,10 @@ export type BuildSoyConfig = Required<
  * @param printConfig Print only
  * @return An array of input Soy template filepaths
  */
-export async function buildSoy(config: BuildSoyConfig, printConfig = false): Promise<string[]> {
+export async function buildSoy(
+  config: BuildSoyConfig,
+  printConfig = false
+): Promise<string[]> {
   logger.info("Finding soy templates");
   const soyFiles = await findSoyFiles(config);
   await compileSoy(soyFiles, config, printConfig);

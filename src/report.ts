@@ -30,7 +30,7 @@ export interface ErrorReason {
 const reporterClasses = {
   json: JsonReporter,
   text: TextReporter,
-  xunit: XUnitReporter,
+  xunit: XUnitReporter
 } as const;
 
 export async function reportTestResults(

@@ -17,8 +17,8 @@ async function parse(filepath: string): Promise<DependencyTransferData> {
       symOrPath: i.symOrPath,
       // Convert getter methods to properties to transfer with postMessage() to workers.
       isGoogRequire: i.isGoogRequire(),
-      isEs6Import: i.isEs6Import(),
-    })),
+      isEs6Import: i.isEs6Import()
+    }))
   };
 }
 

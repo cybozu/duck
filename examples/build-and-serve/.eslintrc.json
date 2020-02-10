@@ -1,6 +1,6 @@
 {
-  "extends": ["teppeis/+closure"],
   "globals": {
-    "app": true
+    "app": true,
+    "goog": true
   }
 }

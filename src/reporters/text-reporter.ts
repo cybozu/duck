@@ -11,7 +11,7 @@ export class TextReporter extends BaseReporter {
     super({
       stderr: options.stderr || true,
       outputDir: options.outputDir || null,
-      resultFilename: "results.txt",
+      resultFilename: "results.txt"
     });
   }
 
@@ -25,7 +25,9 @@ export class TextReporter extends BaseReporter {
     return `# ${entryConfigPath}:
 ${command ? `\n${command}\n` : ""}
 ${items
-  .map(item => (item.level === "info" ? item.description : this.formatErrorCase(item)))
+  .map(item =>
+    item.level === "info" ? item.description : this.formatErrorCase(item)
+  )
   .join("\n\n")}\n`;
   }
 
