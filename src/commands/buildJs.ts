@@ -162,21 +162,14 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
   }
   return reasons;
 
-  function deleteLogUrl(input: string[]) {
-    const messages = [...input];
-    const lastIndex = messages.length - 1;
-    let message = messages[lastIndex];
-    if (message.startsWith(":")) {
-      message = message.substring(1).trim();
-
-      try {
-        new URL(message); // check valid URL
-        messages.splice(lastIndex, 1); // delete logUrl
-      } catch (e) {
-        // do nothing
-      }
-    }
-    return messages;
+  function parseErrorReason(
+    reason: CompilerError & { info?: Record<string, any> },
+    config: DuckConfig
+  ): { command: string; items: CompileErrorItem[] } {
+    const { message: stderr, info } = reason;
+    const message = config.batch === "aws" && info ? info.message : stderr;
+    const [command, , ...messages] = message.split("\n");
+    return { command, items: JSON.parse(messages.join("\n")) };
   }
 }
 export class BuildJsCompilationError extends Error {
