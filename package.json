@@ -85,7 +85,7 @@
     "nyc": "^15.0.0",
     "power-assert": "^1.6.1",
     "prettier": "^1.19.1",
-    "rimraf": "^3.0.1",
+    "rimraf": "^3.0.2",
     "standard-version": "^7.1.0",
     "typescript": "^3.7.5"
   },
