@@ -89,13 +89,13 @@
     "standard-version": "^7.1.0",
     "typescript": "^3.7.5"
   },
-  "homepage": "https://github.com/teppeis/duck",
+  "homepage": "https://github.com/cybozu/duck",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/teppeis/duck.git"
+    "url": "git+ssh://git@github.com/cybozu/duck.git"
   },
   "bugs": {
-    "url": "https://github.com/teppeis/duck/issues"
+    "url": "https://github.com/cybozu/duck/issues"
   },
   "keywords": [],
   "license": "MIT"
