@@ -25,7 +25,9 @@
     "lint": "eslint --ext js,ts src test types examples",
     "test": "npm-run-all clean -p lint build -s unit:coverage --aggregate-output -l",
     "unit": "mocha",
-    "unit:coverage": "nyc mocha"
+    "unit:coverage": "nyc mocha",
+    "release": "run-s build lint && standard-version",
+    "release:dryrun": "standard-version --dry-run"
   },
   "dependencies": {
     "@teppeis/stream-to-observable": "^0.3.1",
