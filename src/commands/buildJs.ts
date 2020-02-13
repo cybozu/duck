@@ -95,7 +95,8 @@ export async function buildJs(
   try {
     return await waitAllAndThrowIfAnyCompilationsFailed(
       promises,
-      entryConfigPaths
+      entryConfigPaths,
+      config
     );
   } finally {
     if (faastModule) {
@@ -124,7 +125,8 @@ export async function buildJs(
  */
 async function waitAllAndThrowIfAnyCompilationsFailed(
   promises: ReadonlyArray<Promise<CompileErrorItem[] | undefined>>,
-  entryConfigPaths: readonly string[]
+  entryConfigPaths: readonly string[],
+  config: DuckConfig
 ): Promise<ErrorReason[]> {
   const results = await pSettled(promises);
   const reasons: ErrorReason[] = results
@@ -142,10 +144,9 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
         };
       }
       // has some errors
-      const { message: stderr } = result.reason as CompilerError;
-      const [command, , ...messages] = stderr.split("\n");
+      const reason = result.reason as CompilerError;
       try {
-        const items: CompileErrorItem[] = JSON.parse(messages.join("\n"));
+        const { command, items } = parseErrorReason(reason, config);
         return {
           entryConfigPath: result.entryConfigPath,
           command,
@@ -153,7 +154,7 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
         };
       } catch {
         // for invalid compiler options errors
-        throw new Error(`Unexpected non-JSON error: ${stderr}`);
+        throw new Error(`Unexpected non-JSON error: ${reason.message}`);
       }
     })
     .filter(result => result.items.length > 0);
