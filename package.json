@@ -55,7 +55,7 @@
     "strip-json-comments": "^3.0.1",
     "tempy": "^0.3.0",
     "workerpool": "^5.0.4",
-    "xmlbuilder": "^13.0.2",
+    "xmlbuilder": "^14.0.0",
     "yargs": "^15.1.0",
     "zet": "^1.1.0"
   },
