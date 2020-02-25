@@ -168,16 +168,9 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
     config: DuckConfig
   ): { command: string; items: CompileErrorItem[] } {
     const { message: stderr, info } = reason;
-    const message = isBatchMode(config.batch) && info ? info.message : stderr;
+    const message = config.batch && info ? info.message : stderr;
     const [command, , ...messages] = message.split("\n");
     return { command, items: JSON.parse(messages.join("\n")) };
-  }
-
-  function isBatchMode(batchMode?: string) {
-    if (!batchMode) {
-      return false;
-    }
-    return ["aws", "local"].includes(batchMode);
   }
 }
 export class BuildJsCompilationError extends Error {
