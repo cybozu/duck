@@ -1,5 +1,8 @@
 {
-  "extends": "@cybozu/eslint-config/presets/node-typescript-prettier",
+  "extends": [
+    "teppeis/node-v10",
+    "@cybozu/eslint-config/presets/node-typescript-prettier"
+  ],
   "env": {
     "mocha": true
   },
