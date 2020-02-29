@@ -21,8 +21,6 @@ export namespace parser {
   }
 
   namespace ParseResult {
-    // TODO: workaround for a bug of @typescript-eslint
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     enum Source {
       /**
        * Scanned from an actual source file.

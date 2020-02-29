@@ -1,11 +1,8 @@
 import assert = require("assert");
-import fs from "fs";
+import { promises as fs, existsSync } from "fs";
 import path from "path";
 import tempy from "tempy";
-import { promisify } from "util";
 import { JsonReporter } from "../src/reporters/json-reporter";
-
-const readFile = promisify(fs.readFile);
 
 describe("JsonReporter", () => {
   const entryConfigPath = "/path/to/entry.json";
@@ -42,7 +39,7 @@ describe("JsonReporter", () => {
 
     it("makes a directory and a result file", async () => {
       await reporter.output(reasons);
-      const actual = await readFile(
+      const actual = await fs.readFile(
         path.join(outputDir, "entry", "results.json"),
         "utf8"
       );
@@ -53,7 +50,7 @@ describe("JsonReporter", () => {
     it("does not make any dirs or files", async () => {
       reporter = new JsonReporter({ outputDir: null });
       await reporter.output(reasons);
-      assert(!fs.existsSync(path.join(process.cwd(), "test-results")));
+      assert(!existsSync(path.join(process.cwd(), "test-results")));
       assert.equal(actualMessage, undefined);
     });
 

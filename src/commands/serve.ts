@@ -2,12 +2,11 @@ import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
 import cors from "cors";
 import fastify from "fastify";
-import { readFile } from "fs";
+import { promises as fs } from "fs";
 import { ServerResponse } from "http";
 import path from "path";
 import pino from "pino";
 import serveStatic from "serve-static";
-import { promisify } from "util";
 import { assertNonNullable, assertString } from "../assert";
 import {
   CompilerOutput,
@@ -355,8 +354,8 @@ async function createServer(
   >;
   if (https) {
     const httpsOptions = {
-      key: await promisify(readFile)(https.keyPath, "utf8"),
-      cert: await promisify(readFile)(https.certPath, "utf8")
+      key: await fs.readFile(https.keyPath, "utf8"),
+      cert: await fs.readFile(https.certPath, "utf8")
     };
     // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
     // But it is not a big deal.
