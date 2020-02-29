@@ -355,7 +355,7 @@ async function createServer(
   if (https) {
     const httpsOptions = {
       key: await fs.readFile(https.keyPath, "utf8"),
-      cert: await fs.readFile(https.certPath, "utf8"),
+      cert: await fs.readFile(https.certPath, "utf8")
     };
     // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
     // But it is not a big deal.

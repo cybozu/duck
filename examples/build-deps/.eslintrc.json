@@ -1,5 +1,4 @@
 {
-  "extends": ["teppeis/+closure"],
   "globals": {
     "app": true,
     "goog": "readonly"

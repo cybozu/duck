@@ -45,7 +45,6 @@ export function loadConfig(opts: any = {}): DuckConfig {
   }
   let result: DuckConfig = opts;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const config: DuckConfig = require(configPath);
     const configDir = path.dirname(configPath);
     // resolve relative path to absolute
