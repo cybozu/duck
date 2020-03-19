@@ -1,10 +1,6 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import path from "path";
-import { promisify } from "util";
 import { ErrorReason } from "../report";
-
-const mkdir = promisify(fs.mkdir);
-const writeFile = promisify(fs.writeFile);
 
 export abstract class BaseReporter {
   private stderr: boolean;
@@ -39,8 +35,8 @@ export abstract class BaseReporter {
           this.outputDir,
           path.basename(reason.entryConfigPath, ".json")
         );
-        await mkdir(subDir, { recursive: true });
-        await writeFile(path.join(subDir, this.resultFilename), content);
+        await fs.mkdir(subDir, { recursive: true });
+        await fs.writeFile(path.join(subDir, this.resultFilename), content);
       }
     });
     await Promise.all(promises);

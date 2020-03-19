@@ -1,9 +1,8 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import pLimit from "p-limit";
 import pSettled from "p-settle";
 import path from "path";
 import recursive from "recursive-readdir";
-import { promisify } from "util";
 import { assertString } from "../assert";
 import { resultInfoLogType } from "../cli";
 import {
@@ -18,9 +17,6 @@ import { EntryConfig, loadEntryConfig } from "../entryconfig";
 import { restoreDepsJs } from "../gendeps";
 import { logger } from "../logger";
 import { CompileErrorItem, ErrorReason } from "../report";
-
-const writeFile = promisify(fs.writeFile);
-const mkdir = promisify(fs.mkdir);
 
 /**
  * @throws If compiler throws errors
@@ -79,8 +75,8 @@ export async function buildJs(
         logWithCount(entryConfigPath, runningJobCount++, "Compiling");
         const [outputs, warnings] = await compileFn(options);
         const promises = outputs.map(async output => {
-          await mkdir(path.dirname(output.path), { recursive: true });
-          return writeFile(output.path, output.src);
+          await fs.mkdir(path.dirname(output.path), { recursive: true });
+          return fs.writeFile(output.path, output.src);
         });
         await Promise.all(promises);
         logWithCount(entryConfigPath, completedJobCount++, "Compiled");
