@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@teppeis/stream-to-observable": "^0.3.1",
-    "@types/pino": "^5.15.5",
+    "@types/pino": "^5.17.0",
     "array.prototype.flat": "^1.2.3",
     "chokidar": "^3.3.1",
     "common-tags": "^1.8.0",
@@ -45,7 +45,7 @@
     "merge-options": "^2.0.0",
     "p-limit": "^2.2.2",
     "p-settle": "^3.1.0",
-    "pino": "^5.16.0",
+    "pino": "^5.17.0",
     "pino-pretty": "^3.5.0",
     "recursive-readdir": "^2.2.2",
     "rxjs": "^6.5.4",
