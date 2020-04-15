@@ -46,12 +46,9 @@ function getScriptBaseUrl(
   reply: fastify.FastifyReply<ServerResponse>,
   isHttps: boolean
 ): URL {
-  const { host } = reply.request.headers;
-  if (typeof host !== "string") {
-    throw new TypeError(`Host header of request doesn't exist: ${host}`);
-  }
+  const { hostname } = reply.request;
   const scheme = isHttps ? "https" : "http";
-  return new URL(`${scheme}://${host}/`);
+  return new URL(`${scheme}://${hostname}/`);
 }
 
 function getGoogBaseUrl(baseUrl: URL): URL {
