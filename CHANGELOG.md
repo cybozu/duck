@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.32.6](https://github.com/cybozu/duck/compare/v0.32.5...v0.32.6) (2020-04-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency fastify to ^2.13.1 ([#440](https://github.com/cybozu/duck/issues/440)) ([31e611e](https://github.com/cybozu/duck/commit/31e611e2936c3d6be70834e8cfd4680f9bdaab03))
+* **deps:** update dependency p-limit to ^2.3.0 ([6c75a5e](https://github.com/cybozu/duck/commit/6c75a5ef7953bd825a7c453e687a240f2741938d))
+* **deps:** update dependency rxjs to ^6.5.5 ([#434](https://github.com/cybozu/duck/issues/434)) ([841b4ec](https://github.com/cybozu/duck/commit/841b4ecb3b886be73257152031bf1cad195ccfd7))
+* **serve:** http2 does not work ([#438](https://github.com/cybozu/duck/issues/438)) ([222055f](https://github.com/cybozu/duck/commit/222055ff31f3739b16aad8bc55e0c9728a30862a))
+
 ### [0.32.5](https://github.com/cybozu/duck/compare/v0.32.4...v0.32.5) (2020-03-25)
 
 
