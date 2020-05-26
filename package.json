@@ -87,7 +87,7 @@
     "prettier": "^1.19.1",
     "rimraf": "^3.0.2",
     "standard-version": "^7.1.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.3"
   },
   "homepage": "https://github.com/cybozu/duck",
   "repository": {
