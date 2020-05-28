@@ -24,7 +24,7 @@ export async function buildDeps(config: DuckConfig): Promise<void> {
       msg: "Generated to stdout",
       type: resultInfoLogType,
       title: "Generated deps.js",
-      bodyString: fileText
+      bodyString: fileText,
     });
   }
 }

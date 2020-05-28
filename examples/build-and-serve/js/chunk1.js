@@ -6,7 +6,7 @@ goog.require("goog.ui.Component");
 /**
  * @return {string}
  */
-app.chunk1.getMessage = function() {
+app.chunk1.getMessage = function () {
   return "from chunk1";
 };
 

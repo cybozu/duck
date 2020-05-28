@@ -32,7 +32,7 @@ export class Dag {
       throw new Error("The `nodes` is empty");
     }
     // populate idToNode
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (this.idToNode.has(node.id)) {
         throw new Error(`Same ID found: ${node.id}`);
       }
@@ -51,13 +51,13 @@ export class Dag {
     }
     this.root = root;
     // populate children (inverting deps)
-    nodes.forEach(node => {
-      node.deps.forEach(dep => {
+    nodes.forEach((node) => {
+      node.deps.forEach((dep) => {
         this.idToNode.get(dep)!.children.add(node);
       });
     });
     this.populateDepth();
-    this.idToNode.forEach(node => {
+    this.idToNode.forEach((node) => {
       node.ancestors = new Set(this.populateAncestors(node));
     });
   }
@@ -73,7 +73,7 @@ export class Dag {
       throw new Error(`Circular dependencies found: ${ancestors}`);
     }
     ancestors.push(node.id);
-    node.deps.forEach(dep => {
+    node.deps.forEach((dep) => {
       this.populateAncestors(this.idToNode.get(dep)!, ancestors);
     });
     return ancestors;
@@ -190,6 +190,6 @@ export class Dag {
    * The result is cached and returned from the second time.
    */
   getSortedIds(): string[] {
-    return this.getSortedNodes().map(node => node.id);
+    return this.getSortedNodes().map((node) => node.id);
   }
 }

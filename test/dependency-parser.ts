@@ -39,7 +39,7 @@ const expectedVariousModulesDeps = [
     `${variousModulesFixturesDir}/script.js`,
     [],
     [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
-  )
+  ),
 ] as const;
 
 describe("DependencyParser()", () => {

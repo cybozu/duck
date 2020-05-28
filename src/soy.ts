@@ -27,7 +27,7 @@ export async function compileSoy(
       msg: "Print config only",
       type: resultInfoLogType,
       title: "Soy config",
-      bodyObject: soyArgs
+      bodyObject: soyArgs,
     });
     return;
   }
@@ -42,7 +42,7 @@ export function toSoyArgs(
   const args = [
     "-classpath",
     soyJarPath,
-    "com.google.template.soy.SoyToJsSrcCompiler"
+    "com.google.template.soy.SoyToJsSrcCompiler",
   ];
   Object.entries(soyOptions).forEach(([key, value]) => {
     if (typeof value === "boolean" && value) {
@@ -57,7 +57,7 @@ export function toSoyArgs(
   });
   if (soyOptions.inputPrefix) {
     const { inputPrefix } = soyOptions;
-    soyFiles = soyFiles.map(filepath => path.relative(inputPrefix, filepath));
+    soyFiles = soyFiles.map((filepath) => path.relative(inputPrefix, filepath));
   }
   args.push("--srcs", soyFiles.join(","));
   return args;

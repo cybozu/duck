@@ -39,14 +39,14 @@ export function generateDepFileTextFromDeps(
   // so change the type to CLOSURE_PROVIDE temporally.
   // TODO: fix upstream google-closure-deps and remove this
   const scriptDeps = dependencies.filter(
-    dep => dep.type === depGraph.DependencyType.SCRIPT
+    (dep) => dep.type === depGraph.DependencyType.SCRIPT
   );
-  scriptDeps.forEach(dep => {
+  scriptDeps.forEach((dep) => {
     dep.type = depGraph.DependencyType.CLOSURE_PROVIDE;
   });
   const depFileText = depFile.getDepFileText(googBaseDir, dependencies);
   // restore the type
-  scriptDeps.forEach(dep => {
+  scriptDeps.forEach((dep) => {
     dep.type = depGraph.DependencyType.SCRIPT;
   });
   return depFileText;
@@ -91,7 +91,7 @@ export async function restoreDepsJs(
     result.dependencies,
     path.join(closureLibraryDir, "closure", "goog")
   );
-  result.dependencies.forEach(dep => {
+  result.dependencies.forEach((dep) => {
     pathToDependencyCache.set(dep.path, Promise.resolve(dep));
   });
 }
@@ -105,30 +105,30 @@ export async function getDependencies(
   ignoreDirs: readonly string[] = [],
   numOfWorkers?: number
 ): Promise<depGraph.Dependency[]> {
-  const ignoreDirPatterns = ignoreDirs.map(dir => path.join(dir, "**/*"));
+  const ignoreDirPatterns = ignoreDirs.map((dir) => path.join(dir, "**/*"));
   const parser = new DependencyParserWithWorkers(numOfWorkers);
   try {
     // TODO: uniq
-    const parseResultPromises = entryConfig.paths.map(async p => {
+    const parseResultPromises = entryConfig.paths.map(async (p) => {
       let testExcludes: readonly string[] = [];
       if (entryConfig["test-excludes"]) {
         testExcludes = entryConfig["test-excludes"];
       }
       const files = await globPromise(path.join(p, "**/*.js"), {
         ignore: ignoreDirPatterns,
-        follow: true
+        follow: true,
       });
       return Promise.all(
         files
           // TODO: load deps.js path from config
-          .filter(file => !/\bdeps\.js$/.test(file))
-          .filter(file => {
-            if (testExcludes.some(exclude => file.startsWith(exclude))) {
+          .filter((file) => !/\bdeps\.js$/.test(file))
+          .filter((file) => {
+            if (testExcludes.some((exclude) => file.startsWith(exclude))) {
               return !/_test\.js$/.test(file);
             }
             return true;
           })
-          .map(async file => {
+          .map(async (file) => {
             if (pathToDependencyCache.has(file)) {
               return pathToDependencyCache.get(file)!;
             }
@@ -179,11 +179,11 @@ function appendGoogImport(
   dependencies: readonly depGraph.Dependency[],
   googBaseDir: string
 ) {
-  dependencies.forEach(dep => {
+  dependencies.forEach((dep) => {
     dep.setClosurePath(googBaseDir);
     if (
       dep.closureSymbols.length > 0 ||
-      dep.imports.find(i => i.isGoogRequire())
+      dep.imports.find((i) => i.isGoogRequire())
     ) {
       const goog = new depGraph.GoogRequire("goog");
       goog.from = dep;
