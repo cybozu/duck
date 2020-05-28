@@ -17,7 +17,7 @@ export class JsonReporter extends BaseReporter {
         options.outputDir === undefined
           ? DEFAULT_OUTPUT_DIR
           : options.outputDir,
-      resultFilename: "results.json"
+      resultFilename: "results.json",
     });
   }
 
