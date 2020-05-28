@@ -14,7 +14,7 @@ export class DependencyParserWithWorkers {
     }
     this.pool = workerpool.pool(script, {
       minWorkers: "max",
-      maxWorkers: numOfWorkers
+      maxWorkers: numOfWorkers,
     });
   }
   async parse(filepath: string): Promise<depGraph.Dependency> {
@@ -23,7 +23,7 @@ export class DependencyParserWithWorkers {
   }
 
   private deserialize(depData: DependencyTransferData): depGraph.Dependency {
-    const imports = depData.imports.map(i => {
+    const imports = depData.imports.map((i) => {
       if (i.isEs6Import && !i.isGoogRequire) {
         return new depGraph.Es6Import(i.symOrPath);
       } else if (!i.isEs6Import && i.isGoogRequire) {

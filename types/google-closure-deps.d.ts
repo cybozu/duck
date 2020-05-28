@@ -30,7 +30,7 @@ export namespace parser {
       /**
        * A goog.addDependency statement.
        */
-      GOOG_ADD_DEPENDENCY = "d"
+      GOOG_ADD_DEPENDENCY = "d",
     }
   }
 
@@ -76,7 +76,7 @@ export namespace depGraph {
     /** An ES6 module file. */
     ES6_MODULE = "es6 module",
     /** A JavaScript file that has no goog.provide/module and is not an ES6 module. */
-    SCRIPT = "script"
+    SCRIPT = "script",
   }
 
   /**

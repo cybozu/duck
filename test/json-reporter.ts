@@ -30,10 +30,10 @@ describe("JsonReporter", () => {
         items: [
           {
             level: "info",
-            description: "89 error(s), 5 warning(s), 98.4% typed"
-          }
-        ]
-      }
+            description: "89 error(s), 5 warning(s), 98.4% typed",
+          },
+        ],
+      },
     ] as const;
     const expected = JSON.stringify(reasons[0]);
 

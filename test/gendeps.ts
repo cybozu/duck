@@ -11,7 +11,7 @@ import {
   getClosureLibraryDependencies,
   getDependencies,
   restoreDepsJs,
-  writeCachedDepsOnDisk
+  writeCachedDepsOnDisk,
 } from "../src/gendeps";
 
 const fixturesBaseDir = path.join(__dirname, "fixtures");
@@ -53,7 +53,7 @@ const expectedVariousModulesDeps = [
     `${variousModulesFixturesDir}/script.js`,
     [],
     [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
-  )
+  ),
 ] as const;
 
 describe("gendeps", () => {
@@ -65,7 +65,7 @@ describe("gendeps", () => {
       const inputsRoot = path.join(fixturesBaseDir, "generateDepFileText");
       const closureDir = path.join(inputsRoot, "closure");
       const entryConfig = {
-        paths: [inputsRoot]
+        paths: [inputsRoot],
       };
       assert.equal(
         await generateDepFileText(entryConfig, inputsRoot, [closureDir]),
@@ -120,7 +120,7 @@ describe("gendeps", () => {
       const path1 = path.join(fixturesDir, "path1");
       const path2 = path.join(fixturesDir, "path2");
       const entryConfig = {
-        paths: [path1, path2]
+        paths: [path1, path2],
       };
       const results = await getDependencies(entryConfig);
       assert.deepEqual(
@@ -129,7 +129,7 @@ describe("gendeps", () => {
           createScriptDependency("path1/foo.js"),
           createScriptDependency("path1/foo_test.js"),
           createScriptDependency("path2/bar.js"),
-          createScriptDependency("path2/bar_test.js")
+          createScriptDependency("path2/bar_test.js"),
         ])
       );
     });
@@ -137,7 +137,7 @@ describe("gendeps", () => {
       const path1 = path.join(fixturesDir, "path1");
       const path2 = path.join(fixturesDir, "path2");
       const entryConfig = {
-        paths: [path1, path2]
+        paths: [path1, path2],
       };
       const results = await getDependencies(entryConfig, [path2]);
       assert.equal(results.length, 2);
@@ -145,7 +145,7 @@ describe("gendeps", () => {
         new Set(results),
         new Set([
           createScriptDependency("path1/foo.js"),
-          createScriptDependency("path1/foo_test.js")
+          createScriptDependency("path1/foo_test.js"),
         ])
       );
     });
@@ -154,7 +154,7 @@ describe("gendeps", () => {
       const path2 = path.join(fixturesDir, "path2");
       const entryConfig = {
         paths: [path1, path2],
-        "test-excludes": [path2]
+        "test-excludes": [path2],
       };
       const results = await getDependencies(entryConfig);
       assert.equal(results.length, 3);
@@ -163,13 +163,13 @@ describe("gendeps", () => {
         new Set([
           createScriptDependency("path1/foo.js"),
           createScriptDependency("path1/foo_test.js"),
-          createScriptDependency("path2/bar.js")
+          createScriptDependency("path2/bar.js"),
         ])
       );
     });
     it("loads various modules", async () => {
       const entryConfig = {
-        paths: [variousModulesFixturesDir]
+        paths: [variousModulesFixturesDir],
       };
       const deps = await getDependencies(entryConfig);
       deps.sort((a, b) => a.path.localeCompare(b.path));
@@ -192,7 +192,7 @@ describe("gendeps", () => {
       const closureLibraryDir = path.join(fixturesDir, "closure");
       await restoreDepsJs(originalDepsJs, closureLibraryDir);
       const actualDepsJsPath = tempy.file({
-        name: "writeCachedDepsOnDisk-deps.js"
+        name: "writeCachedDepsOnDisk-deps.js",
       });
       await writeCachedDepsOnDisk(actualDepsJsPath, closureLibraryDir);
       const actual = await fs.readFile(actualDepsJsPath, "utf8");
@@ -207,7 +207,7 @@ describe("gendeps", () => {
       assert.equal(countDepCache(), 5);
 
       const entryConfig = {
-        paths: [variousModulesFixturesDir]
+        paths: [variousModulesFixturesDir],
       };
       const deps = await getDependencies(entryConfig);
       deps.sort((a, b) => a.path.localeCompare(b.path));
@@ -227,7 +227,7 @@ describe("gendeps", () => {
           ["goog.a11y.aria"],
           [
             new depGraph.GoogRequire("goog"),
-            new depGraph.GoogRequire("goog.a11y.aria.Role")
+            new depGraph.GoogRequire("goog.a11y.aria.Role"),
           ]
         ),
         new depGraph.Dependency(
@@ -236,7 +236,7 @@ describe("gendeps", () => {
           ["goog.collections.sets"],
           [new depGraph.GoogRequire("goog")],
           "es6"
-        )
+        ),
       ]);
     });
   });
