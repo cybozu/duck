@@ -3,7 +3,7 @@ module.exports = {
   inputsRoot: "js",
   depsJs: "build/deps.js",
   depsJsIgnoreDirs: ["node_modules", "build"],
-  entryConfigDir: "entry-config/entries"
+  entryConfigDir: "entry-config/entries",
   // http2: true,
   // https: {
   //   keyPath: "./duck-key.pem",

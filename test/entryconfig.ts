@@ -15,7 +15,7 @@ describe("entryconfig", () => {
         inputs: [path.join(fixturesBaseDir, "js", "foo.js")],
         externs: [
           path.join(fixturesBaseDir, "ext", "foo.js"),
-          path.join(fixturesDir, "ext", "bar.js")
+          path.join(fixturesDir, "ext", "bar.js"),
         ],
         paths: [path.join(fixturesBaseDir, "path1")],
         "output-file": path.join(fixturesDir, "out.js"),
@@ -23,13 +23,13 @@ describe("entryconfig", () => {
           checkRegExp: "ERROR",
           checkTypes: "ERROR",
           checkVars: "WARNING",
-          deprecated: "OFF"
-        }
+          deprecated: "OFF",
+        },
       });
     });
     it("overrides `mode`", async () => {
       const config = await loadEntryConfigById("simple", fixturesDir, {
-        mode: PlovrMode.ADVANCED
+        mode: PlovrMode.ADVANCED,
       });
       assert(config.mode === PlovrMode.ADVANCED);
     });
@@ -42,15 +42,15 @@ describe("entryconfig", () => {
         modules: {
           base: {
             inputs: [path.join(fixturesBaseDir, "js", "base.js")],
-            deps: []
+            deps: [],
           },
           chunk1: {
             inputs: [path.join(fixturesDir, "js", "chunk1.js")],
-            deps: ["base"]
-          }
+            deps: ["base"],
+          },
         },
         "module-output-path": path.join(fixturesBaseDir, "chunks", "%s.js"),
-        "module-production-uri": "../output/%s.js"
+        "module-production-uri": "../output/%s.js",
       });
     });
     it("normalizes chunks config", async () => {
@@ -63,13 +63,13 @@ describe("entryconfig", () => {
         modules: {
           base: {
             inputs: [path.join(fixturesBaseDir, "js", "base.js")],
-            deps: []
+            deps: [],
           },
           chunk1: {
             inputs: [path.join(fixturesDir, "js", "chunk1.js")],
-            deps: ["base"]
-          }
-        }
+            deps: ["base"],
+          },
+        },
       });
     });
     it("inherits parent configs", async () => {
@@ -86,7 +86,7 @@ describe("entryconfig", () => {
         paths: [path.join(fixturesBaseDir, "path1")],
         debug: true,
         // resolve relative path and normalize in base.json
-        "test-excludes": [fixturesBaseDir]
+        "test-excludes": [fixturesBaseDir],
       });
     });
     it("warningsWhitelist", async () => {
@@ -98,12 +98,12 @@ describe("entryconfig", () => {
         {
           file: `${fixturesDir}/path/to/file1.js`,
           line: 1,
-          description: "Error1"
+          description: "Error1",
         },
         {
           file: `${fixturesDir}/path/to/file2.js`,
-          description: "Error2"
-        }
+          description: "Error2",
+        },
       ]);
     });
   });

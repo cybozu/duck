@@ -123,7 +123,7 @@ function toAbsPathArray<T>(
   const values = config[key];
   if (Array.isArray(values)) {
     // "as any": TypeScript can not handle conditional type
-    config[key] = values.map(value => path.resolve(baseDir, value)) as any;
+    config[key] = values.map((value) => path.resolve(baseDir, value)) as any;
   }
 }
 /**

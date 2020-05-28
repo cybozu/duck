@@ -16,7 +16,7 @@ export function watchJsAndSoy(config: DuckConfig) {
   let soyConfig: SoyConfig | null = null;
   if (soyJarPath && soyFileRoots && soyOptions) {
     soyConfig = { soyJarPath, soyOptions };
-    paths.push(...soyFileRoots.map(p => `${p}/**/*.soy`));
+    paths.push(...soyFileRoots.map((p) => `${p}/**/*.soy`));
     target = "JS and Soy";
   }
   const ignored = [...config.depsJsIgnoreDirs];
@@ -28,7 +28,7 @@ export function watchJsAndSoy(config: DuckConfig) {
     logger.info(`Watching for ${target} file changes...`)
   );
   watcher.on("error", logger.error.bind(logger));
-  chokidarEvents.forEach(event => {
+  chokidarEvents.forEach((event) => {
     watcher.on(event, handleChokidarEvent.bind(null, event, soyConfig));
   });
 }
@@ -48,7 +48,7 @@ function handleChokidarEvent(
 const jsHandlers = {
   add: handleJsUpdated.bind(null, "ADDED"),
   change: handleJsUpdated.bind(null, "CHANGED"),
-  unlink: handleJsUpdated.bind(null, "DELETED")
+  unlink: handleJsUpdated.bind(null, "DELETED"),
 } as const;
 
 /**
@@ -64,7 +64,7 @@ function handleJsUpdated(event: string, filepath: string) {
 const soyHandlers = {
   add: handleSoyUpdated.bind(null, "ADDED"),
   change: handleSoyUpdated.bind(null, "CHANGED"),
-  unlink: handleSoyDeleted
+  unlink: handleSoyDeleted,
 } as const;
 
 type SoyConfig = Required<Pick<DuckConfig, "soyJarPath" | "soyOptions">>;
