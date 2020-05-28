@@ -9,7 +9,7 @@ import {
   CompilationLevel,
   CompilerOptions,
   CompilerOptionsFormattingType,
-  ExtendedCompilerOptions
+  ExtendedCompilerOptions,
 } from "./compiler-core";
 import { Dag } from "./dag";
 import { DuckConfig } from "./duckconfig";
@@ -17,7 +17,7 @@ import {
   createDag,
   EntryConfig,
   PlovrMode,
-  WarningsWhitelistItem
+  WarningsWhitelistItem,
 } from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
 
@@ -26,7 +26,7 @@ export {
   CompilerOptions,
   CompilerOutput,
   compileToJson,
-  convertToFlagfile
+  convertToFlagfile,
 } from "./compiler-core";
 
 /**
@@ -36,7 +36,7 @@ export {
 const GLOBAL_NAMESPACE = "z";
 
 function snakeCase(key: string): string {
-  return key.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`);
+  return key.replace(/[A-Z]/g, (match) => `_${match.toLowerCase()}`);
 }
 
 function createBaseOptions(
@@ -105,7 +105,7 @@ function createBaseOptions(
       : "PRUNE";
     const js = entryConfig.paths.slice();
     if (entryConfig.externs) {
-      js.push(...entryConfig.externs.map(extern => `!${extern}`));
+      js.push(...entryConfig.externs.map((extern) => `!${extern}`));
     }
     opts.js = js;
     opts.entry_point = assertNonNullable(entryConfig.inputs).slice();
@@ -231,7 +231,7 @@ export async function createCompilerOptionsForChunks(
   const dependencies = flat(
     await Promise.all([
       getDependencies(entryConfig, ignoreDirs, duckConfig.depsWorkers),
-      getClosureLibraryDependencies(duckConfig.closureLibraryDir)
+      getClosureLibraryDependencies(duckConfig.closureLibraryDir),
     ])
   );
   const dag = createDag(entryConfig);
@@ -252,9 +252,9 @@ export async function createCompilerOptionsForChunks(
     outputToFile
   );
   compilerOptions.js = flat(
-    [...chunkToInputPathSet.values()].map(inputs => [...inputs])
+    [...chunkToInputPathSet.values()].map((inputs) => [...inputs])
   );
-  compilerOptions.module = sortedChunkIds.map(id => {
+  compilerOptions.module = sortedChunkIds.map((id) => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;
   });
@@ -269,7 +269,7 @@ export async function createCompilerOptionsForChunks(
   }
 
   const options: ExtendedCompilerOptions = {
-    compilerOptions
+    compilerOptions,
   };
   if (entryConfig.warningsWhitelist) {
     options.warningsWhitelist = createWarningsWhitelist(
@@ -354,19 +354,19 @@ function findTransitiveDeps(
   }
 ): Map<string, Set<string>> {
   const pathToDep = new Map(
-    dependencies.map(dep => [dep.path, dep] as [string, depGraph.Dependency])
+    dependencies.map((dep) => [dep.path, dep] as [string, depGraph.Dependency])
   );
   const graph = new depGraph.Graph(dependencies);
   const chunkToTransitiveDepPathSet: Map<string, Set<string>> = new Map();
-  sortedChunkIds.forEach(chunkId => {
+  sortedChunkIds.forEach((chunkId) => {
     const chunkConfig = modules[chunkId];
-    const entryPoints = chunkConfig.inputs.map(input =>
+    const entryPoints = chunkConfig.inputs.map((input) =>
       assertNonNullable(
         pathToDep.get(input),
         `entryConfig.paths does not include the inputs: ${input}`
       )
     );
-    const depPaths = graph.order(...entryPoints).map(dep => dep.path);
+    const depPaths = graph.order(...entryPoints).map((dep) => dep.path);
     chunkToTransitiveDepPathSet.set(chunkId, new Set(depPaths));
   });
   return chunkToTransitiveDepPathSet;
@@ -381,7 +381,7 @@ function splitDepsIntoChunks(
   dag: Dag
 ): Map<string, Set<string>> {
   const chunkToInputPathSet: Map<string, Set<string>> = new Map();
-  sortedChunkIds.forEach(chunk => {
+  sortedChunkIds.forEach((chunk) => {
     chunkToInputPathSet.set(chunk, new Set());
   });
   for (const targetDepPathSet of chunkToTransitiveDepPathSet.values()) {
@@ -424,7 +424,7 @@ function createWarningsWhitelist(
   duckConfig: DuckConfig,
   basepath: string = process.cwd()
 ): WarningsWhitelistItem[] {
-  return warningsWhitelist.map(item => {
+  return warningsWhitelist.map((item) => {
     const newItem = { ...item };
     if (duckConfig.batch === "aws") {
       newItem.file = path.relative(basepath, item.file);
@@ -438,7 +438,7 @@ function convertCompilerOptionsToRelative(
   basepath: string = process.cwd()
 ): void {
   if (options.js) {
-    options.js = options.js.map(file => {
+    options.js = options.js.map((file) => {
       if (file.startsWith("!")) {
         return `!${path.relative(basepath, file.slice(1))}`;
       }
@@ -446,12 +446,12 @@ function convertCompilerOptionsToRelative(
     });
   }
   if (options.externs) {
-    options.externs = options.externs.map(file =>
+    options.externs = options.externs.map((file) =>
       path.relative(basepath, file)
     );
   }
   if (options.entry_point) {
-    options.entry_point = options.entry_point.map(file =>
+    options.entry_point = options.entry_point.map((file) =>
       path.relative(basepath, file)
     );
   }

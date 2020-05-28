@@ -30,7 +30,7 @@ export interface ErrorReason {
 const reporterClasses = {
   json: JsonReporter,
   text: TextReporter,
-  xunit: XUnitReporter
+  xunit: XUnitReporter,
 } as const;
 
 export async function reportTestResults(
@@ -38,7 +38,7 @@ export async function reportTestResults(
   config: DuckConfig
 ): Promise<void> {
   const reporters = config.reporters || ["text"];
-  const promises = reporters.map(name => {
+  const promises = reporters.map((name) => {
     const options = (config.reporterOptions || {})[name];
     const reporter = new reporterClasses[name](options);
     return reporter.output(reasons);
