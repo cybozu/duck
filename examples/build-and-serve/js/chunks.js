@@ -10,13 +10,13 @@ goog.scope(() => {
   // moduleLoader.setDebugMode(!!goog.global['PLOVR_MODULE_USE_DEBUG_MODE']);
   moduleLoader.setDebugMode(true);
   moduleManager.setLoader(moduleLoader);
-  moduleManager.setAllModuleInfo(goog.global["PLOVR_MODULE_INFO"]);
+  moduleManager.setAllModuleInfo(goog.global.PLOVR_MODULE_INFO);
   const trustedModuleUris = {};
-  for (const id in goog.global["PLOVR_MODULE_URIS"]) {
+  for (const id in goog.global.PLOVR_MODULE_URIS) {
     trustedModuleUris[id] = [
       goog.html.legacyconversions.trustedResourceUrlFromString(
-        goog.global["PLOVR_MODULE_URIS"][id]
-      )
+        goog.global.PLOVR_MODULE_URIS[id]
+      ),
     ];
   }
   moduleManager.setModuleTrustedUris(trustedModuleUris);

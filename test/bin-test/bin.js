@@ -8,7 +8,7 @@ const bin = path.resolve(__dirname, "..", "..", "bin", "duck.js");
 
 // Run this test after tsc
 describe("bin/duck.js", () => {
-  it("is executable", async function() {
+  it("is executable", async function () {
     this.timeout(5000);
     const { stderr } = await execFileP(bin, ["--help"]);
     assert.equal(stderr, "");

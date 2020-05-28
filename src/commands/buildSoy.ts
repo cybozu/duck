@@ -24,9 +24,9 @@ export async function buildSoy(
 }
 
 async function findSoyFiles(config: BuildSoyConfig): Promise<string[]> {
-  const soyFilePromises = config.soyFileRoots.map(async p => {
+  const soyFilePromises = config.soyFileRoots.map(async (p) => {
     const files = await recursive(p);
-    return files.filter(file => /\.soy$/.test(file));
+    return files.filter((file) => /\.soy$/.test(file));
   });
   const soyFiles = flat(await Promise.all(soyFilePromises));
   return soyFiles;
