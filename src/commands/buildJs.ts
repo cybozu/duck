@@ -9,7 +9,7 @@ import {
   CompilerError,
   compileToJson,
   createCompilerOptionsForChunks,
-  createCompilerOptionsForPage
+  createCompilerOptionsForPage,
 } from "../compiler";
 import * as compilerCoreFunctions from "../compiler-core";
 import { DuckConfig } from "../duckconfig";
@@ -42,7 +42,7 @@ export async function buildJs(
   const limit = pLimit(config.concurrency || 1);
   let runningJobCount = 1;
   let completedJobCount = 1;
-  const promises = entryConfigPaths.map(entryConfigPath =>
+  const promises = entryConfigPaths.map((entryConfigPath) =>
     limit(async () => {
       try {
         const entryConfig = await loadEntryConfig(entryConfigPath);
@@ -67,14 +67,14 @@ export async function buildJs(
             msg: "Print config only",
             type: resultInfoLogType,
             title: "Compiler config",
-            bodyObject: options
+            bodyObject: options,
           });
           return;
         }
 
         logWithCount(entryConfigPath, runningJobCount++, "Compiling");
         const [outputs, warnings] = await compileFn(options);
-        const promises = outputs.map(async output => {
+        const promises = outputs.map(async (output) => {
           await fs.mkdir(path.dirname(output.path), { recursive: true });
           return fs.writeFile(output.path, output.src);
         });
@@ -128,15 +128,15 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
   const reasons: ErrorReason[] = results
     .map((result, idx) => ({
       ...result,
-      entryConfigPath: entryConfigPaths[idx]
+      entryConfigPath: entryConfigPaths[idx],
     }))
-    .map(result => {
+    .map((result) => {
       if (result.isFulfilled) {
         // no errors, but it may contain warnings
         return {
           entryConfigPath: result.entryConfigPath,
           command: null,
-          items: result.value || []
+          items: result.value || [],
         };
       }
       // has some errors
@@ -146,15 +146,15 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
         return {
           entryConfigPath: result.entryConfigPath,
           command,
-          items
+          items,
         };
       } catch {
         // for invalid compiler options errors
         throw new Error(`Unexpected non-JSON error: ${reason.message}`);
       }
     })
-    .filter(result => result.items.length > 0);
-  if (results.filter(result => result.isRejected).length > 0) {
+    .filter((result) => result.items.length > 0);
+  if (results.filter((result) => result.isRejected).length > 0) {
     throw new BuildJsCompilationError(reasons, results.length);
   }
   return reasons;
@@ -180,7 +180,7 @@ export class BuildJsCompilationError extends Error {
 
 async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
   const files = await recursive(entryConfigDir);
-  return files.filter(file => /\.json$/.test(file));
+  return files.filter((file) => /\.json$/.test(file));
 }
 
 async function createCompilerOptionsForChunks_(

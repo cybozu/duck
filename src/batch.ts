@@ -5,7 +5,7 @@ import {
   faastLocal,
   FaastModuleProxy,
   LocalOptions,
-  log
+  log,
 } from "faastjs";
 import mergeOptions from "merge-options";
 import semver from "semver";
@@ -57,8 +57,8 @@ function defaultBatchOptions(config: DuckConfig): AwsOptions {
       dependencies: {
         [`google-closure-compiler-${getOsForNativeImage(
           config
-        )}`]: `^${major}.0.0`
-      }
+        )}`]: `^${major}.0.0`,
+      },
     },
     webpackOptions: {
       externals: [
@@ -70,9 +70,9 @@ function defaultBatchOptions(config: DuckConfig): AwsOptions {
         "chalk",
         // used in google-closure-compiler/lib/gulp
         /^gulp($|-)/,
-        /^vinyl($|-)/
-      ]
-    }
+        /^vinyl($|-)/,
+      ],
+    },
   };
 }
 

@@ -75,7 +75,7 @@ export async function compileToJson(
   extendedOpts.compilerOptions = {
     ...extendedOpts.compilerOptions,
     json_streams: "OUT",
-    error_format: "JSON"
+    error_format: "JSON",
   };
   const { stdout, stderr } = await compile(extendedOpts);
   const outputs: CompilerOutput[] = JSON.parse(stdout);
@@ -147,7 +147,7 @@ function rewriteNodePathForAwsLambda(options: CompilerOptions): void {
       // eslint-disable-next-line no-eval
       eval("require.resolve")("google-closure-library/package.json")
     );
-    options.js = options.js.map(js =>
+    options.js = options.js.map((js) =>
       js.replace(/^node_modules\/google-closure-library/, closureLibraryDir)
     );
   }
@@ -168,12 +168,12 @@ export class CompilerError extends Error {
  */
 export function convertToFlagfile(opts: CompilerOptions): { flagfile: string } {
   const flagfile = tempy.file({
-    name: `${new Date().toISOString().replace(/[^\w]/g, "")}.closure.conf`
+    name: `${new Date().toISOString().replace(/[^\w]/g, "")}.closure.conf`,
   });
   const lines: string[] = [];
   Object.entries(opts).forEach(([key, value]) => {
     if (Array.isArray(value)) {
-      lines.push(...value.map(v => createKeyValue(key, v)));
+      lines.push(...value.map((v) => createKeyValue(key, v)));
     } else {
       lines.push(createKeyValue(key, value));
     }
