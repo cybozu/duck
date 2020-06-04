@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.32.7](https://github.com/cybozu/duck/compare/v0.32.6...v0.32.7) (2020-06-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency chokidar to ^3.4.0 ([0ed308a](https://github.com/cybozu/duck/commit/0ed308a09e179c3d5676727799fccd5fa584fb3d))
+* **deps:** update dependency fastify to ^2.14.1 ([e31fcaf](https://github.com/cybozu/duck/commit/e31fcaff27070120e2f29e8b2685462f2c6ca660))
+* **deps:** update dependency google-closure-deps to v20200517 ([11074e6](https://github.com/cybozu/duck/commit/11074e640ce9e1b837e43cef8939fc4dec5f4d0d))
+* **deps:** update dependency google-closure-deps to v20200517 ([e88c3cb](https://github.com/cybozu/duck/commit/e88c3cb9b99b890016a68c0b9b1d0bcf8c73d923))
+* **deps:** update dependency semver to ^7.3.2 ([21b57b3](https://github.com/cybozu/duck/commit/21b57b31d6dc3d4e7074df51d15a8d45b57c71ed))
+
 ### [0.32.6](https://github.com/cybozu/duck/compare/v0.32.5...v0.32.6) (2020-04-28)
 
 
