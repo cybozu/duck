@@ -18,7 +18,7 @@ export class XUnitReporter extends BaseReporter {
         options.outputDir === undefined
           ? DEFAULT_OUTPUT_DIR
           : options.outputDir,
-      resultFilename: "results.xml"
+      resultFilename: "results.xml",
     });
   }
 
@@ -28,10 +28,10 @@ export class XUnitReporter extends BaseReporter {
       .element("testsuite")
       .attribute("name", entryConfigPath);
     const errors = items.filter(
-      item => item.level === "error"
+      (item) => item.level === "error"
     ) as CompileErrorCase[];
     if (errors.length > 0) {
-      errors.forEach(error => {
+      errors.forEach((error) => {
         const testcase = testsuite
           .element("testcase")
           .attribute("classname", error.source)

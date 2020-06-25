@@ -56,7 +56,7 @@ describe("Dag", () => {
         new Node("a", []),
         new Node("b", ["a"]),
         new Node("c", ["a"]),
-        new Node("d", ["b"])
+        new Node("d", ["b"]),
       ]);
       assert(dag.getLcaNode("a", "b").id === "a");
       assert(dag.getLcaNode("b", "c").id === "a");
@@ -73,7 +73,7 @@ describe("Dag", () => {
       const dag = new Dag([
         new Node("a", []),
         new Node("b", ["a", "c"]),
-        new Node("c", ["a"])
+        new Node("c", ["a"]),
       ]);
       assert(dag.getLcaNode("a", "b").id === "a");
       assert(dag.getLcaNode("a", "c").id === "a");
@@ -89,7 +89,7 @@ describe("Dag", () => {
         new Node("b", ["a"]),
         new Node("c", ["a"]),
         new Node("d", ["c"]),
-        new Node("e", ["b", "d"])
+        new Node("e", ["b", "d"]),
       ]);
       assert(dag.getLcaNode("a", "b").id === "a");
       assert(dag.getLcaNode("b", "c").id === "a");
@@ -108,7 +108,7 @@ describe("Dag", () => {
         new Node("b", ["a"]),
         new Node("c", ["a"]),
         new Node("d", ["b"]),
-        new Node("e", ["b"])
+        new Node("e", ["b"]),
       ]);
       assert(dag.getLcaNode("a", "b", "c").id === "a");
       assert(dag.getLcaNode("a", "b", "d").id === "a");

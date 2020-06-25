@@ -9,7 +9,7 @@ export abstract class BaseReporter {
   constructor({
     stderr,
     outputDir,
-    resultFilename
+    resultFilename,
   }: {
     stderr: boolean;
     outputDir: string | null;
@@ -25,7 +25,7 @@ export abstract class BaseReporter {
    * @param reasons
    */
   async output(reasons: readonly ErrorReason[]): Promise<void> {
-    const promises = reasons.map(async reason => {
+    const promises = reasons.map(async (reason) => {
       const content = this.format(reason);
       if (this.stderr) {
         console.error(content);

@@ -31,10 +31,10 @@ describe("XUnitReporter", () => {
         items: [
           {
             level: "info",
-            description: "89 error(s), 5 warning(s), 98.4% typed"
-          }
-        ]
-      }
+            description: "89 error(s), 5 warning(s), 98.4% typed",
+          },
+        ],
+      },
     ] as const;
     const expected = oneLineTrim`
         <?xml version="1.0"?>
@@ -79,9 +79,9 @@ describe("XUnitReporter", () => {
         items: [
           {
             level: "info",
-            description: "89 error(s), 5 warning(s), 98.4% typed"
-          }
-        ]
+            description: "89 error(s), 5 warning(s), 98.4% typed",
+          },
+        ],
       });
       assert.equal(
         actual,
@@ -107,9 +107,9 @@ describe("XUnitReporter", () => {
             line: 57,
             column: 32,
             context:
-              "  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^"
-          }
-        ]
+              "  this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^",
+          },
+        ],
       });
       assert.equal(
         actual,
@@ -139,9 +139,9 @@ describe("XUnitReporter", () => {
             source:
               "/path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js",
             line: 57,
-            column: 32
-          }
-        ]
+            column: 32,
+          },
+        ],
       });
       assert.equal(
         actual,
