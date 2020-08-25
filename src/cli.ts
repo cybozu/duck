@@ -158,6 +158,11 @@ const buildSoyOptions = {
     type: "array",
     coerce: path.resolve,
   },
+  soyClasspaths: {
+    desc: "Classpaths for running Soy.jar",
+    type: "array",
+    coerce: path.resolve,
+  },
   config,
   watch: {
     desc: "Re-compile incrementally when files change",

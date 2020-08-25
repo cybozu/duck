@@ -84,6 +84,7 @@ Options:
   --skipInitialBuild, -s  Skip initial building of Soy and deps.js      [boolean] [default: false]
   --soyJarPath            A path to Soy.jar                                               [string]
   --soyFileRoots          Root directories of soy files                                    [array]
+  --soyClasspaths         Classpaths for Closure Templates                                 [array]
   --watch, -w             Re-compile incrementally when files change    [boolean] [default: false]
   -v, --version           Show version number                                            [boolean]
   -h, --help              Show help                                                      [boolean]
@@ -121,6 +122,8 @@ module.exports = {
   soyJarPath: "lib/closure-templates.jar",
   // (Required) Directories where Closure Templates .soy files are stored
   soyFileRoots: ["src/soy"],
+  // Classpaths for Closure Templates 
+  soyClasspaths: ["lib/plugin.jar"],
   // CLI options for Closure Templates
   soyOptions: {
     shouldGenerateJsdoc: true,
