@@ -7,6 +7,7 @@ describe("soy", () => {
       const config = {
         soyFileRoots: [],
         soyJarPath: "/soy.jar",
+        soyClasspaths: ["/plugin1.jar", "/plugin2.jar"],
         soyOptions: {
           outputPathFormat: "{INPUT_DIRECTORY}/{INPUT_FILE_NAME_NO_EXT}.soy.js",
           shouldProvideRequireSoyNamespaces: true,
@@ -16,7 +17,7 @@ describe("soy", () => {
       };
       assert.deepEqual(toSoyArgs(["/js/foo.soy", "/js/bar.soy"], config), [
         "-classpath",
-        "/soy.jar",
+        "/soy.jar:/plugin1.jar:/plugin2.jar",
         "com.google.template.soy.SoyToJsSrcCompiler",
         "--outputPathFormat",
         "{INPUT_DIRECTORY}/{INPUT_FILE_NAME_NO_EXT}.soy.js",
@@ -33,6 +34,7 @@ describe("soy", () => {
       const config = {
         soyFileRoots: [],
         soyJarPath: "/soy.jar",
+        soyClasspaths: [],
         soyOptions: {
           outputPathFormat: "/out",
           inputPrefix: "/path/to/js/",

@@ -5,7 +5,10 @@ import { logger } from "../logger";
 import { compileSoy } from "../soy";
 
 export type BuildSoyConfig = Required<
-  Pick<DuckConfig, "soyFileRoots" | "soyJarPath" | "soyOptions">
+  Pick<
+    DuckConfig,
+    "soyFileRoots" | "soyJarPath" | "soyClasspaths" | "soyOptions"
+  >
 >;
 
 /**
