@@ -15,6 +15,7 @@ export interface DuckConfig {
   depsWorkers?: number;
   entryConfigDir: string;
   soyJarPath?: string;
+  soyClasspaths: readonly string[];
   soyOptions?: SoyToJsOptions;
   soyFileRoots?: readonly string[];
   concurrency?: number;
@@ -55,6 +56,8 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPath(config, configDir, "depsJs");
     toAbsPathArray(config, configDir, "depsJsIgnoreDirs");
     config.depsJsIgnoreDirs = config.depsJsIgnoreDirs || [];
+    toAbsPathArray(config, configDir, "soyClasspaths");
+    config.soyClasspaths = config.soyClasspaths || [];
     toAbsPathArray(config, configDir, "soyFileRoots");
     if (config.soyOptions) {
       const { inputPrefix } = config.soyOptions;
