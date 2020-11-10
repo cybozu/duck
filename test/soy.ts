@@ -7,16 +7,17 @@ describe("soy", () => {
       const config = {
         soyFileRoots: [],
         soyJarPath: "/soy.jar",
+        soyClasspaths: ["/plugin1.jar", "/plugin2.jar"],
         soyOptions: {
           outputPathFormat: "{INPUT_DIRECTORY}/{INPUT_FILE_NAME_NO_EXT}.soy.js",
           shouldProvideRequireSoyNamespaces: true,
           bidiGlobalDir: 1 as const,
-          pluginModules: ["com.example.Foo", "com.example.Bar"]
-        }
+          pluginModules: ["com.example.Foo", "com.example.Bar"],
+        },
       };
       assert.deepEqual(toSoyArgs(["/js/foo.soy", "/js/bar.soy"], config), [
         "-classpath",
-        "/soy.jar",
+        "/soy.jar:/plugin1.jar:/plugin2.jar",
         "com.google.template.soy.SoyToJsSrcCompiler",
         "--outputPathFormat",
         "{INPUT_DIRECTORY}/{INPUT_FILE_NAME_NO_EXT}.soy.js",
@@ -26,17 +27,18 @@ describe("soy", () => {
         "--pluginModules",
         "com.example.Foo,com.example.Bar",
         "--srcs",
-        "/js/foo.soy,/js/bar.soy"
+        "/js/foo.soy,/js/bar.soy",
       ]);
     });
     it("inputPrefix", () => {
       const config = {
         soyFileRoots: [],
         soyJarPath: "/soy.jar",
+        soyClasspaths: [],
         soyOptions: {
           outputPathFormat: "/out",
-          inputPrefix: "/path/to/js/"
-        }
+          inputPrefix: "/path/to/js/",
+        },
       };
       assert.deepEqual(
         toSoyArgs(["/path/to/js/foo.soy", "/path/to/js/bar/baz.soy"], config),
@@ -49,7 +51,7 @@ describe("soy", () => {
           "--inputPrefix",
           "/path/to/js/",
           "--srcs",
-          "foo.soy,bar/baz.soy"
+          "foo.soy,bar/baz.soy",
         ]
       );
     });

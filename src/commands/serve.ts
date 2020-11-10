@@ -13,19 +13,19 @@ import {
   compileToJson,
   convertModuleInfos,
   createCompilerOptionsForChunks,
-  createCompilerOptionsForPage
+  createCompilerOptionsForPage,
 } from "../compiler";
 import { DuckConfig } from "../duckconfig";
 import {
   createDag,
   EntryConfig,
   loadEntryConfigById,
-  PlovrMode
+  PlovrMode,
 } from "../entryconfig";
 import {
   generateDepFileText,
   restoreDepsJs,
-  writeCachedDepsOnDisk
+  writeCachedDepsOnDisk,
 } from "../gendeps";
 import { logger, setGlobalLogger } from "../logger";
 import {
@@ -33,7 +33,7 @@ import {
   compileUrlPath,
   depsUrlPath,
   googBaseUrlPath,
-  inputsUrlPath
+  inputsUrlPath,
 } from "../urls";
 import { watchJsAndSoy } from "../watch";
 
@@ -46,12 +46,9 @@ function getScriptBaseUrl(
   reply: fastify.FastifyReply<ServerResponse>,
   isHttps: boolean
 ): URL {
-  const { host } = reply.request.headers;
-  if (typeof host !== "string") {
-    throw new TypeError(`Host header of request doesn't exist: ${host}`);
-  }
+  const { hostname } = reply.request;
   const scheme = isHttps ? "https" : "http";
-  return new URL(`${scheme}://${host}/`);
+  return new URL(`${scheme}://${hostname}/`);
 }
 
 function getGoogBaseUrl(baseUrl: URL): URL {
@@ -67,7 +64,7 @@ function getDepsUrl(baseUrl: URL, entryConfigId: string): URL {
 export async function serve(config: DuckConfig, watch = true) {
   setGlobalLogger(
     pino({
-      prettyPrint: { translateTime: "SYS:HH:MM:ss.l", ignore: "hostname,pid" }
+      prettyPrint: { translateTime: "SYS:HH:MM:ss.l", ignore: "hostname,pid" },
     })
   );
 
@@ -88,7 +85,7 @@ export async function serve(config: DuckConfig, watch = true) {
     closureLibraryUrlPath,
     serveStatic(config.closureLibraryDir, {
       maxAge: "1d",
-      immutable: true
+      immutable: true,
     }) as any
   );
   server.use(inputsUrlPath, serveStatic(config.inputsRoot) as any);
@@ -113,14 +110,14 @@ export async function serve(config: DuckConfig, watch = true) {
           id: { type: "string" },
           mode: {
             type: "string",
-            enum: ["RAW", "WHITESPACE", "SIMPLE", "ADVANCED"]
+            enum: ["RAW", "WHITESPACE", "SIMPLE", "ADVANCED"],
           },
           chunk: { type: "string" },
-          parentRequest: { type: "string" }
+          parentRequest: { type: "string" },
         },
-        required: ["id"]
-      }
-    }
+        required: ["id"],
+      },
+    },
   };
 
   server.get<CompileQuery>(compileUrlPath, opts, async (request, reply) => {
@@ -153,8 +150,8 @@ export async function serve(config: DuckConfig, watch = true) {
     baseUrl: URL
   ): string[] {
     return inputs
-      .map(input => path.relative(config.inputsRoot, input))
-      .map(input => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
+      .map((input) => path.relative(config.inputsRoot, input))
+      .map((input) => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
   }
 
   function replyChunksRaw(
@@ -163,13 +160,13 @@ export async function serve(config: DuckConfig, watch = true) {
   ) {
     const baseUrl = getScriptBaseUrl(reply, !!config.https);
     const modules = assertNonNullable(entryConfig.modules);
-    const { moduleInfo, moduleUris } = convertModuleInfos(entryConfig, id => {
+    const { moduleInfo, moduleUris } = convertModuleInfos(entryConfig, (id) => {
       return inputsToUrisForRaw(modules[id].inputs, baseUrl);
     });
     // The root chunk loads all chunks in RAW mode
     const sortedChunkIds = createDag(entryConfig).getSortedIds();
     const rootId = sortedChunkIds[0];
-    moduleUris[rootId] = flat(sortedChunkIds.map(id => moduleUris[id]));
+    moduleUris[rootId] = flat(sortedChunkIds.map((id) => moduleUris[id]));
     for (const id in moduleUris) {
       if (id !== rootId) {
         moduleUris[id] = [];
@@ -190,7 +187,9 @@ export async function serve(config: DuckConfig, watch = true) {
     )};</script>');
     document.write('<script>var PLOVR_MODULE_USE_DEBUG_MODE = ${!!entryConfig.debug};</script>');
     ${rootModuleUris
-      .map(uri => `document.write('<script>goog.require("${uri}")</script>');`)
+      .map(
+        (uri) => `document.write('<script>goog.require("${uri}")</script>');`
+      )
       .join("\n")}
     `);
   }
@@ -227,7 +226,7 @@ export async function serve(config: DuckConfig, watch = true) {
     const {
       options,
       sortedChunkIds,
-      rootChunkId
+      rootChunkId,
     } = await createCompilerOptionsForChunks(
       entryConfig,
       config,
@@ -262,7 +261,9 @@ export async function serve(config: DuckConfig, watch = true) {
       entryConfig.id
     )}"></script>');
     ${uris
-      .map(uri => `document.write('<script>goog.require("${uri}")</script>');`)
+      .map(
+        (uri) => `document.write('<script>goog.require("${uri}")</script>');`
+      )
       .join("\n")}
   `);
   }
@@ -283,10 +284,7 @@ export async function serve(config: DuckConfig, watch = true) {
         `Unexpectedly chunkOutputs.length must be 1, but actual ${compileOutputs.length}`
       );
     }
-    reply
-      .code(200)
-      .type("application/javascript")
-      .send(compileOutputs[0].src);
+    reply.code(200).type("application/javascript").send(compileOutputs[0].src);
   }
 
   server.get<CompileQuery>(depsUrlPath, opts, async (request, reply) => {
@@ -301,10 +299,7 @@ export async function serve(config: DuckConfig, watch = true) {
       config.depsJsIgnoreDirs.concat(config.closureLibraryDir),
       config.depsWorkers
     );
-    reply
-      .code(200)
-      .type("application/javascript")
-      .send(depsContent);
+    reply.code(200).type("application/javascript").send(depsContent);
     updateDepsJsCache(config);
   });
 
@@ -330,7 +325,7 @@ function updateDepsJsCache(config: DuckConfig) {
         logger.debug(
           `[DEPSJS_UPDATED]: ${path.relative(process.cwd(), depsJs)}`
         ),
-      err => logger.error({ err }, "Fail to write deps.js")
+      (err) => logger.error({ err }, "Fail to write deps.js")
     );
   }
 }
@@ -340,7 +335,7 @@ async function createServer(
 ): Promise<fastify.FastifyInstance> {
   const opts: fastify.ServerOptions = {
     logger,
-    disableRequestLogging: true
+    disableRequestLogging: true,
   };
   const { http2, https } = config;
   // `req.originalUrl` is added by fastify but doesn't exist in the type definition.
@@ -355,7 +350,7 @@ async function createServer(
   if (https) {
     const httpsOptions = {
       key: await fs.readFile(https.keyPath, "utf8"),
-      cert: await fs.readFile(https.certPath, "utf8")
+      cert: await fs.readFile(https.certPath, "utf8"),
     };
     // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
     // But it is not a big deal.
@@ -363,7 +358,7 @@ async function createServer(
       server = fastify({
         ...opts,
         https: httpsOptions,
-        http2: true
+        http2: true,
       }) as fastify.FastifyInstance<any, any, any>;
     } else {
       server = fastify({ ...opts, https: httpsOptions }) as any;
@@ -394,7 +389,7 @@ async function createServer(
       {
         request: `${method} ${originalUrl || url || '"N/A"'}`,
         statusCode: reply.res.statusCode,
-        responseTime: `${Math.round(reply.getResponseTime())}ms`
+        responseTime: `${Math.round(reply.getResponseTime())}ms`,
       },
       "request completed"
     );

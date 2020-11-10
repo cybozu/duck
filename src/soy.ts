@@ -14,7 +14,9 @@ export interface SoyToJsOptions {
   pluginModules?: readonly string[];
 }
 
-type SoyConfig = Required<Pick<DuckConfig, "soyJarPath" | "soyOptions">>;
+type SoyConfig = Required<
+  Pick<DuckConfig, "soyJarPath" | "soyClasspaths" | "soyOptions">
+>;
 
 export async function compileSoy(
   soyFiles: readonly string[],
@@ -27,7 +29,7 @@ export async function compileSoy(
       msg: "Print config only",
       type: resultInfoLogType,
       title: "Soy config",
-      bodyObject: soyArgs
+      bodyObject: soyArgs,
     });
     return;
   }
@@ -37,12 +39,13 @@ export async function compileSoy(
 
 export function toSoyArgs(
   soyFiles: readonly string[],
-  { soyJarPath, soyOptions }: SoyConfig
+  { soyJarPath, soyClasspaths, soyOptions }: SoyConfig
 ): string[] {
+  const classpaths = [soyJarPath, ...soyClasspaths].join(":");
   const args = [
     "-classpath",
-    soyJarPath,
-    "com.google.template.soy.SoyToJsSrcCompiler"
+    classpaths,
+    "com.google.template.soy.SoyToJsSrcCompiler",
   ];
   Object.entries(soyOptions).forEach(([key, value]) => {
     if (typeof value === "boolean" && value) {
@@ -57,7 +60,7 @@ export function toSoyArgs(
   });
   if (soyOptions.inputPrefix) {
     const { inputPrefix } = soyOptions;
-    soyFiles = soyFiles.map(filepath => path.relative(inputPrefix, filepath));
+    soyFiles = soyFiles.map((filepath) => path.relative(inputPrefix, filepath));
   }
   args.push("--srcs", soyFiles.join(","));
   return args;
