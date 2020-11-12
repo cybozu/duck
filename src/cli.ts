@@ -198,7 +198,6 @@ export function run(processArgv: readonly string[]): void {
           coerce: path.resolve,
         },
         closureLibraryDir,
-        depsJs,
         ...buildDepsOptions,
         skipInitialBuild,
         port: {
