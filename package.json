@@ -86,7 +86,7 @@
     "power-assert": "^1.6.1",
     "prettier": "^2.1.2",
     "rimraf": "^3.0.2",
-    "standard-version": "^8.0.2",
+    "standard-version": "^9.0.0",
     "typescript": "^3.9.7"
   },
   "homepage": "https://github.com/cybozu/duck",
