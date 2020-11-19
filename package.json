@@ -24,8 +24,8 @@
     "clean": "rimraf lib .tsbuildinfo",
     "lint": "eslint --ext js,ts src test types examples",
     "test": "npm-run-all clean -p lint build -s unit:coverage --aggregate-output -l",
-    "unit": "mocha",
-    "unit:coverage": "nyc mocha",
+    "unit": "mocha --timeout 10000",
+    "unit:coverage": "nyc mocha --timeout 10000",
     "release": "run-s build lint && standard-version",
     "release:dryrun": "standard-version --dry-run"
   },
