@@ -32,7 +32,7 @@
   "dependencies": {
     "@teppeis/stream-to-observable": "^0.3.1",
     "@types/pino": "^6.3.3",
-    "array.prototype.flat": "^1.2.3",
+    "array.prototype.flat": "^1.2.4",
     "chokidar": "^3.4.3",
     "common-tags": "^1.8.0",
     "cors": "^2.8.5",
