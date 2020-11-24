@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.32.8](https://github.com/cybozu/duck/compare/v0.32.7...v0.32.8) (2020-11-24)
+
+
+### Features
+
+* add soyClasspaths option ([6a6d656](https://github.com/cybozu/duck/commit/6a6d656493f0634dc978039a4606e65335f276f9))
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/pino to ^6.3.4 ([#537](https://github.com/cybozu/duck/issues/537)) ([7cf90bf](https://github.com/cybozu/duck/commit/7cf90bf4d09aacfb7abd6b93bc81125006ffeee9))
+* **deps:** update dependency array.prototype.flat to ^1.2.4 ([#535](https://github.com/cybozu/duck/issues/535)) ([304e7c7](https://github.com/cybozu/duck/commit/304e7c72b5582f6ea895e0c4e359dad120be180f))
+* **deps:** update dependency chokidar to ^3.4.3 ([#503](https://github.com/cybozu/duck/issues/503)) ([3ed0db2](https://github.com/cybozu/duck/commit/3ed0db29f53690736da9eb06e1fddd4df4d4b8f6))
+* **deps:** update dependency execa to ^4.0.3 ([#476](https://github.com/cybozu/duck/issues/476)) ([280e17b](https://github.com/cybozu/duck/commit/280e17b0e02d293c62af836f3319e1d1721a46c4))
+* **deps:** update dependency execa to ^4.1.0 ([#512](https://github.com/cybozu/duck/issues/512)) ([8128707](https://github.com/cybozu/duck/commit/812870770ed6a7940ea5b5e51bd83307bdec3de9))
+* **deps:** update dependency fastify to v2.15.1 [security] ([#506](https://github.com/cybozu/duck/issues/506)) ([13f00dd](https://github.com/cybozu/duck/commit/13f00dd26e3ca4cee1d9a8c8903fcd783d2226f6))
+* **deps:** update dependency merge-options to v3 ([#528](https://github.com/cybozu/duck/issues/528)) ([8908d95](https://github.com/cybozu/duck/commit/8908d9581440710670bb2d0a0843375363e2e5ed))
+* **deps:** update dependency p-limit to v3 ([14f170d](https://github.com/cybozu/duck/commit/14f170d3c29ae2be9ed1587ac76dc69bd98bd7e8))
+* **deps:** update dependency p-limit to v3 ([3b0ae32](https://github.com/cybozu/duck/commit/3b0ae32e43800faad4598234f765b12a2bddbdff))
+* **deps:** update dependency p-settle to ^4.1.1 ([#466](https://github.com/cybozu/duck/issues/466)) ([eb13f7f](https://github.com/cybozu/duck/commit/eb13f7f12ab28f4c2e75a525c928c774af5470bd))
+* **deps:** update dependency pino to ^6.7.0 ([#513](https://github.com/cybozu/duck/issues/513)) ([ab5fcb6](https://github.com/cybozu/duck/commit/ab5fcb64228f7153ec2f881f4c36e9c46e44d44c))
+* **deps:** update dependency pino to v6 ([#427](https://github.com/cybozu/duck/issues/427)) ([62ac7c3](https://github.com/cybozu/duck/commit/62ac7c36b2be472ee28d3a57f95686e08f2b5382))
+* **deps:** update dependency pino-pretty to v4 ([#432](https://github.com/cybozu/duck/issues/432)) ([33ba0c0](https://github.com/cybozu/duck/commit/33ba0c0778936f84b6238e7e14aee67f5e6742ff))
+* **deps:** update dependency rxjs to ^6.6.3 ([#479](https://github.com/cybozu/duck/issues/479)) ([d115b7b](https://github.com/cybozu/duck/commit/d115b7b5be2a460a2c9fe869c98600065e7795d9))
+* **deps:** update dependency split2 to ^3.2.2 ([#514](https://github.com/cybozu/duck/issues/514)) ([5af391d](https://github.com/cybozu/duck/commit/5af391d3ffaa5ea364b2f35c4ddb8996fa84fb6f))
+* **deps:** update dependency strip-json-comments to ^3.1.1 ([#505](https://github.com/cybozu/duck/issues/505)) ([234fc92](https://github.com/cybozu/duck/commit/234fc927ad8bd13a6a0db6112d795b8c25f780a4))
+* **deps:** update dependency tempy to ^0.7.1 ([#515](https://github.com/cybozu/duck/issues/515)) ([83dbf39](https://github.com/cybozu/duck/commit/83dbf39ef7c2cd192e881d019c9e7cc717bbf4aa))
+* **deps:** update dependency tempy to v1 ([#529](https://github.com/cybozu/duck/issues/529)) ([83e329d](https://github.com/cybozu/duck/commit/83e329d819c913fbd176c62cc5945eb11c8463db))
+* **deps:** update dependency xmlbuilder to v15 ([dc4a044](https://github.com/cybozu/duck/commit/dc4a044f51548e4866fc2b9221c04a76686784f8))
+* **deps:** update dependency yargs to ^15.4.1 ([#516](https://github.com/cybozu/duck/issues/516)) ([7edc755](https://github.com/cybozu/duck/commit/7edc755354ebed54f04b8b24282f2291725b2e3f))
+* **deps:** update dependency yargs to ^16.1.1 ([#531](https://github.com/cybozu/duck/issues/531)) ([d189848](https://github.com/cybozu/duck/commit/d189848c3b706b14487aac35c2cf20086f34e6d5))
+* **deps:** update dependency yargs to v16 ([#530](https://github.com/cybozu/duck/issues/530)) ([b5d3ba2](https://github.com/cybozu/duck/commit/b5d3ba2b8c9608c0520c1ba4121f99e05527ac70))
+
 ### [0.32.7](https://github.com/cybozu/duck/compare/v0.32.6...v0.32.7) (2020-06-04)
 
 
