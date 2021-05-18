@@ -15,6 +15,7 @@
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/class-name-casing": "off",
     "node/no-exports-assign": "off",
-    "consistent-return": "off"
+    "consistent-return": "off",
+    "max-statements": "off"
   }
 }
