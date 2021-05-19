@@ -24,4 +24,7 @@ jobs:
         uses: npm ci
 
       - name: Lint with ESLint
-        uses: npm run lint
+        uses: npm run lint:eslint
+
+      - name: Check with tsc
+        uses: npm run lint:tsc
