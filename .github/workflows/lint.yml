@@ -21,10 +21,10 @@ jobs:
           node-version: "14"
 
       - name: Install dependencies
-        uses: npm ci
+        run: npm ci
 
       - name: Lint with ESLint
-        uses: npm run lint:eslint
+        run: npm run lint:eslint
 
       - name: Check with tsc
-        uses: npm run lint:tsc
+        run: npm run lint:tsc
