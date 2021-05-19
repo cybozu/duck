@@ -1,11 +1,11 @@
-export function assertString(arg: any, msg = "Should be string"): string {
+export function assertString(arg: unknown, msg = "Should be string"): string {
   if (typeof arg !== "string") {
     throw new TypeError(`${msg}: ${arg}`);
   }
   return arg;
 }
 
-export function assertNumber(arg: any, msg = "Should be number"): number {
+export function assertNumber(arg: unknown, msg = "Should be number"): number {
   if (typeof arg !== "number") {
     throw new TypeError(`${msg}: ${arg}`);
   }
