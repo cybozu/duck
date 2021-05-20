@@ -13,11 +13,15 @@ goog.scope(() => {
   moduleManager.setAllModuleInfo(goog.global.PLOVR_MODULE_INFO);
   const trustedModuleUris = {};
   for (const id in goog.global.PLOVR_MODULE_URIS) {
-    trustedModuleUris[id] = [
-      goog.html.legacyconversions.trustedResourceUrlFromString(
-        goog.global.PLOVR_MODULE_URIS[id]
-      ),
-    ];
+    if (
+      Object.prototype.hasOwnProperty.call(goog.global.PLOVR_MODULE_URIS, id)
+    ) {
+      trustedModuleUris[id] = [
+        goog.html.legacyconversions.trustedResourceUrlFromString(
+          goog.global.PLOVR_MODULE_URIS[id]
+        ),
+      ];
+    }
   }
   moduleManager.setModuleTrustedUris(trustedModuleUris);
   moduleManager.getModuleInfo("chunks").setLoaded();

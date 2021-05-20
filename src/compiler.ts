@@ -48,7 +48,9 @@ function createBaseOptions(
   if (entryConfig["experimental-compiler-options"]) {
     const expOpts = entryConfig["experimental-compiler-options"];
     for (const key in expOpts) {
-      opts[snakeCase(key)] = expOpts[key];
+      if (Object.prototype.hasOwnProperty.call(expOpts, key)) {
+        opts[snakeCase(key)] = expOpts[key];
+      }
     }
   }
 
@@ -412,9 +414,11 @@ export function convertModuleInfos(
   const moduleInfo: { [id: string]: string[] } = {};
   const moduleUris: { [id: string]: string[] } = {};
   for (const id in modules) {
-    const module = modules[id];
-    moduleInfo[id] = module.deps.slice();
-    moduleUris[id] = createModuleUris(id);
+    if (Object.prototype.hasOwnProperty.call(modules, id)) {
+      const module = modules[id];
+      moduleInfo[id] = module.deps.slice();
+      moduleUris[id] = createModuleUris(id);
+    }
   }
   return { moduleInfo, moduleUris };
 }
