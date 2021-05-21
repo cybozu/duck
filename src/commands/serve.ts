@@ -223,16 +223,13 @@ export async function serve(config: DuckConfig, watch = true) {
       return [uri.toString()];
     }
 
-    const {
-      options,
-      sortedChunkIds,
-      rootChunkId,
-    } = await createCompilerOptionsForChunks(
-      entryConfig,
-      config,
-      false,
-      createModuleUris
-    );
+    const { options, sortedChunkIds, rootChunkId } =
+      await createCompilerOptionsForChunks(
+        entryConfig,
+        config,
+        false,
+        createModuleUris
+      );
     updateDepsJsCache(config);
     const [chunkOutputs] = await compileToJson(options);
     const chunkIdToOutput: { [id: string]: CompilerOutput } = {};
