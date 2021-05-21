@@ -3,8 +3,8 @@
 Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to [plovr](https://github.com/bolinfest/plovr).
 
 [![npm version](https://badge.fury.io/js/%40cybozu%2Fduck.svg)](https://badge.fury.io/js/%40cybozu%2Fduck)
-[![](https://github.com/cybozu/duck/workflows/test/badge.svg)](https://github.com/cybozu/duck/actions?workflow=test)
-[![](https://github.com/cybozu/duck/workflows/lint/badge.svg)](https://github.com/cybozu/duck/actions?workflow=lint)
+[![](https://github.com/cybozu/duck/workflows/Test/badge.svg)](https://github.com/cybozu/duck/actions?workflow=Test)
+[![](https://github.com/cybozu/duck/workflows/Lint/badge.svg)](https://github.com/cybozu/duck/actions?workflow=Lint)
 [![coverage](https://codecov.io/gh/cybozu/duck/branch/master/graph/badge.svg)](https://codecov.io/gh/cybozu/duck)
 
 ## Install
