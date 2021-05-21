@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.33.0](https://github.com/cybozu/duck/compare/v0.32.8...v0.33.0) (2021-05-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop Node v10 support because of EOL
+
+### Bug Fixes
+
+* make directories recursively to generate deps.js ([#590](https://github.com/cybozu/duck/issues/590)) ([bfe1e40](https://github.com/cybozu/duck/commit/bfe1e40e1d041223b5df420aff9926422da59ca3))
+* Show friendly message for missing entryConfigDir ([#598](https://github.com/cybozu/duck/issues/598)) ([5ca2f33](https://github.com/cybozu/duck/commit/5ca2f33f56d480b1d7874a087d6462fa805831f5))
+* **deps:** update dependency @types/pino to ^6.3.5 ([#560](https://github.com/cybozu/duck/issues/560)) ([3d029f1](https://github.com/cybozu/duck/commit/3d029f1857c76e19456dd7266d94a3696feff83c))
+* **deps:** update dependency execa to v5 ([#550](https://github.com/cybozu/duck/issues/550)) ([27039e9](https://github.com/cybozu/duck/commit/27039e9127da320b127a7f8c5c7c819e0ea8cb92))
+* **deps:** update dependency fastify to v2.15.1 [security] ([#572](https://github.com/cybozu/duck/issues/572)) ([03df523](https://github.com/cybozu/duck/commit/03df5231f32fe5bc4daa9137c2f1d811069c1471))
+* **deps:** update dependency google-closure-deps to v20201102 ([#536](https://github.com/cybozu/duck/issues/536)) ([a4f9873](https://github.com/cybozu/duck/commit/a4f9873df4e1e8723b7647ac89485c478118bc26))
+* **deps:** update dependency merge-options to ^3.0.4 ([#541](https://github.com/cybozu/duck/issues/541)) ([1613697](https://github.com/cybozu/duck/commit/1613697f3e05992122a9267fced812db8e430beb))
+* **deps:** update dependency semver to ^7.3.4 ([#548](https://github.com/cybozu/duck/issues/548)) ([70e1fb1](https://github.com/cybozu/duck/commit/70e1fb1c883c9bff5e961bcb4e6581ab2823e58d))
+* **deps:** update dependency yargs to ^16.2.0 ([#552](https://github.com/cybozu/duck/issues/552)) ([252a8b1](https://github.com/cybozu/duck/commit/252a8b16e71ff310fdb6047152b7be38efad3037))
+
+
+* drop Node v10 support  ([#601](https://github.com/cybozu/duck/issues/601)) ([830e096](https://github.com/cybozu/duck/commit/830e0969523d943c86d87d476a16ec2f2c34bbde))
+
 ### [0.32.8](https://github.com/cybozu/duck/compare/v0.32.7...v0.32.8) (2020-11-24)
 
 
