@@ -2,16 +2,10 @@
 
 Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to [plovr](https://github.com/bolinfest/plovr).
 
-Status: **_WIP_**
-
-[![npm][npm-image]][npm-url]
-![node.js support versions][node-version]
-[![build status][circleci-image]][circleci-url]
-[![coverage][codecov-image]][codecov-url]
-[![dependency status][deps-image]][deps-url]
-[![license][license]](./LICENSE)
-
-<a title="Berkaycagdas [CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Yellow_Duck.jpg"><img width="256" alt="Yellow Duck" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Yellow_Duck.jpg/256px-Yellow_Duck.jpg"></a>
+[![npm version](https://badge.fury.io/js/%40cybozu%2Feslint-config.svg)](https://badge.fury.io/js/%40cybozu%2Fduck)
+[![](https://github.com/cybozu/eslint-config/workflows/test/badge.svg)](https://github.com/cybozu/duck/actions?workflow=test)
+[![](https://github.com/cybozu/eslint-config/workflows/lint/badge.svg)](https://github.com/cybozu/duck/actions?workflow=lint)
+[![coverage](https://codecov.io/gh/cybozu/duck/branch/master/graph/badge.svg)](https://codecov.io/gh/cybozu/duck)
 
 ## Install
 
@@ -258,15 +252,3 @@ build:soy   -- Compile Soy templates
 ## License
 
 MIT License: Cybozu, Inc.
-
-[npm-image]: https://img.shields.io/npm/v/@cybozu/duck.svg
-[npm-url]: https://npmjs.org/package/@cybozu/duck
-[npm-downloads-image]: https://img.shields.io/npm/dm/@cybozu/duck.svg
-[deps-image]: https://img.shields.io/david/cybozu/duck.svg
-[deps-url]: https://david-dm.org/cybozu/duck
-[node-version]: https://img.shields.io/badge/Node.js%20support->=v10.12-brightgreen.svg
-[license]: https://img.shields.io/npm/l/@cybozu/duck.svg
-[circleci-image]: https://circleci.com/gh/cybozu/duck.svg?style=shield
-[circleci-url]: https://circleci.com/gh/cybozu/duck
-[codecov-image]: https://codecov.io/gh/cybozu/duck/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/cybozu/duck
