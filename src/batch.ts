@@ -25,16 +25,19 @@ export async function getFaastCompiler(
   logger.info("Initializing batch mode");
   const batch = assertNonNullable(config.batch);
   const batchOptions = getBatchOptions(config);
-  const m =
-    batch === "aws"
-      ? await faastAws(compilerFaastFunctions, batchOptions as AwsOptions)
-      : batch === "local"
-      ? await faastLocal(compilerFaastFunctions, batchOptions as LocalOptions)
-      : null;
-  if (!m) {
-    throw new TypeError(`Unsupported batch mode: ${batch}`);
+  return getFaastModule(batch, batchOptions);
+}
+
+async function getFaastModule(
+  batch: "aws" | "local",
+  batchOptions: AwsOptions | LocalOptions
+) {
+  if (batch === "aws") {
+    return faastAws(compilerFaastFunctions, batchOptions as AwsOptions);
+  } else if (batch === "local") {
+    return faastLocal(compilerFaastFunctions, batchOptions as LocalOptions);
   }
-  return m;
+  throw new TypeError(`Unsupported batch mode: ${batch}`);
 }
 
 function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
@@ -47,8 +50,8 @@ function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
 }
 
 function defaultBatchOptions(config: DuckConfig): AwsOptions {
-  const closureVersion = require("google-closure-compiler/package.json")
-    .version;
+  const closureVersion =
+    require("google-closure-compiler/package.json").version;
   const major = semver.major(closureVersion);
   return {
     packageJson: {
