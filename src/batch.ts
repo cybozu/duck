@@ -50,8 +50,8 @@ function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
 }
 
 function defaultBatchOptions(config: DuckConfig): AwsOptions {
-  const closureVersion = require("google-closure-compiler/package.json")
-    .version;
+  const closureVersion =
+    require("google-closure-compiler/package.json").version;
   const major = semver.major(closureVersion);
   return {
     packageJson: {
