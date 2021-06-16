@@ -63,13 +63,16 @@ logStream.on("data", (data: any) => {
   }
 });
 
-function assertStringWithConfig (config: DuckConfig, key: keyof DuckConfig) {
+function assertStringWithConfig(config: DuckConfig, key: keyof DuckConfig) {
   const value = config[key];
   return assertString(value, `'${key}' is not string(${value}).`);
 }
-function assertNonNullableWithConfig (config: DuckConfig, key: keyof DuckConfig) {
+function assertNonNullableWithConfig(
+  config: DuckConfig,
+  key: keyof DuckConfig
+) {
   const value = config[key];
-  return assertNonNullable(value, `'${key}' is ${value}.`)
+  return assertNonNullable(value, `'${key}' is ${value}.`);
 }
 
 interface ResultInfo {
@@ -401,7 +404,9 @@ export function run(processArgv: readonly string[]): void {
           [
             {
               title: `Clean up deps.js: ${config.depsJs}`,
-              task: wrap(() => cleanDeps(assertStringWithConfig(config, "depsJs"))),
+              task: wrap(() =>
+                cleanDeps(assertStringWithConfig(config, "depsJs"))
+              ),
             },
           ],
           argv
