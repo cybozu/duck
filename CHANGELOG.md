@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.33.2](https://github.com/cybozu/duck/compare/v0.33.1...v0.33.2) (2021-07-20)
+
+
+### Bug Fixes
+
+* downgrade faastjs to v3 ([#626](https://github.com/cybozu/duck/issues/626)) ([2b2b0e8](https://github.com/cybozu/duck/commit/2b2b0e864b04639b14a56552f1cc87e4a75f049f))
+
 ### [0.33.1](https://github.com/cybozu/duck/compare/v0.33.0...v0.33.1) (2021-07-20)
 
 
