@@ -1,4 +1,4 @@
-import assert = require("assert");
+import { strict as assert } from "assert";
 import { oneLineTrim } from "common-tags";
 import { existsSync, promises as fs } from "fs";
 import path from "path";
