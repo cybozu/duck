@@ -1,4 +1,4 @@
-import assert = require("assert");
+import { strict as assert } from "assert";
 import path from "path";
 import fs from "fs";
 import tempy from "tempy";

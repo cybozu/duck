@@ -1,16 +1,14 @@
 import flat from "array.prototype.flat";
 import { promises as fs } from "fs";
-import glob from "glob";
+import fg from "fast-glob";
 import { depFile, depGraph, parser } from "google-closure-deps";
 import path from "path";
-import { promisify } from "util";
 import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
 import { EntryConfig } from "./entryconfig";
 import { googBaseUrlPath, inputsUrlPath } from "./urls";
 
 const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> =
   new Map();
-const globPromise = promisify(glob);
 
 /**
  * Generate deps.js source text for RAW mode.
@@ -112,9 +110,8 @@ export async function getDependencies(
       if (entryConfig["test-excludes"]) {
         testExcludes = entryConfig["test-excludes"];
       }
-      const files = await globPromise(path.join(p, "**/*.js"), {
+      const files = await fg(path.join(p, "**/*.js"), {
         ignore: ignoreDirPatterns,
-        follow: true,
       });
       return Promise.all(
         files
