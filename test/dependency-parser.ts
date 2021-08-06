@@ -1,4 +1,4 @@
-import assert = require("assert");
+import { strict as assert } from "assert";
 import { depGraph } from "google-closure-deps";
 import path from "path";
 import { parseDependency } from "../src/dependency-parser";
