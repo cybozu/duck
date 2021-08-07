@@ -381,7 +381,7 @@ export function run(processArgv: readonly string[]): void {
       buildSoyOptions,
       async (argv) => {
         const config = loadConfig(argv);
-        assertNonNullable(config, "soyOptions");
+        assertNonNullableWithConfig(config, "soyOptions");
         const tasks = listr(
           [
             {
