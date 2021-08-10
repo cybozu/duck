@@ -1,4 +1,4 @@
-import assert = require("assert");
+import { strict as assert } from "assert";
 import { stripIndents } from "common-tags";
 import { readFileSync } from "fs";
 import path from "path";
