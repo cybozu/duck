@@ -1,0 +1,6 @@
+{
+  "globals": {
+    "app": true,
+    "goog": true
+  }
+}
