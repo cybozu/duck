@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.33.2](https://github.com/cybozu/duck/compare/v0.33.1...v0.33.2) (2021-07-20)
+
+
+### Bug Fixes
+
+* downgrade faastjs to v3 ([#626](https://github.com/cybozu/duck/issues/626)) ([2b2b0e8](https://github.com/cybozu/duck/commit/2b2b0e864b04639b14a56552f1cc87e4a75f049f))
+
+### [0.33.1](https://github.com/cybozu/duck/compare/v0.33.0...v0.33.1) (2021-07-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/pino to ^6.3.8 ([#605](https://github.com/cybozu/duck/issues/605)) ([f3045dc](https://github.com/cybozu/duck/commit/f3045dcd5fe8ccbf94f72c6f059dc36c2dbdfd5b))
+* **deps:** update dependency faastjs to ^5.0.9 ([#606](https://github.com/cybozu/duck/issues/606)) ([54d2451](https://github.com/cybozu/duck/commit/54d245147a34c367da911d217c44e9b17a5c4e03))
+* **deps:** update dependency faastjs to ^5.4.5 ([#614](https://github.com/cybozu/duck/issues/614)) ([531df15](https://github.com/cybozu/duck/commit/531df151b224bdaab6dee3e6681765e23a16e9ef))
+* **deps:** update dependency fastify to ^2.15.3 ([#607](https://github.com/cybozu/duck/issues/607)) ([7514b3d](https://github.com/cybozu/duck/commit/7514b3dfe522ea645b313463d8885a9b7f907d85))
+* **deps:** update dependency glob to ^7.1.7 ([#608](https://github.com/cybozu/duck/issues/608)) ([cba2126](https://github.com/cybozu/duck/commit/cba21262311b4559917c2fce3f691ff5f7dd020b))
+* **deps:** update dependency rxjs to ^6.6.7 ([#609](https://github.com/cybozu/duck/issues/609)) ([561ed6f](https://github.com/cybozu/duck/commit/561ed6fa0d2d30cfd79e76402170b5e60aec0a24))
+* **deps:** update dependency semver to ^7.3.5 ([#610](https://github.com/cybozu/duck/issues/610)) ([661548c](https://github.com/cybozu/duck/commit/661548c22760c7714e396746c1eeefcd941f2c6b))
+* **deps:** update dependency tempy to ^1.0.1 ([#611](https://github.com/cybozu/duck/issues/611)) ([c5bac79](https://github.com/cybozu/duck/commit/c5bac793b3706c576b9ae811e3d19554da54c06a))
+
 ## [0.33.0](https://github.com/cybozu/duck/compare/v0.32.8...v0.33.0) (2021-05-21)
 
 
