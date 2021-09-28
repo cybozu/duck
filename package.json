@@ -57,7 +57,7 @@
     "split2": "^3.2.2",
     "strip-json-comments": "^3.1.1",
     "tempy": "^1.0.1",
-    "workerpool": "^6.1.4",
+    "workerpool": "^6.1.5",
     "xmlbuilder": "^15.1.1",
     "yargs": "^16.2.0",
     "zet": "^1.1.0"
@@ -76,7 +76,7 @@
     "@types/semver": "^7.3.8",
     "@types/serve-static": "^1.13.10",
     "@types/split2": "^3.2.1",
-    "@types/workerpool": "^6.0.1",
+    "@types/workerpool": "^6.1.0",
     "@types/yargs": "^15.0.14",
     "codecov": "^3.8.3",
     "eslint": "^7.26.0",
