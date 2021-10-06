@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.33.3](https://github.com/cybozu/duck/compare/v0.33.2...v0.33.3) (2021-10-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @types/pino to ^6.3.11 ([#648](https://github.com/cybozu/duck/issues/648)) ([5177c14](https://github.com/cybozu/duck/commit/5177c14c91ea06c6fc623d761b2590275fd592a5))
+* **deps:** update dependency chokidar to ^3.5.2 ([#564](https://github.com/cybozu/duck/issues/564)) ([a3e623a](https://github.com/cybozu/duck/commit/a3e623aa215394fdbf129a93525b40703051be06))
+* **deps:** update dependency execa to ^5.0.1 ([#620](https://github.com/cybozu/duck/issues/620)) ([888ba81](https://github.com/cybozu/duck/commit/888ba81ed46c7804eaa80b6d409698d9915b5ba4))
+* **deps:** update dependency execa to ^5.1.1 ([#649](https://github.com/cybozu/duck/issues/649)) ([734cbc5](https://github.com/cybozu/duck/commit/734cbc58814468512a10ecd8c8f91fbfd1f4eb3f))
+* **deps:** update dependency pino to ^6.13.3 ([#555](https://github.com/cybozu/duck/issues/555)) ([fb6157f](https://github.com/cybozu/duck/commit/fb6157f027bab91edbddc9851d4b7d8db7113102))
+* **deps:** update dependency pino-pretty to ^4.8.0 ([#570](https://github.com/cybozu/duck/issues/570)) ([8771e0c](https://github.com/cybozu/duck/commit/8771e0c58ed19e86e301abb4cf726a8a99f5452f))
+* **deps:** update dependency workerpool to ^6.1.5 ([#650](https://github.com/cybozu/duck/issues/650)) ([fd2f5fd](https://github.com/cybozu/duck/commit/fd2f5fdc43ec8f3c90a09a90c1cdd63e8944ab96))
+* show friendly messages for config assertions ([#624](https://github.com/cybozu/duck/issues/624)) ([10d3746](https://github.com/cybozu/duck/commit/10d3746ad0373dc3ecd253514aeb9fc48bd8c805))
+
 ### [0.33.2](https://github.com/cybozu/duck/compare/v0.33.1...v0.33.2) (2021-07-20)
 
 
