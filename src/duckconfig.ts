@@ -1,3 +1,4 @@
+import type { AwsOptions, GoogleOptions, LocalOptions } from "faastjs";
 import compilerPakageJson from "google-closure-compiler/package.json";
 import path from "path";
 import semver from "semver";
@@ -19,8 +20,8 @@ export interface DuckConfig {
   soyOptions?: SoyToJsOptions;
   soyFileRoots?: readonly string[];
   concurrency?: number;
-  batch?: "aws" | "local";
-  batchOptions?: import("faastjs").AwsOptions | import("faastjs").LocalOptions;
+  batch?: "aws" | "google" | "local";
+  batchOptions?: AwsOptions | GoogleOptions | LocalOptions;
   reporters?: Array<"json" | "text" | "xunit">;
   reporterOptions?: {
     json?: JsonReporterOptions;

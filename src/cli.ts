@@ -143,8 +143,8 @@ const buildJsOptions = {
     type: "number",
   },
   batch: {
-    desc: "Build in batch mode (on AWS or local for debug)",
-    choices: ["aws", "local"],
+    desc: "Build in batch mode (on AWS, Google or local for debug)",
+    choices: ["aws", "google", "local"],
   },
   reporters: {
     desc: 'Test reporters ("text", "xunit" or "json")',

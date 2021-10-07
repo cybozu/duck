@@ -178,7 +178,7 @@ function createBaseOptions(
     }
   }
 
-  if (duckConfig.batch === "aws") {
+  if (duckConfig.batch === "aws" || duckConfig.batch === "google") {
     convertCompilerOptionsToRelative(opts);
   }
 
@@ -266,7 +266,7 @@ export async function createCompilerOptionsForChunks(
     assertNonNullable(compilerOptions.compilation_level),
     createModuleUris
   );
-  if (duckConfig.batch === "aws") {
+  if (duckConfig.batch === "aws" || duckConfig.batch === "google") {
     convertCompilerOptionsToRelative(compilerOptions);
   }
 

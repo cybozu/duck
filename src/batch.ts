@@ -2,8 +2,10 @@ import {
   AwsOptions,
   CommonOptions,
   faastAws,
+  faastGoogle,
   faastLocal,
   FaastModuleProxy,
+  GoogleOptions,
   LocalOptions,
   log,
 } from "faastjs";
@@ -29,18 +31,22 @@ export async function getFaastCompiler(
 }
 
 async function getFaastModule(
-  batch: "aws" | "local",
-  batchOptions: AwsOptions | LocalOptions
+  batch: "aws" | "google" | "local",
+  batchOptions: AwsOptions | LocalOptions | GoogleOptions
 ) {
   if (batch === "aws") {
     return faastAws(compilerFaastFunctions, batchOptions as AwsOptions);
+  } else if (batch === "google") {
+    return faastGoogle(compilerFaastFunctions, batchOptions as GoogleOptions);
   } else if (batch === "local") {
     return faastLocal(compilerFaastFunctions, batchOptions as LocalOptions);
   }
   throw new TypeError(`Unsupported batch mode: ${batch}`);
 }
 
-function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
+function getBatchOptions(
+  config: DuckConfig
+): AwsOptions | LocalOptions | GoogleOptions {
   const { batchOptions = {} } = config;
   return mergeOptions.call(
     { concatArrays: true },
@@ -49,7 +55,7 @@ function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
   );
 }
 
-function defaultBatchOptions(config: DuckConfig): AwsOptions {
+function defaultBatchOptions(config: DuckConfig): AwsOptions | GoogleOptions {
   const closureVersion =
     require("google-closure-compiler/package.json").version;
   const major = semver.major(closureVersion);
@@ -81,7 +87,11 @@ function defaultBatchOptions(config: DuckConfig): AwsOptions {
 
 function getOsForNativeImage(config: DuckConfig) {
   const { platform } = process;
-  if (config.batch === "aws" || platform === "linux") {
+  if (
+    config.batch === "aws" ||
+    config.batch === "google" ||
+    platform === "linux"
+  ) {
     return "linux";
   } else if (platform === "darwin") {
     return "osx";

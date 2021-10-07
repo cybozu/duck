@@ -56,7 +56,7 @@ export type CompilerOptionsFormattingType =
 
 export interface ExtendedCompilerOptions {
   compilerOptions: CompilerOptions;
-  batch?: "aws" | "local";
+  batch?: "aws" | "google" | "local";
   warningsWhitelist?: WarningsWhitelistItem[];
 }
 
