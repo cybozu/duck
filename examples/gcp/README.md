@@ -5,13 +5,22 @@
 See https://faastjs.org/docs/google-cloud and https://cloud.google.com/docs/authentication/getting-started.
 
 1. Create a project
-2. Create a google service account
-3. Assign Owner permissions for the service account
-4. Set an environment variable `GOOGLE_APPLICATION_CREDENTIALS`
-5. Enable following APIs
+2. Enable following APIs
    - Cloud functions API
    - Cloud Billing API
    - Cloud Build API
+3. Create a google service account
+4. Assign Owner permissions for the service account
+5. Set an environment variable `GOOGLE_APPLICATION_CREDENTIALS`
+
+If you want to set strict permissions for the service account instead of Owner permissions, assign the following roles:
+
+- Cloud Functions Admin
+- Pub/Sub Editor
+- Billing Account Usage Commitment Recommender Viewer
+
+To allow the service account to impersonate App Engine default service account (`PROJECT-ID@appspot.gserviceaccount.com`), grant Service Account User role on the service account.
+See https://cloud.google.com/iam/docs/impersonating-service-accounts#impersonate-sa-level.
 
 ## How to build
 
