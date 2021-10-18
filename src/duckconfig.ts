@@ -90,9 +90,15 @@ export function loadConfig(opts: any = {}): DuckConfig {
     }
   }
 
-  if (result.batch === "aws" && !result.concurrency) {
-    // 1000 is the max concurrency of AWS Lambda
-    result.concurrency = 1000;
+  if (!result.concurrency) {
+    if (result.batch === "aws") {
+      // 1000 is the max concurrency of AWS Lambda
+      result.concurrency = 1000;
+    } else if (result.batch === "google") {
+      // https://cloud.google.com/functions/quotas#additional_quotas_for_background_functions
+      // The max concurrent invocations per function is 3000
+      result.concurrency = 3000;
+    }
   }
 
   if (result.batch) {
