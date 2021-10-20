@@ -73,7 +73,7 @@
     "@types/node": "^12.20.33",
     "@types/recursive-readdir": "^2.2.0",
     "@types/rimraf": "^3.0.2",
-    "@types/semver": "^7.3.8",
+    "@types/semver": "^7.3.9",
     "@types/serve-static": "^1.13.10",
     "@types/split2": "^3.2.1",
     "@types/workerpool": "^6.1.0",
