@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@teppeis/stream-to-observable": "^0.3.1",
-    "@types/pino": "^6.3.11",
+    "@types/pino": "^6.3.12",
     "array.prototype.flat": "^1.2.5",
     "chokidar": "^3.5.2",
     "common-tags": "^1.8.0",
