@@ -69,7 +69,7 @@
     "@cybozu/eslint-config": "^17.0.2",
     "@types/common-tags": "^1.8.1",
     "@types/listr": "^0.14.4",
-    "@types/mocha": "^9.0.0",
+    "@types/mocha": "^9.1.1",
     "@types/node": "^16.11.45",
     "@types/recursive-readdir": "^2.2.1",
     "@types/rimraf": "^3.0.2",
