@@ -71,7 +71,7 @@
     "@types/listr": "^0.14.4",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.45",
-    "@types/recursive-readdir": "^2.2.0",
+    "@types/recursive-readdir": "^2.2.1",
     "@types/rimraf": "^3.0.2",
     "@types/semver": "^7.3.9",
     "@types/serve-static": "^1.13.10",
