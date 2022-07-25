@@ -7,8 +7,10 @@ import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
 import { EntryConfig } from "./entryconfig";
 import { googBaseUrlPath, inputsUrlPath } from "./urls";
 
-const pathToDependencyCache: Map<string, Promise<depGraph.Dependency>> =
-  new Map();
+const pathToDependencyCache: Map<
+  string,
+  Promise<depGraph.Dependency>
+> = new Map();
 
 /**
  * Generate deps.js source text for RAW mode.
