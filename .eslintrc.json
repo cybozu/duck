@@ -1,5 +1,6 @@
 {
   "extends": "@cybozu/eslint-config/presets/node-typescript-prettier",
+  "root": true,
   "env": {
     "mocha": true
   },
