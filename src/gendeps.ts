@@ -127,6 +127,7 @@ export async function getDependencies(
           })
           .map(async (file) => {
             if (pathToDependencyCache.has(file)) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               return pathToDependencyCache.get(file)!;
             }
             const promise = parser.parse(file);

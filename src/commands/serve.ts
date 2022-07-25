@@ -205,8 +205,10 @@ export async function serve(config: DuckConfig, watch = true) {
     if (!entryIdToChunkCache.has(entryConfig.id)) {
       entryIdToChunkCache.set(entryConfig.id, new Map());
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const chunkCache = entryIdToChunkCache.get(entryConfig.id)!;
     if (requestedChunkId && parentRequest && chunkCache.has(parentRequest)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const parentChunkCache = chunkCache.get(parentRequest)!;
       if (!parentChunkCache[requestedChunkId]) {
         throw new Error(`Unexpected requested chunk: ${requestedChunkId}`);
