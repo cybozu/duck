@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [16.x, 18.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -42,7 +42,7 @@ jobs:
           npm i --no-save google-closure-library@20180910
           npm run build:ci
       - name: Report coverage to codecov
-        if: matrix.node-version == '12.x'
+        if: matrix.node-version == '16.x'
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: npx codecov

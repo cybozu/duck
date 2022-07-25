@@ -7,7 +7,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=16"
   },
   "main": "lib/compiler.js",
   "types": "lib/compiler.d.ts",
@@ -70,7 +70,7 @@
     "@types/common-tags": "^1.8.1",
     "@types/listr": "^0.14.4",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^12.20.41",
+    "@types/node": "^16.11.45",
     "@types/recursive-readdir": "^2.2.0",
     "@types/rimraf": "^3.0.2",
     "@types/semver": "^7.3.9",
