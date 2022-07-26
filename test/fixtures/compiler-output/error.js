@@ -1,7 +1,5 @@
-goog.provide('hello.world');
-
 /**
- * @returns {string}
+ * @return {string}
  */
 hello.world = function () {
   return null;
