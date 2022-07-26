@@ -7,18 +7,18 @@ goog.require("goog.module.ModuleManager");
 goog.scope(() => {
   const moduleManager = goog.module.ModuleManager.getInstance();
   const moduleLoader = new goog.module.ModuleLoader();
-  // moduleLoader.setDebugMode(!!goog.global['PLOVR_MODULE_USE_DEBUG_MODE']);
+  // moduleLoader.setDebugMode(!!goog.global["PLOVR_MODULE_USE_DEBUG_MODE"]);
   moduleLoader.setDebugMode(true);
   moduleManager.setLoader(moduleLoader);
-  moduleManager.setAllModuleInfo(goog.global.PLOVR_MODULE_INFO);
+  moduleManager.setAllModuleInfo(goog.global["PLOVR_MODULE_INFO"]);
   const trustedModuleUris = {};
-  for (const id in goog.global.PLOVR_MODULE_URIS) {
+  for (const id in goog.global["PLOVR_MODULE_URIS"]) {
     if (
-      Object.prototype.hasOwnProperty.call(goog.global.PLOVR_MODULE_URIS, id)
+      Object.prototype.hasOwnProperty.call(goog.global["PLOVR_MODULE_URIS"], id)
     ) {
       trustedModuleUris[id] = [
         goog.html.legacyconversions.trustedResourceUrlFromString(
-          goog.global.PLOVR_MODULE_URIS[id]
+          goog.global["PLOVR_MODULE_URIS"][id]
         ),
       ];
     }
