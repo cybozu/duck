@@ -1,6 +1,6 @@
 import flat from "array.prototype.flat";
-import { promises as fs } from "fs";
 import fg from "fast-glob";
+import { promises as fs } from "fs";
 import { depFile, depGraph, parser } from "google-closure-deps";
 import path from "path";
 import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
@@ -103,7 +103,6 @@ export async function getDependencies(
   ignoreDirs: readonly string[] = [],
   numOfWorkers?: number
 ): Promise<depGraph.Dependency[]> {
-  const ignoreDirPatterns = ignoreDirs.map((dir) => path.join(dir, "**/*"));
   const parser = new DependencyParserWithWorkers(numOfWorkers);
   try {
     // TODO: uniq
@@ -113,7 +112,7 @@ export async function getDependencies(
         testExcludes = entryConfig["test-excludes"];
       }
       const files = await fg(path.join(p, "**/*.js"), {
-        ignore: ignoreDirPatterns,
+        ignore: [...ignoreDirs],
       });
       return Promise.all(
         files
