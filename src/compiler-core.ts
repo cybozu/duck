@@ -23,12 +23,11 @@ export interface CompilerOptions {
   compilation_level?: CompilationLevel;
   js?: readonly string[];
   js_output_file?: string;
-  // NOTE: To support older compiler, use old `module` term instead of `chunk`
-  // chunk (module): `name:num-js-files[:[dep,...][:]]`, ex) "chunk1:3:app"
-  module?: readonly string[];
+  // chunk: `name:num-js-files[:[dep,...][:]]`, ex) "chunk1:3:app"
+  chunk?: readonly string[];
   // chunkname:wrappercode
-  module_wrapper?: readonly string[];
-  module_output_path_prefix?: string;
+  chunk_wrapper?: readonly string[];
+  chunk_output_path_prefix?: string;
   language_in?: string;
   language_out?: string;
   json_streams?: "IN" | "OUT" | "BOTH";
