@@ -96,7 +96,7 @@ function createBaseOptions(
           `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
         );
       }
-      opts.module_output_path_prefix = outputPath.slice(0, suffix.length * -1);
+      opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
     }
   } else {
     // for pages
@@ -256,11 +256,11 @@ export async function createCompilerOptionsForChunks(
   compilerOptions.js = flat(
     [...chunkToInputPathSet.values()].map((inputs) => [...inputs])
   );
-  compilerOptions.module = sortedChunkIds.map((id) => {
+  compilerOptions.chunk = sortedChunkIds.map((id) => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;
   });
-  compilerOptions.module_wrapper = createChunkWrapper(
+  compilerOptions.chunk_wrapper = createChunkWrapper(
     entryConfig,
     sortedChunkIds,
     assertNonNullable(compilerOptions.compilation_level),
