@@ -123,6 +123,28 @@ describe("gendeps", () => {
         paths: [path1, path2],
       };
       const results = await getDependencies(entryConfig);
+      assert.equal(results.length, 6);
+      assert.deepEqual(
+        new Set(results),
+        new Set([
+          createScriptDependency("path1/foo.js"),
+          createScriptDependency("path1/foo_test.js"),
+          createScriptDependency("path2/bar.js"),
+          createScriptDependency("path2/bar_test.js"),
+          createScriptDependency("path1/path1-1/baz.js"),
+          createScriptDependency("path1/path1-1/baz_test.js"),
+        ])
+      );
+    });
+    it("does not load files in `ignoreDirs`: sub directory match", async () => {
+      const path1 = path.join(fixturesDir, "path1");
+      const path11 = path.join(fixturesDir, "path1/path1-1");
+      const path2 = path.join(fixturesDir, "path2");
+      const entryConfig = {
+        paths: [path1, path2],
+      };
+      const results = await getDependencies(entryConfig, [path11]);
+      assert.equal(results.length, 4);
       assert.deepEqual(
         new Set(results),
         new Set([
@@ -133,19 +155,21 @@ describe("gendeps", () => {
         ])
       );
     });
-    it("does not load files in `ignoreDirs`", async () => {
+    it("does not load files in `ignoreDirs`: glob match", async () => {
       const path1 = path.join(fixturesDir, "path1");
       const path2 = path.join(fixturesDir, "path2");
       const entryConfig = {
         paths: [path1, path2],
       };
       const results = await getDependencies(entryConfig, [path2]);
-      assert.equal(results.length, 2);
+      assert.equal(results.length, 4);
       assert.deepEqual(
         new Set(results),
         new Set([
           createScriptDependency("path1/foo.js"),
           createScriptDependency("path1/foo_test.js"),
+          createScriptDependency("path1/path1-1/baz.js"),
+          createScriptDependency("path1/path1-1/baz_test.js"),
         ])
       );
     });
@@ -157,12 +181,14 @@ describe("gendeps", () => {
         "test-excludes": [path2],
       };
       const results = await getDependencies(entryConfig);
-      assert.equal(results.length, 3);
+      assert.equal(results.length, 5);
       assert.deepEqual(
         new Set(results),
         new Set([
           createScriptDependency("path1/foo.js"),
           createScriptDependency("path1/foo_test.js"),
+          createScriptDependency("path1/path1-1/baz.js"),
+          createScriptDependency("path1/path1-1/baz_test.js"),
           createScriptDependency("path2/bar.js"),
         ])
       );
