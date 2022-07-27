@@ -111,6 +111,12 @@ export async function getDependencies(
       if (entryConfig["test-excludes"]) {
         testExcludes = entryConfig["test-excludes"];
       }
+      for (const ignoreDir of ignoreDirs) {
+        // NOTE: fast-glob doesn't filter this pattern
+        if (p.startsWith(ignoreDir)) {
+          return [];
+        }
+      }
       const files = await fg(path.join(p, "**/*.js"), {
         ignore: [...ignoreDirs],
       });
