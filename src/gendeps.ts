@@ -103,6 +103,7 @@ export async function getDependencies(
   ignoreDirs: readonly string[] = [],
   numOfWorkers?: number
 ): Promise<depGraph.Dependency[]> {
+  const ignoreDirPatterns = ignoreDirs.map((dir) => path.join(dir, "**"));
   const parser = new DependencyParserWithWorkers(numOfWorkers);
   try {
     // TODO: uniq
@@ -111,14 +112,8 @@ export async function getDependencies(
       if (entryConfig["test-excludes"]) {
         testExcludes = entryConfig["test-excludes"];
       }
-      for (const ignoreDir of ignoreDirs) {
-        // NOTE: fast-glob doesn't filter this pattern
-        if (p.startsWith(ignoreDir)) {
-          return [];
-        }
-      }
       const files = await fg(path.join(p, "**/*.js"), {
-        ignore: [...ignoreDirs],
+        ignore: ignoreDirPatterns,
       });
       return Promise.all(
         files
