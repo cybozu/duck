@@ -358,6 +358,7 @@ function findTransitiveDeps(
   const pathToDep = new Map(
     dependencies.map((dep) => [dep.path, dep] as [string, depGraph.Dependency])
   );
+  const googBase = findGoogBaseFromDeps(dependencies);
   const graph = new depGraph.Graph(dependencies);
   const chunkToTransitiveDepPathSet: Map<string, Set<string>> = new Map();
   sortedChunkIds.forEach((chunkId) => {
@@ -368,10 +369,38 @@ function findTransitiveDeps(
         `entryConfig.paths does not include the inputs: ${input}`
       )
     );
-    const depPaths = graph.order(...entryPoints).map((dep) => dep.path);
+    let useGoogBase = false;
+    const depPaths = graph.order(...entryPoints).map((dep) => {
+      useGoogBase ||= dependsOnGoogBase(dep);
+      return dep.path;
+    });
+    if (useGoogBase) {
+      depPaths.unshift(googBase.path);
+    }
     chunkToTransitiveDepPathSet.set(chunkId, new Set(depPaths));
   });
   return chunkToTransitiveDepPathSet;
+}
+
+function dependsOnGoogBase(dep: depGraph.Dependency): boolean {
+  return (
+    dep.closureSymbols.length > 0 ||
+    dep.imports.some((imprt) => imprt.isGoogRequire())
+  );
+}
+
+function findGoogBaseFromDeps(
+  dependencies: readonly depGraph.Dependency[]
+): depGraph.Dependency {
+  const googBase = dependencies.find(
+    (dep) =>
+      dep instanceof depGraph.ParsedDependency &&
+      dep.closureRelativePath === "base.js"
+  );
+  if (!googBase) {
+    throw new TypeError("base.js is not found in dependencies");
+  }
+  return googBase;
 }
 
 /**

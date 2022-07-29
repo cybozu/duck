@@ -12,19 +12,19 @@ const expectedVariousModulesDeps = [
     depGraph.DependencyType.CLOSURE_MODULE,
     `${variousModulesFixturesDir}/closuremodule.js`,
     ["closuremodule"],
-    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")]
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_PROVIDE,
     `${variousModulesFixturesDir}/closureprovide.js`,
     ["closureprovide"],
-    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")]
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.ES6_MODULE,
     `${variousModulesFixturesDir}/esm-moduleid.js`,
     ["esm"],
-    [new depGraph.Es6Import("./foo.js"), new depGraph.GoogRequire("goog")],
+    [new depGraph.Es6Import("./foo.js")],
     "es6"
   ),
   new depGraph.Dependency(
@@ -38,7 +38,7 @@ const expectedVariousModulesDeps = [
     depGraph.DependencyType.SCRIPT,
     `${variousModulesFixturesDir}/script.js`,
     [],
-    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")]
   ),
 ] as const;
 

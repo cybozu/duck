@@ -26,19 +26,19 @@ const expectedVariousModulesDeps = [
     depGraph.DependencyType.CLOSURE_MODULE,
     `${variousModulesFixturesDir}/closuremodule.js`,
     ["closuremodule"],
-    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")]
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_PROVIDE,
     `${variousModulesFixturesDir}/closureprovide.js`,
     ["closureprovide"],
-    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")]
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.ES6_MODULE,
     `${variousModulesFixturesDir}/esm-moduleid.js`,
     ["esm"],
-    [new depGraph.Es6Import("./foo.js"), new depGraph.GoogRequire("goog")],
+    [new depGraph.Es6Import("./foo.js")],
     "es6"
   ),
   new depGraph.Dependency(
@@ -52,7 +52,7 @@ const expectedVariousModulesDeps = [
     depGraph.DependencyType.SCRIPT,
     `${variousModulesFixturesDir}/script.js`,
     [],
-    [new depGraph.GoogRequire("goog"), new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")]
   ),
 ] as const;
 
@@ -69,7 +69,7 @@ describe("gendeps", () => {
       };
       assert.equal(
         await generateDepFileText(entryConfig, inputsRoot, [closureDir]),
-        "goog.addDependency('../../../../foo/init.js', ['foo.init'], ['foo.bar', 'goog.array'], {});\n"
+        "goog.addDependency('../../../../foo/init.js', ['foo.init'], ['foo.bar', 'goog.array']);\n"
       );
     });
   });
@@ -84,25 +84,12 @@ describe("gendeps", () => {
       const text = await generateDepFileTextFromDeps([dep], "/closure/goog");
       assert.equal(
         text,
-        "goog.addDependency('../../app/foo.js', [], ['goog.array'], {});\n"
+        "goog.addDependency('../../app/foo.js', [], ['goog.array']);\n"
       );
       assert.equal(
         dep.type,
         depGraph.DependencyType.SCRIPT,
         "dep.type should not be changed"
-      );
-    });
-    it("does not output imported `goog`", async () => {
-      const dep = new depGraph.Dependency(
-        depGraph.DependencyType.SCRIPT,
-        "/app/foo.js",
-        [],
-        [new depGraph.GoogRequire("goog")]
-      );
-      const result = await generateDepFileTextFromDeps([dep], "/closure/goog");
-      assert.equal(
-        result,
-        "goog.addDependency('../../app/foo.js', [], [], {});\n"
       );
     });
   });
@@ -251,16 +238,13 @@ describe("gendeps", () => {
           depGraph.DependencyType.CLOSURE_PROVIDE,
           `${closureLib1}/closure/goog/a11y/aria/aria.js`,
           ["goog.a11y.aria"],
-          [
-            new depGraph.GoogRequire("goog"),
-            new depGraph.GoogRequire("goog.a11y.aria.Role"),
-          ]
+          [new depGraph.GoogRequire("goog.a11y.aria.Role")]
         ),
         new depGraph.Dependency(
           depGraph.DependencyType.CLOSURE_MODULE,
           `${closureLib1}/closure/goog/collections/sets.js`,
           ["goog.collections.sets"],
-          [new depGraph.GoogRequire("goog")],
+          [],
           "es6"
         ),
       ]);
