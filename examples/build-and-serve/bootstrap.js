@@ -1,8 +1,8 @@
 (() => {
   const [, basename] = /([^/]*).html$/.exec(location.pathname);
-  const mode = new URLSearchParams(location.search).get("mode");
+  const mode = new URLSearchParams(location.search).get("mode") ?? "RAW";
   let url;
-  if (mode && mode.toLowerCase() === "compiled") {
+  if (mode.toLowerCase() === "compiled") {
     url = new URL(location.origin);
     if (basename === "chunks") {
       url.pathname = "/build/chunks/chunks.js";
@@ -12,11 +12,7 @@
   } else {
     const params = new URLSearchParams();
     params.set("id", basename);
-    if (mode) {
-      params.set("mode", mode.toUpperCase());
-    } else {
-      params.set("mode", "RAW");
-    }
+    params.set("mode", mode.toUpperCase());
     url = new URL("http://localhost:9810/compile");
     // url = new URL("https://localhost:9810/compile");
     url.search = params.toString();

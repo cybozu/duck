@@ -3,7 +3,7 @@
 
 import workerpool from "workerpool";
 import { parseDependency } from "./dependency-parser";
-import { DependencyTransferData } from "./dependency-parser-wrapper";
+import type { DependencyTransferData } from "./dependency-parser-wrapper";
 
 async function parse(filepath: string): Promise<DependencyTransferData> {
   const dep = await parseDependency(filepath);

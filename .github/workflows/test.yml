@@ -34,7 +34,7 @@ jobs:
           npm run build:ci
       - name: Test in the oldest Google Closure Tools
         run: |
-          npm i --no-save google-closure-compiler@20180910 google-closure-deps@20190325
+          npm i --no-save google-closure-compiler@20180910 google-closure-deps@20210406
           OLDEST_COMPILER=1 npm run unit
       - name: Test examples in the oldest Google Closure Tools
         run: |
