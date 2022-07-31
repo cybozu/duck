@@ -1,11 +1,11 @@
+import cors from "@fastify/cors";
+import serveStatic from "@fastify/static";
 import { stripIndents } from "common-tags";
-import cors from "cors";
-import fastify from "fastify";
+import fastify, { FastifyInstance, FastifyReply } from "fastify";
 import { promises as fs } from "fs";
-import { ServerResponse } from "http";
+import type http2 from "http2";
 import path from "path";
 import pino from "pino";
-import serveStatic from "serve-static";
 import { assertNonNullable, assertString } from "../assert";
 import {
   CompilerOutput,
@@ -41,10 +41,7 @@ const entryIdToChunkCache: Map<
   Map<string, { [id: string]: CompilerOutput }>
 > = new Map();
 
-function getScriptBaseUrl(
-  reply: fastify.FastifyReply<ServerResponse>,
-  isHttps: boolean
-): URL {
+function getScriptBaseUrl(reply: FastifyReply, isHttps: boolean): URL {
   const { hostname } = reply.request;
   const scheme = isHttps ? "https" : "http";
   return new URL(`${scheme}://${hostname}/`);
@@ -80,14 +77,17 @@ export async function serve(config: DuckConfig, watch = true) {
   const server = await createServer(config);
 
   // static assets
-  server.use(
-    closureLibraryUrlPath,
-    serveStatic(config.closureLibraryDir, {
-      maxAge: "1d",
-      immutable: true,
-    }) as any
-  );
-  server.use(inputsUrlPath, serveStatic(config.inputsRoot) as any);
+  server.register(serveStatic, {
+    root: config.closureLibraryDir,
+    prefix: closureLibraryUrlPath,
+    maxAge: "1d",
+    immutable: true,
+  });
+  server.register(serveStatic, {
+    root: config.inputsRoot,
+    prefix: inputsUrlPath,
+    decorateReply: false,
+  });
 
   // route
   server.get("/", async (request, reply) => {
@@ -119,30 +119,34 @@ export async function serve(config: DuckConfig, watch = true) {
     },
   };
 
-  server.get<CompileQuery>(compileUrlPath, opts, async (request, reply) => {
-    const entryConfig = await loadEntryConfigById(
-      request.query.id,
-      config.entryConfigDir,
-      request.query
-    );
-    if (entryConfig.mode === "RAW") {
-      if (entryConfig.modules) {
-        return replyChunksRaw(reply, entryConfig);
-      }
-      return replyPageRaw(reply, entryConfig);
-    }
-    if (entryConfig.modules) {
-      return replyChunksCompile(
-        reply,
-        entryConfig,
-        assertString(request.raw.url),
-        // convert number to string
-        String(request.id),
+  server.get<{ Querystring: CompileQuery }>(
+    compileUrlPath,
+    opts,
+    async (request, reply) => {
+      const entryConfig = await loadEntryConfigById(
+        request.query.id,
+        config.entryConfigDir,
         request.query
       );
+      if (entryConfig.mode === "RAW") {
+        if (entryConfig.modules) {
+          return replyChunksRaw(reply, entryConfig);
+        }
+        return replyPageRaw(reply, entryConfig);
+      }
+      if (entryConfig.modules) {
+        return replyChunksCompile(
+          reply,
+          entryConfig,
+          assertString(request.raw.url),
+          // convert number to string
+          String(request.id),
+          request.query
+        );
+      }
+      return replyPageCompile(reply, entryConfig, config);
     }
-    return replyPageCompile(reply, entryConfig, config);
-  });
+  );
 
   function inputsToUrisForRaw(
     inputs: readonly string[],
@@ -153,10 +157,7 @@ export async function serve(config: DuckConfig, watch = true) {
       .map((input) => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
   }
 
-  function replyChunksRaw(
-    reply: fastify.FastifyReply<ServerResponse>,
-    entryConfig: EntryConfig
-  ) {
+  function replyChunksRaw(reply: FastifyReply, entryConfig: EntryConfig) {
     const baseUrl = getScriptBaseUrl(reply, !!config.https);
     const modules = assertNonNullable(entryConfig.modules);
     const { moduleInfo, moduleUris } = convertModuleInfos(entryConfig, (id) => {
@@ -194,7 +195,7 @@ export async function serve(config: DuckConfig, watch = true) {
   }
 
   async function replyChunksCompile(
-    reply: fastify.FastifyReply<ServerResponse>,
+    reply: FastifyReply,
     entryConfig: EntryConfig,
     url: string,
     requestId: string,
@@ -244,10 +245,7 @@ export async function serve(config: DuckConfig, watch = true) {
       .send(chunkIdToOutput[requestedChunkId || rootChunkId].src);
   }
 
-  function replyPageRaw(
-    reply: fastify.FastifyReply<ServerResponse>,
-    entryConfig: EntryConfig
-  ) {
+  function replyPageRaw(reply: FastifyReply, entryConfig: EntryConfig) {
     // TODO: separate EntryConfigPage from EntryConfig
     const inputs = assertNonNullable(entryConfig.inputs);
     const baseUrl = getScriptBaseUrl(reply, !!config.https);
@@ -267,7 +265,7 @@ export async function serve(config: DuckConfig, watch = true) {
   }
 
   async function replyPageCompile(
-    reply: fastify.FastifyReply<ServerResponse>,
+    reply: FastifyReply,
     entryConfig: EntryConfig,
     duckConfig: DuckConfig
   ) {
@@ -285,21 +283,25 @@ export async function serve(config: DuckConfig, watch = true) {
     reply.code(200).type("application/javascript").send(compileOutputs[0].src);
   }
 
-  server.get<CompileQuery>(depsUrlPath, opts, async (request, reply) => {
-    const entryConfig = await loadEntryConfigById(
-      request.query.id,
-      config.entryConfigDir,
-      request.query
-    );
-    const depsContent = await generateDepFileText(
-      entryConfig,
-      config.inputsRoot,
-      config.depsJsIgnoreDirs.concat(config.closureLibraryDir),
-      config.depsWorkers
-    );
-    reply.code(200).type("application/javascript").send(depsContent);
-    updateDepsJsCache(config);
-  });
+  server.get<{ Querystring: CompileQuery }>(
+    depsUrlPath,
+    opts,
+    async (request, reply) => {
+      const entryConfig = await loadEntryConfigById(
+        request.query.id,
+        config.entryConfigDir,
+        request.query
+      );
+      const depsContent = await generateDepFileText(
+        entryConfig,
+        config.inputsRoot,
+        config.depsJsIgnoreDirs.concat(config.closureLibraryDir),
+        config.depsWorkers
+      );
+      reply.code(200).type("application/javascript").send(depsContent);
+      updateDepsJsCache(config);
+    }
+  );
 
   // start server
   const start = async () => {
@@ -328,65 +330,60 @@ function updateDepsJsCache(config: DuckConfig) {
   }
 }
 
-async function createServer(
-  config: DuckConfig
-): Promise<fastify.FastifyInstance> {
-  const opts: fastify.ServerOptions = {
+async function createServer(config: DuckConfig): Promise<FastifyInstance> {
+  const opts = {
     logger,
     disableRequestLogging: true,
   };
-  const { http2, https } = config;
-  // `req.originalUrl` is added by fastify but doesn't exist in the type definition.
-  // https://github.com/fastify/fastify/blob/ecea232ae596fd0eb06a5b38080e19e4414bd942/lib/route.js#L285
-  type FastifyIncomingMessage = import("http").IncomingMessage & {
-    originalUrl?: string;
-  };
-  let server: fastify.FastifyInstance<
-    import("http").Server,
-    FastifyIncomingMessage
-  >;
-  if (https) {
+  let server: FastifyInstance;
+  if (config.https) {
     const httpsOptions = {
-      key: await fs.readFile(https.keyPath, "utf8"),
-      cert: await fs.readFile(https.certPath, "utf8"),
+      key: await fs.readFile(config.https.keyPath, "utf8"),
+      cert: await fs.readFile(config.https.certPath, "utf8"),
     };
     // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
     // But it is not a big deal.
-    if (http2) {
-      server = fastify({
+    if (config.http2) {
+      server = fastify<http2.Http2SecureServer>({
         ...opts,
         https: httpsOptions,
         http2: true,
-      }) as fastify.FastifyInstance<any, any, any>;
+      }) as FastifyInstance<any, any, any>;
     } else {
-      server = fastify({ ...opts, https: httpsOptions }) as any;
+      server = fastify({ ...opts, https: httpsOptions });
     }
   } else {
     server = fastify(opts);
   }
 
   // enable CORS at first
-  server.use(cors());
+  server.register(cors);
 
   // customize log output
   server.addHook("onRequest", async ({ raw, log }, reply) => {
     const { method, url } = raw;
-    if (url && url.startsWith(inputsUrlPath)) {
+    if (
+      url?.startsWith(closureLibraryUrlPath) ||
+      url?.startsWith(inputsUrlPath)
+    ) {
       // skip logging for static assets
       return;
     }
     log.info({ request: `${method} ${url}` }, "incoming request");
   });
   server.addHook("onResponse", async ({ raw, log }, reply) => {
-    const { method, url, originalUrl } = raw;
-    if (originalUrl && originalUrl.startsWith(inputsUrlPath)) {
+    const { method, url } = raw;
+    if (
+      url?.startsWith(closureLibraryUrlPath) ||
+      url?.startsWith(inputsUrlPath)
+    ) {
       // skip logging for static assets
       return;
     }
     log.info(
       {
-        request: `${method} ${originalUrl || url || '"N/A"'}`,
-        statusCode: reply.res.statusCode,
+        request: `${method} ${url || '"N/A"'}`,
+        statusCode: reply.statusCode,
         responseTime: `${Math.round(reply.getResponseTime())}ms`,
       },
       "request completed"
