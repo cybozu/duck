@@ -51,7 +51,7 @@
     "recursive-readdir": "^2.2.2",
     "rxjs": "^6.6.7",
     "semver": "^7.3.7",
-    "split2": "^3.2.2",
+    "split2": "^4.1.0",
     "strip-json-comments": "^3.1.1",
     "tempy": "^1.0.1",
     "workerpool": "^6.2.1",
