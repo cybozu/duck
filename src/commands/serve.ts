@@ -1,4 +1,3 @@
-import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
 import cors from "cors";
 import fastify from "fastify";
@@ -166,7 +165,7 @@ export async function serve(config: DuckConfig, watch = true) {
     // The root chunk loads all chunks in RAW mode
     const sortedChunkIds = createDag(entryConfig).getSortedIds();
     const rootId = sortedChunkIds[0];
-    moduleUris[rootId] = flat(sortedChunkIds.map((id) => moduleUris[id]));
+    moduleUris[rootId] = sortedChunkIds.map((id) => moduleUris[id]).flat();
     for (const id in moduleUris) {
       if (id !== rootId) {
         moduleUris[id] = [];

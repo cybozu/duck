@@ -1,4 +1,3 @@
-import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
 import compilerPkg from "google-closure-compiler/package.json";
 import { depGraph } from "google-closure-deps";
@@ -230,12 +229,12 @@ export async function createCompilerOptionsForChunks(
   const ignoreDirs = duckConfig.depsJsIgnoreDirs.concat(
     duckConfig.closureLibraryDir
   );
-  const dependencies = flat(
+  const dependencies = (
     await Promise.all([
       getDependencies(entryConfig, ignoreDirs, duckConfig.depsWorkers),
       getClosureLibraryDependencies(duckConfig.closureLibraryDir),
     ])
-  );
+  ).flat();
   const dag = createDag(entryConfig);
   const sortedChunkIds = dag.getSortedIds();
   const chunkToTransitiveDepPathSet = findTransitiveDeps(
@@ -253,9 +252,9 @@ export async function createCompilerOptionsForChunks(
     duckConfig,
     outputToFile
   );
-  compilerOptions.js = flat(
-    [...chunkToInputPathSet.values()].map((inputs) => [...inputs])
-  );
+  compilerOptions.js = [...chunkToInputPathSet.values()]
+    .map((inputs) => [...inputs])
+    .flat();
   compilerOptions.chunk = sortedChunkIds.map((id) => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;

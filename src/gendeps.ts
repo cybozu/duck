@@ -1,4 +1,3 @@
-import flat from "array.prototype.flat";
 import fg from "fast-glob";
 import { promises as fs } from "fs";
 import { depFile, depGraph, parser } from "google-closure-deps";
@@ -149,7 +148,7 @@ export async function getDependencies(
           })
       );
     });
-    return flat(await Promise.all(parseResultPromises));
+    return (await Promise.all(parseResultPromises)).flat();
   } finally {
     await parser.terminate();
   }
