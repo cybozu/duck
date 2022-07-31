@@ -19,8 +19,8 @@ export async function buildDeps(config: DuckConfig): Promise<void> {
   if (config.depsJs) {
     try {
       await fs.writeFile(config.depsJs, fileText);
-    } catch (error) {
-      if (error.code === "ENOENT") {
+    } catch (error: unknown) {
+      if ((error as any)?.code === "ENOENT") {
         await fs.mkdir(path.dirname(config.depsJs), { recursive: true });
         await fs.writeFile(config.depsJs, fileText);
       } else {
