@@ -2,7 +2,8 @@ import { depGraph } from "google-closure-deps";
 import path from "path";
 import workerpool from "workerpool";
 
-const script = path.join(__dirname, "../lib/dependency-parser-worker.js");
+// find from the parent directory for ts-node based testing
+const script = path.join(__dirname, "../dist/dependency-parser-worker.js");
 
 export class DependencyParserWithWorkers {
   private pool: workerpool.WorkerPool;

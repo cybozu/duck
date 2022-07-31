@@ -12,7 +12,7 @@
       "*": ["types/*"]
     },
     "declaration": true,
-    "outDir": "./lib",
+    "outDir": "./dist",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true

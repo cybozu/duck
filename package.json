@@ -9,19 +9,19 @@
   "engines": {
     "node": ">=16"
   },
-  "main": "lib/compiler.js",
-  "types": "lib/compiler.d.ts",
+  "main": "dist/compiler.js",
+  "types": "dist/compiler.d.ts",
   "bin": {
     "duck": "bin/duck.js"
   },
   "files": [
     "bin",
-    "lib",
+    "dist",
     "types/google-closure-deps.d.ts"
   ],
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf lib .tsbuildinfo",
+    "clean": "rimraf dist",
     "lint": "run-p lint:*",
     "lint:tsc": "tsc --noEmit",
     "lint:eslint": "eslint --ext js,ts src test types examples",

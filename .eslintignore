@@ -1,4 +1,5 @@
 /test/fixtures
+/dist
 deps.js
 node_modules
 build
