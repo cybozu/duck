@@ -4,9 +4,6 @@ node_modules
 # editors
 .vscode
 
-# TypeScript
-.tsbuildinfo
-
 # nyc
 /coverage
 .nyc_output
