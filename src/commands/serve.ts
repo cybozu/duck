@@ -307,8 +307,8 @@ export async function serve(config: DuckConfig, watch = true) {
     const { host, port } = config;
     try {
       await server.listen(port, host);
-    } catch (err) {
-      server.log.error(err);
+    } catch (err: unknown) {
+      server.log.error(err as any);
       process.exit(1);
     }
   };

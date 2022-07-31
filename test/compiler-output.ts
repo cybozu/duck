@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
-import path from "path";
 import fs from "fs";
+import path from "path";
 import tempy from "tempy";
 import { CompilerOutput, compileToJson } from "../src/compiler";
 import { CompileErrorItem } from "../src/report";
@@ -82,7 +82,8 @@ describe("compiler output", () => {
             js_output_file: "out.js",
           },
         });
-      } catch (err) {
+      } catch (err: any) {
+        assert(err instanceof Error);
         const [f, s, ...r] = err.message.split("\n");
         first = f;
         second = s;
