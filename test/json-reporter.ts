@@ -1,4 +1,4 @@
-import assert = require("assert");
+import { strict as assert } from "assert";
 import { promises as fs, existsSync } from "fs";
 import path from "path";
 import tempy from "tempy";

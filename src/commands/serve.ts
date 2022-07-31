@@ -1,4 +1,3 @@
-import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
 import cors from "cors";
 import fastify from "fastify";
@@ -166,7 +165,7 @@ export async function serve(config: DuckConfig, watch = true) {
     // The root chunk loads all chunks in RAW mode
     const sortedChunkIds = createDag(entryConfig).getSortedIds();
     const rootId = sortedChunkIds[0];
-    moduleUris[rootId] = flat(sortedChunkIds.map((id) => moduleUris[id]));
+    moduleUris[rootId] = sortedChunkIds.map((id) => moduleUris[id]).flat();
     for (const id in moduleUris) {
       if (id !== rootId) {
         moduleUris[id] = [];
@@ -205,8 +204,10 @@ export async function serve(config: DuckConfig, watch = true) {
     if (!entryIdToChunkCache.has(entryConfig.id)) {
       entryIdToChunkCache.set(entryConfig.id, new Map());
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const chunkCache = entryIdToChunkCache.get(entryConfig.id)!;
     if (requestedChunkId && parentRequest && chunkCache.has(parentRequest)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const parentChunkCache = chunkCache.get(parentRequest)!;
       if (!parentChunkCache[requestedChunkId]) {
         throw new Error(`Unexpected requested chunk: ${requestedChunkId}`);
@@ -223,16 +224,13 @@ export async function serve(config: DuckConfig, watch = true) {
       return [uri.toString()];
     }
 
-    const {
-      options,
-      sortedChunkIds,
-      rootChunkId,
-    } = await createCompilerOptionsForChunks(
-      entryConfig,
-      config,
-      false,
-      createModuleUris
-    );
+    const { options, sortedChunkIds, rootChunkId } =
+      await createCompilerOptionsForChunks(
+        entryConfig,
+        config,
+        false,
+        createModuleUris
+      );
     updateDepsJsCache(config);
     const [chunkOutputs] = await compileToJson(options);
     const chunkIdToOutput: { [id: string]: CompilerOutput } = {};
@@ -308,8 +306,8 @@ export async function serve(config: DuckConfig, watch = true) {
     const { host, port } = config;
     try {
       await server.listen(port, host);
-    } catch (err) {
-      server.log.error(err);
+    } catch (err: unknown) {
+      server.log.error(err as any);
       process.exit(1);
     }
   };

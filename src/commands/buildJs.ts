@@ -37,7 +37,11 @@ export async function buildJs(
   let restoringDepsJs: Promise<void> | null = null;
   const entryConfigPaths = entryConfigs
     ? entryConfigs
-    : (await findEntryConfigs(assertString(config.entryConfigDir))).sort();
+    : (
+        await findEntryConfigs(
+          assertString(config.entryConfigDir, '"entryConfigDir" is required')
+        )
+      ).sort();
   let runningJobCount = 1;
   let completedJobCount = 1;
   const compileFunctions = entryConfigPaths.map(

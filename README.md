@@ -2,16 +2,10 @@
 
 Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to [plovr](https://github.com/bolinfest/plovr).
 
-Status: **_WIP_**
-
-[![npm][npm-image]][npm-url]
-![node.js support versions][node-version]
-[![build status][circleci-image]][circleci-url]
-[![coverage][codecov-image]][codecov-url]
-[![dependency status][deps-image]][deps-url]
-[![license][license]](./LICENSE)
-
-<a title="Berkaycagdas [CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0)], via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Yellow_Duck.jpg"><img width="256" alt="Yellow Duck" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Yellow_Duck.jpg/256px-Yellow_Duck.jpg"></a>
+[![npm version](https://badge.fury.io/js/%40cybozu%2Fduck.svg)](https://badge.fury.io/js/%40cybozu%2Fduck)
+[![](https://github.com/cybozu/duck/workflows/Test/badge.svg)](https://github.com/cybozu/duck/actions?workflow=Test)
+[![](https://github.com/cybozu/duck/workflows/Lint/badge.svg)](https://github.com/cybozu/duck/actions?workflow=Lint)
+[![coverage](https://codecov.io/gh/cybozu/duck/branch/master/graph/badge.svg)](https://codecov.io/gh/cybozu/duck)
 
 ## Install
 
@@ -84,6 +78,7 @@ Options:
   --skipInitialBuild, -s  Skip initial building of Soy and deps.js      [boolean] [default: false]
   --soyJarPath            A path to Soy.jar                                               [string]
   --soyFileRoots          Root directories of soy files                                    [array]
+  --soyClasspaths         Classpaths for Closure Templates                                 [array]
   --watch, -w             Re-compile incrementally when files change    [boolean] [default: false]
   -v, --version           Show version number                                            [boolean]
   -h, --help              Show help                                                      [boolean]
@@ -121,6 +116,8 @@ module.exports = {
   soyJarPath: "lib/closure-templates.jar",
   // (Required) Directories where Closure Templates .soy files are stored
   soyFileRoots: ["src/soy"],
+  // Classpaths for Closure Templates 
+  soyClasspaths: ["lib/plugin.jar"],
   // CLI options for Closure Templates
   soyOptions: {
     shouldGenerateJsdoc: true,
@@ -255,15 +252,3 @@ build:soy   -- Compile Soy templates
 ## License
 
 MIT License: Cybozu, Inc.
-
-[npm-image]: https://img.shields.io/npm/v/@cybozu/duck.svg
-[npm-url]: https://npmjs.org/package/@cybozu/duck
-[npm-downloads-image]: https://img.shields.io/npm/dm/@cybozu/duck.svg
-[deps-image]: https://img.shields.io/david/cybozu/duck.svg
-[deps-url]: https://david-dm.org/cybozu/duck
-[node-version]: https://img.shields.io/badge/Node.js%20support->=v10.12-brightgreen.svg
-[license]: https://img.shields.io/npm/l/@cybozu/duck.svg
-[circleci-image]: https://circleci.com/gh/cybozu/duck.svg?style=shield
-[circleci-url]: https://circleci.com/gh/cybozu/duck
-[codecov-image]: https://codecov.io/gh/cybozu/duck/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/cybozu/duck

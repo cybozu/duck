@@ -1,5 +1,6 @@
 {
   "extends": "@cybozu/eslint-config/presets/node-typescript-prettier",
+  "root": true,
   "env": {
     "mocha": true
   },
@@ -14,6 +15,9 @@
     "no-param-reassign": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/class-name-casing": "off",
-    "node/no-exports-assign": "off"
+    "node/no-exports-assign": "off",
+    "consistent-return": "off",
+    "max-statements": "off",
+    "no-invalid-this": "off"
   }
 }

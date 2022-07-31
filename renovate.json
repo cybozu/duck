@@ -1,5 +1,5 @@
 {
-  "extends": ["@cybozu"],
+  "extends": ["github>cybozu/renovate-config"],
   "packageRules": [
     {
       "packageNames": ["google-closure-deps"],

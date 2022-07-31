@@ -1,4 +1,3 @@
-import flat from "array.prototype.flat";
 import { stripIndents } from "common-tags";
 import compilerPkg from "google-closure-compiler/package.json";
 import { depGraph } from "google-closure-deps";
@@ -48,7 +47,9 @@ function createBaseOptions(
   if (entryConfig["experimental-compiler-options"]) {
     const expOpts = entryConfig["experimental-compiler-options"];
     for (const key in expOpts) {
-      opts[snakeCase(key)] = expOpts[key];
+      if (Object.prototype.hasOwnProperty.call(expOpts, key)) {
+        opts[snakeCase(key)] = expOpts[key];
+      }
     }
   }
 
@@ -94,7 +95,7 @@ function createBaseOptions(
           `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
         );
       }
-      opts.module_output_path_prefix = outputPath.slice(0, suffix.length * -1);
+      opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
     }
   } else {
     // for pages
@@ -228,12 +229,12 @@ export async function createCompilerOptionsForChunks(
   const ignoreDirs = duckConfig.depsJsIgnoreDirs.concat(
     duckConfig.closureLibraryDir
   );
-  const dependencies = flat(
+  const dependencies = (
     await Promise.all([
       getDependencies(entryConfig, ignoreDirs, duckConfig.depsWorkers),
       getClosureLibraryDependencies(duckConfig.closureLibraryDir),
     ])
-  );
+  ).flat();
   const dag = createDag(entryConfig);
   const sortedChunkIds = dag.getSortedIds();
   const chunkToTransitiveDepPathSet = findTransitiveDeps(
@@ -251,14 +252,14 @@ export async function createCompilerOptionsForChunks(
     duckConfig,
     outputToFile
   );
-  compilerOptions.js = flat(
-    [...chunkToInputPathSet.values()].map((inputs) => [...inputs])
-  );
-  compilerOptions.module = sortedChunkIds.map((id) => {
+  compilerOptions.js = [...chunkToInputPathSet.values()]
+    .map((inputs) => [...inputs])
+    .flat();
+  compilerOptions.chunk = sortedChunkIds.map((id) => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
     return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;
   });
-  compilerOptions.module_wrapper = createChunkWrapper(
+  compilerOptions.chunk_wrapper = createChunkWrapper(
     entryConfig,
     sortedChunkIds,
     assertNonNullable(compilerOptions.compilation_level),
@@ -356,6 +357,7 @@ function findTransitiveDeps(
   const pathToDep = new Map(
     dependencies.map((dep) => [dep.path, dep] as [string, depGraph.Dependency])
   );
+  const googBase = findGoogBaseFromDeps(dependencies);
   const graph = new depGraph.Graph(dependencies);
   const chunkToTransitiveDepPathSet: Map<string, Set<string>> = new Map();
   sortedChunkIds.forEach((chunkId) => {
@@ -366,10 +368,38 @@ function findTransitiveDeps(
         `entryConfig.paths does not include the inputs: ${input}`
       )
     );
-    const depPaths = graph.order(...entryPoints).map((dep) => dep.path);
+    let useGoogBase = false;
+    const depPaths = graph.order(...entryPoints).map((dep) => {
+      useGoogBase ||= dependsOnGoogBase(dep);
+      return dep.path;
+    });
+    if (useGoogBase) {
+      depPaths.unshift(googBase.path);
+    }
     chunkToTransitiveDepPathSet.set(chunkId, new Set(depPaths));
   });
   return chunkToTransitiveDepPathSet;
+}
+
+function dependsOnGoogBase(dep: depGraph.Dependency): boolean {
+  return (
+    dep.closureSymbols.length > 0 ||
+    dep.imports.some((imprt) => imprt.isGoogRequire())
+  );
+}
+
+function findGoogBaseFromDeps(
+  dependencies: readonly depGraph.Dependency[]
+): depGraph.Dependency {
+  const googBase = dependencies.find(
+    (dep) =>
+      dep instanceof depGraph.ParsedDependency &&
+      dep.closureRelativePath === "base.js"
+  );
+  if (!googBase) {
+    throw new TypeError("base.js is not found in dependencies");
+  }
+  return googBase;
 }
 
 /**
@@ -412,9 +442,11 @@ export function convertModuleInfos(
   const moduleInfo: { [id: string]: string[] } = {};
   const moduleUris: { [id: string]: string[] } = {};
   for (const id in modules) {
-    const module = modules[id];
-    moduleInfo[id] = module.deps.slice();
-    moduleUris[id] = createModuleUris(id);
+    if (Object.prototype.hasOwnProperty.call(modules, id)) {
+      const module = modules[id];
+      moduleInfo[id] = module.deps.slice();
+      moduleUris[id] = createModuleUris(id);
+    }
   }
   return { moduleInfo, moduleUris };
 }

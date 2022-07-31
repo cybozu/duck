@@ -17,7 +17,16 @@ export async function buildDeps(config: DuckConfig): Promise<void> {
   logger.info(`Generating deps.js`);
   const fileText = generateDepFileTextFromDeps(deps, googBaseDir);
   if (config.depsJs) {
-    await fs.writeFile(config.depsJs, fileText);
+    try {
+      await fs.writeFile(config.depsJs, fileText);
+    } catch (error: unknown) {
+      if ((error as any)?.code === "ENOENT") {
+        await fs.mkdir(path.dirname(config.depsJs), { recursive: true });
+        await fs.writeFile(config.depsJs, fileText);
+      } else {
+        throw error;
+      }
+    }
     logger.info(`Generated: ${config.depsJs}`);
   } else {
     logger.info({

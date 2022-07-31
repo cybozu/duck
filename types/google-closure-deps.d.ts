@@ -126,6 +126,17 @@ export namespace depGraph {
   }
 
   /**
+   * A dependency that was parsed from an goog.addDependnecy call.
+   */
+  export class ParsedDependency extends Dependency {
+    /**
+     * Relative path from Closure Library to this file.
+     * @const
+     */
+    closureRelativePath: string;
+  }
+
+  /**
    * Generic super class for all types of imports. This acts as an edge in the
    * dependency graph between two dependencies.
    */

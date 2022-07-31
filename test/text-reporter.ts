@@ -1,4 +1,4 @@
-import assert = require("assert");
+import { strict as assert } from "assert";
 import { TextReporter } from "../src/reporters/text-reporter";
 
 describe("TextReporter", () => {

@@ -159,16 +159,18 @@ async function loadInheritedJson(
 function normalize(json: any): EntryConfig {
   if (json.modules) {
     for (const id in json.modules) {
-      const module = json.modules[id];
-      if (!module.inputs) {
-        throw new TypeError(`No module inputs: ${id}`);
-      } else if (!Array.isArray(module.inputs)) {
-        module.inputs = [module.inputs];
-      }
-      if (!module.deps) {
-        module.deps = [];
-      } else if (!Array.isArray(module.deps)) {
-        module.deps = [module.deps];
+      if (Object.prototype.hasOwnProperty.call(json.modules, id)) {
+        const module = json.modules[id];
+        if (!module.inputs) {
+          throw new TypeError(`No module inputs: ${id}`);
+        } else if (!Array.isArray(module.inputs)) {
+          module.inputs = [module.inputs];
+        }
+        if (!module.deps) {
+          module.deps = [];
+        } else if (!Array.isArray(module.deps)) {
+          module.deps = [module.deps];
+        }
       }
     }
   }
@@ -181,8 +183,10 @@ function normalize(json: any): EntryConfig {
 export function createDag(entryConfig: EntryConfig): Dag {
   const chunkNodes: Node[] = [];
   for (const id in entryConfig.modules) {
-    const chunk = entryConfig.modules[id];
-    chunkNodes.push(new Node(id, chunk.deps));
+    if (Object.prototype.hasOwnProperty.call(entryConfig.modules, id)) {
+      const chunk = entryConfig.modules[id];
+      chunkNodes.push(new Node(id, chunk.deps));
+    }
   }
   return new Dag(chunkNodes);
 }
