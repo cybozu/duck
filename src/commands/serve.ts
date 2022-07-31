@@ -60,7 +60,14 @@ function getDepsUrl(baseUrl: URL, entryConfigId: string): URL {
 export async function serve(config: DuckConfig, watch = true) {
   setGlobalLogger(
     pino({
-      prettyPrint: { translateTime: "SYS:HH:MM:ss.l", ignore: "hostname,pid" },
+      transport: {
+        target: "pino-pretty",
+        options: {
+          colorize: true,
+          translateTime: "SYS:HH:MM:ss.l",
+          ignore: "hostname,pid",
+        },
+      },
     })
   );
 
