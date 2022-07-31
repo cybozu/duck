@@ -1,11 +1,8 @@
 node_modules
-/lib
+/dist
 
 # editors
 .vscode
-
-# TypeScript
-.tsbuildinfo
 
 # nyc
 /coverage
