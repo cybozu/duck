@@ -7,3 +7,7 @@ node_modules
 # nyc
 /coverage
 .nyc_output
+
+# for backward compat (TODO: clean up)
+.tsbuildinfo
+/lib
