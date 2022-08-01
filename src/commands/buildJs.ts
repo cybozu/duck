@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import pSettled from "p-settle";
 import path from "path";
 import recursive from "recursive-readdir";
-import { assertString } from "../assert";
+import { assertNonNullable, assertString } from "../assert";
 import { resultInfoLogType } from "../cli";
 import {
   CompilerError,
@@ -30,8 +30,10 @@ export async function buildJs(
     | import("faastjs").FaastModule<typeof compilerCoreFunctions>
     | null = null;
   if (config.batch) {
-    const { getFaastCompiler } = await import("../batch");
+    // eslint-disable-next-line node/no-missing-import
+    const { getFaastCompiler } = await import("../batch.js");
     faastModule = await getFaastCompiler(config);
+    assertNonNullable(faastModule);
     compileFn = faastModule.functions.compileToJson;
   }
   let restoringDepsJs: Promise<void> | null = null;
