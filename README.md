@@ -168,6 +168,15 @@ module.exports = {
 
 Also see [`examples`](examples).
 
+## Limitation
+
+- Closure Compiler >= `v20180910.0.0`
+- Closure Templates >= `2019-03-07`
+- Closure Library < `v20200224.0.0` (partial)
+  - NOTE: Closure Compiler doesn't support `goog.requireType()` in chunks feature.
+    Closure Library `v20200224`+ includes `goog.requireType()`, so you cannot use it with chunks.
+    See [chunks doesn't work with goog.requireType · Issue #3931 · google/closure-compiler](https://github.com/google/closure-compiler/issues/3931)
+
 ## Tips
 
 ### Batch mode using AWS Lambda
