@@ -16,6 +16,7 @@
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/class-name-casing": "off",
     "node/no-exports-assign": "off",
+    "node/no-missing-import": "off",
     "consistent-return": "off",
     "max-statements": "off",
     "no-invalid-this": "off"

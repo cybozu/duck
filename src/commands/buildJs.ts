@@ -30,7 +30,6 @@ export async function buildJs(
     | import("faastjs").FaastModule<typeof compilerCoreFunctions>
     | null = null;
   if (config.batch) {
-    // eslint-disable-next-line node/no-missing-import
     const { getFaastCompiler } = await import("../batch.js");
     faastModule = await getFaastCompiler(config);
     assertNonNullable(faastModule);
