@@ -10,7 +10,7 @@ import { assertNonNullable, assertString } from "../assert";
 import {
   CompilerOutput,
   compileToJson,
-  convertModuleInfos,
+  convertChunkInfos,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
 } from "../compiler";
@@ -136,12 +136,12 @@ export async function serve(config: DuckConfig, watch = true) {
         request.query
       );
       if (entryConfig.mode === "RAW") {
-        if (entryConfig.modules) {
+        if (entryConfig.chunks) {
           return replyChunksRaw(reply, entryConfig);
         }
         return replyPageRaw(reply, entryConfig);
       }
-      if (entryConfig.modules) {
+      if (entryConfig.chunks) {
         return replyChunksCompile(
           reply,
           entryConfig,
@@ -166,20 +166,20 @@ export async function serve(config: DuckConfig, watch = true) {
 
   function replyChunksRaw(reply: FastifyReply, entryConfig: EntryConfig) {
     const baseUrl = getScriptBaseUrl(reply, !!config.https);
-    const modules = assertNonNullable(entryConfig.modules);
-    const { moduleInfo, moduleUris } = convertModuleInfos(entryConfig, (id) => {
-      return inputsToUrisForRaw(modules[id].inputs, baseUrl);
+    const chunks = assertNonNullable(entryConfig.chunks);
+    const { chunkInfo, chunkUris } = convertChunkInfos(entryConfig, (id) => {
+      return inputsToUrisForRaw(chunks[id].inputs, baseUrl);
     });
     // The root chunk loads all chunks in RAW mode
     const sortedChunkIds = createDag(entryConfig).getSortedIds();
     const rootId = sortedChunkIds[0];
-    moduleUris[rootId] = sortedChunkIds.map((id) => moduleUris[id]).flat();
-    for (const id in moduleUris) {
+    chunkUris[rootId] = sortedChunkIds.map((id) => chunkUris[id]).flat();
+    for (const id in chunkUris) {
       if (id !== rootId) {
-        moduleUris[id] = [];
+        chunkUris[id] = [];
       }
     }
-    const rootModuleUris = moduleUris[rootId];
+    const rootModuleUris = chunkUris[rootId];
     reply.code(200).type("application/javascript").send(stripIndents`
     document.write('<script src="${getGoogBaseUrl(baseUrl)}"></script>');
     document.write('<script src="${getDepsUrl(
@@ -187,10 +187,10 @@ export async function serve(config: DuckConfig, watch = true) {
       entryConfig.id
     )}"></script>');
     document.write('<script>var PLOVR_MODULE_INFO = ${JSON.stringify(
-      moduleInfo
+      chunkInfo
     )};</script>');
     document.write('<script>var PLOVR_MODULE_URIS = ${JSON.stringify(
-      moduleUris
+      chunkUris
     )};</script>');
     document.write('<script>var PLOVR_MODULE_USE_DEBUG_MODE = ${!!entryConfig.debug};</script>');
     ${rootModuleUris

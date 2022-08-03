@@ -39,7 +39,7 @@ describe("entryconfig", () => {
         id: "chunks",
         mode: "RAW",
         paths: [path.join(fixturesBaseDir, "path1")],
-        modules: {
+        chunks: {
           base: {
             inputs: [path.join(fixturesBaseDir, "js", "base.js")],
             deps: [],
@@ -49,8 +49,8 @@ describe("entryconfig", () => {
             deps: ["base"],
           },
         },
-        "module-output-path": path.join(fixturesBaseDir, "chunks", "%s.js"),
-        "module-production-uri": "../output/%s.js",
+        "chunk-output-path": path.join(fixturesBaseDir, "chunks", "%s.js"),
+        "chunk-production-uri": "../output/%s.js",
       });
     });
     it("normalizes chunks config", async () => {
@@ -60,7 +60,7 @@ describe("entryconfig", () => {
         mode: "RAW",
         paths: [path.join(fixturesBaseDir, "path1")],
         "test-excludes": [fixturesBaseDir],
-        modules: {
+        chunks: {
           base: {
             inputs: [path.join(fixturesBaseDir, "js", "base.js")],
             deps: [],
