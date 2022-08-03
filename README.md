@@ -176,6 +176,7 @@ Also see [`examples`](examples).
   - NOTE: Closure Compiler doesn't support `goog.requireType()` in chunks feature.
     Closure Library `v20200224`+ includes `goog.requireType()`, so you cannot use it with chunks.
     See [chunks doesn't work with goog.requireType · Issue #3931 · google/closure-compiler](https://github.com/google/closure-compiler/issues/3931)
+- google-closure-deps >= `v20210406`
 
 ## Tips
 
