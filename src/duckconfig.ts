@@ -59,17 +59,6 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPathArray(config, configDir, "soyClasspaths");
     config.soyClasspaths = config.soyClasspaths || [];
     toAbsPathArray(config, configDir, "soyFileRoots");
-    if (config.soyOptions) {
-      const { inputPrefix } = config.soyOptions;
-      if (inputPrefix) {
-        toAbsPath(config.soyOptions, configDir, "inputPrefix");
-        // path.resolve() removes a trailing separator,
-        // but it's important for `inputPrefix`.
-        if (inputPrefix.endsWith(path.sep)) {
-          config.soyOptions.inputPrefix += path.sep;
-        }
-      }
-    }
     if (config.https) {
       assertString(
         config.https.keyPath,

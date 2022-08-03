@@ -95,16 +95,11 @@ function calcOutputPath(
   inputPath: string,
   config: Required<Pick<DuckConfig, "soyOptions">>
 ) {
-  const { outputPathFormat, inputPrefix } = config.soyOptions;
-  let outputPath = outputPathFormat;
-  let inputDirectory = path.dirname(inputPath);
-  if (inputPrefix) {
-    inputDirectory = path.relative(inputPrefix, inputDirectory);
-    outputPath = outputPath.replace("{INPUT_PREFIX}", inputPrefix);
-  }
+  const { outputPathFormat } = config.soyOptions;
+  const inputDirectory = path.dirname(inputPath);
   const filename = path.basename(inputPath);
   const filenameNoExt = filename.slice(0, -path.extname(filename).length);
-  return outputPath
+  return outputPathFormat
     .replace("{INPUT_DIRECTORY}", inputDirectory)
     .replace("{INPUT_FILE_NAME}", filename)
     .replace("{INPUT_FILE_NAME_NO_EXT}", filenameNoExt);

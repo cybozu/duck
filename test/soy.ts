@@ -30,30 +30,5 @@ describe("soy", () => {
         "/js/foo.soy,/js/bar.soy",
       ]);
     });
-    it("inputPrefix", () => {
-      const config = {
-        soyFileRoots: [],
-        soyJarPath: "/soy.jar",
-        soyClasspaths: [],
-        soyOptions: {
-          outputPathFormat: "/out",
-          inputPrefix: "/path/to/js/",
-        },
-      };
-      assert.deepEqual(
-        toSoyArgs(["/path/to/js/foo.soy", "/path/to/js/bar/baz.soy"], config),
-        [
-          "-classpath",
-          "/soy.jar",
-          "com.google.template.soy.SoyToJsSrcCompiler",
-          "--outputPathFormat",
-          "/out",
-          "--inputPrefix",
-          "/path/to/js/",
-          "--srcs",
-          "foo.soy,bar/baz.soy",
-        ]
-      );
-    });
   });
 });
