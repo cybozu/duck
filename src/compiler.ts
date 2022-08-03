@@ -256,7 +256,7 @@ export async function createCompilerOptionsForChunks(
     .map((inputs) => [...inputs])
     .flat();
   compilerOptions.chunk = sortedChunkIds.map((id) => {
-    const numOfInputs = chunkToInputPathSet.get(id)!.size;
+    const numOfInputs = assertNonNullable(chunkToInputPathSet.get(id)).size;
     return `${id}:${numOfInputs}:${chunks[id].deps.join(",")}`;
   });
   compilerOptions.chunk_wrapper = createChunkWrapper(

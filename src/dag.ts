@@ -1,4 +1,5 @@
 import Zet from "zet";
+import { assertNonNullable } from "./assert";
 
 export class Node {
   id: string;
@@ -53,7 +54,7 @@ export class Dag {
     // populate children (inverting deps)
     nodes.forEach((node) => {
       node.deps.forEach((dep) => {
-        this.idToNode.get(dep)!.children.add(node);
+        assertNonNullable(this.idToNode.get(dep)).children.add(node);
       });
     });
     this.populateDepth();
@@ -74,7 +75,10 @@ export class Dag {
     }
     ancestors.push(node.id);
     node.deps.forEach((dep) => {
-      this.populateAncestors(this.idToNode.get(dep)!, ancestors);
+      this.populateAncestors(
+        assertNonNullable(this.idToNode.get(dep)),
+        ancestors
+      );
     });
     return ancestors;
   }
@@ -150,7 +154,8 @@ export class Dag {
     for (const ancestor of commonAncestors) {
       if (
         least === null ||
-        this.idToDepth.get(least)! < this.idToDepth.get(ancestor)!
+        assertNonNullable(this.idToDepth.get(least)) <
+          assertNonNullable(this.idToDepth.get(ancestor))
       ) {
         least = ancestor;
       }
@@ -158,7 +163,7 @@ export class Dag {
     if (!least) {
       throw new Error("LCA not found");
     }
-    result = this.idToNode.get(least)!;
+    result = assertNonNullable(this.idToNode.get(least));
     this.setLcaCache(u, v, result);
     return result;
   }
