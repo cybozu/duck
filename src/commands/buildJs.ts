@@ -50,7 +50,7 @@ export async function buildJs(
       try {
         const entryConfig = await loadEntryConfig(entryConfigPath);
         let options: compilerCoreFunctions.ExtendedCompilerOptions;
-        if (entryConfig.modules) {
+        if (entryConfig.chunks) {
           if (config.depsJs) {
             if (!restoringDepsJs) {
               restoringDepsJs = restoreDepsJs(
@@ -194,17 +194,17 @@ async function createCompilerOptionsForChunks_(
   entryConfig: EntryConfig,
   config: DuckConfig
 ): Promise<compilerCoreFunctions.ExtendedCompilerOptions> {
-  function createModuleUris(chunkId: string): string[] {
-    const moduleProductionUri = assertString(
-      entryConfig["module-production-uri"]
+  function createChunkUris(chunkId: string): string[] {
+    const chunkProductionUri = assertString(
+      entryConfig["chunk-production-uri"]
     );
-    return [moduleProductionUri.replace(/%s/g, chunkId)];
+    return [chunkProductionUri.replace(/%s/g, chunkId)];
   }
   const { options } = await createCompilerOptionsForChunks(
     entryConfig,
     config,
     true,
-    createModuleUris
+    createChunkUris
   );
   return options;
 }

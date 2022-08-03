@@ -1,10 +1,10 @@
 {
   "id": "chunks",
   "inherits": "../base.json",
-  "module-output-path": "../build/chunks/%s.js",
-  "module-production-uri": "/build/chunks/%s.js",
+  "chunk-output-path": "../build/chunks/%s.js",
+  "chunk-production-uri": "/build/chunks/%s.js",
   "global-scope-name": "GSN_CHUNKS",
-  "modules": {
+  "chunks": {
     "chunks": {
       "inputs": ["../js/chunks_init.js", "../js/chunks.js"],
       "deps": []

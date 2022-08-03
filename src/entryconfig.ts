@@ -9,7 +9,7 @@ export interface EntryConfig {
   paths: readonly string[];
   inherits?: string;
   inputs?: readonly string[];
-  modules?: {
+  chunks?: {
     [id: string]: {
       // string is normalized to string[]
       inputs: readonly string[];
@@ -17,10 +17,10 @@ export interface EntryConfig {
       deps: readonly string[];
     };
   };
-  // like "../compiled/modules/%s.js",
-  "module-output-path"?: string;
-  // like "/js/compiled/modules/%s.js"
-  "module-production-uri"?: string;
+  // like "../compiled/chunks/%s.js",
+  "chunk-output-path"?: string;
+  // like "/js/compiled/chunks/%s.js"
+  "chunk-production-uri"?: string;
   define?: {
     [key: string]: boolean | number | string;
   };
@@ -101,8 +101,8 @@ export async function loadEntryConfig(
       entryConfig["output-file"]
     );
   }
-  if (entryConfig.modules) {
-    Object.values(entryConfig.modules).forEach((mod) => {
+  if (entryConfig.chunks) {
+    Object.values(entryConfig.chunks).forEach((mod) => {
       mod.inputs = mod.inputs.map((input) => path.resolve(basedir, input));
     });
   }
@@ -116,10 +116,10 @@ export async function loadEntryConfig(
       path.resolve(basedir, p)
     );
   }
-  if (entryConfig["module-output-path"]) {
-    entryConfig["module-output-path"] = path.resolve(
+  if (entryConfig["chunk-output-path"]) {
+    entryConfig["chunk-output-path"] = path.resolve(
       basedir,
-      entryConfig["module-output-path"]
+      entryConfig["chunk-output-path"]
     );
   }
   if (mode) {
@@ -157,19 +157,19 @@ async function loadInheritedJson(
 }
 
 function normalize(json: any): EntryConfig {
-  if (json.modules) {
-    for (const id in json.modules) {
-      if (Object.prototype.hasOwnProperty.call(json.modules, id)) {
-        const module = json.modules[id];
-        if (!module.inputs) {
-          throw new TypeError(`No module inputs: ${id}`);
-        } else if (!Array.isArray(module.inputs)) {
-          module.inputs = [module.inputs];
+  if (json.chunks) {
+    for (const id in json.chunks) {
+      if (Object.prototype.hasOwnProperty.call(json.chunks, id)) {
+        const chunk = json.chunks[id];
+        if (!chunk.inputs) {
+          throw new TypeError(`No chunk inputs: ${id}`);
+        } else if (!Array.isArray(chunk.inputs)) {
+          chunk.inputs = [chunk.inputs];
         }
-        if (!module.deps) {
-          module.deps = [];
-        } else if (!Array.isArray(module.deps)) {
-          module.deps = [module.deps];
+        if (!chunk.deps) {
+          chunk.deps = [];
+        } else if (!Array.isArray(chunk.deps)) {
+          chunk.deps = [chunk.deps];
         }
       }
     }
@@ -182,9 +182,9 @@ function normalize(json: any): EntryConfig {
 
 export function createDag(entryConfig: EntryConfig): Dag {
   const chunkNodes: Node[] = [];
-  for (const id in entryConfig.modules) {
-    if (Object.prototype.hasOwnProperty.call(entryConfig.modules, id)) {
-      const chunk = entryConfig.modules[id];
+  for (const id in entryConfig.chunks) {
+    if (Object.prototype.hasOwnProperty.call(entryConfig.chunks, id)) {
+      const chunk = entryConfig.chunks[id];
       chunkNodes.push(new Node(id, chunk.deps));
     }
   }

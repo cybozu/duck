@@ -81,18 +81,18 @@ function createBaseOptions(
     opts.compilation_level = entryConfig.mode;
   }
 
-  if (entryConfig.modules) {
+  if (entryConfig.chunks) {
     // for chunks
     opts.dependency_mode = "NONE";
     if (outputToFile) {
-      if (!entryConfig["module-output-path"]) {
-        throw new Error('entryConfig["module-output-path"] must be specified');
+      if (!entryConfig["chunk-output-path"]) {
+        throw new Error('entryConfig["chunk-output-path"] must be specified');
       }
-      const outputPath = entryConfig["module-output-path"];
+      const outputPath = entryConfig["chunk-output-path"];
       const suffix = "%s.js";
       if (!outputPath.endsWith(suffix)) {
         throw new TypeError(
-          `"moduleOutputPath" must end with "${suffix}", but actual "${outputPath}"`
+          `"chunk-output-path" must end with "${suffix}", but actual "${outputPath}"`
         );
       }
       opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
@@ -218,14 +218,14 @@ export async function createCompilerOptionsForChunks(
   entryConfig: EntryConfig,
   duckConfig: DuckConfig,
   outputToFile: boolean,
-  createModuleUris: (chunkId: string) => string[]
+  createChunkUris: (chunkId: string) => string[]
 ): Promise<{
   options: ExtendedCompilerOptions;
   sortedChunkIds: string[];
   rootChunkId: string;
 }> {
   // TODO: separate EntryConfigChunks from EntryConfig
-  const modules = assertNonNullable(entryConfig.modules);
+  const chunks = assertNonNullable(entryConfig.chunks);
   const ignoreDirs = duckConfig.depsJsIgnoreDirs.concat(
     duckConfig.closureLibraryDir
   );
@@ -240,7 +240,7 @@ export async function createCompilerOptionsForChunks(
   const chunkToTransitiveDepPathSet = findTransitiveDeps(
     sortedChunkIds,
     dependencies,
-    modules
+    chunks
   );
   const chunkToInputPathSet = splitDepsIntoChunks(
     sortedChunkIds,
@@ -257,13 +257,13 @@ export async function createCompilerOptionsForChunks(
     .flat();
   compilerOptions.chunk = sortedChunkIds.map((id) => {
     const numOfInputs = chunkToInputPathSet.get(id)!.size;
-    return `${id}:${numOfInputs}:${modules[id].deps.join(",")}`;
+    return `${id}:${numOfInputs}:${chunks[id].deps.join(",")}`;
   });
   compilerOptions.chunk_wrapper = createChunkWrapper(
     entryConfig,
     sortedChunkIds,
     assertNonNullable(compilerOptions.compilation_level),
-    createModuleUris
+    createChunkUris
   );
   if (duckConfig.batch === "aws") {
     convertCompilerOptionsToRelative(compilerOptions);
@@ -300,7 +300,7 @@ function createChunkWrapper(
   compilationLevel: CompilationLevel,
   createModuleUris: (id: string) => string[]
 ): string[] {
-  const { moduleInfo, moduleUris } = convertModuleInfos(
+  const { chunkInfo, chunkUris } = convertChunkInfos(
     entryConfig,
     createModuleUris
   );
@@ -313,8 +313,8 @@ function createChunkWrapper(
     );
     if (isRootChunk) {
       wrapper = stripIndents`
-      var PLOVR_MODULE_INFO=${JSON.stringify(moduleInfo)};
-      var PLOVR_MODULE_URIS=${JSON.stringify(moduleUris)};
+      var PLOVR_MODULE_INFO=${JSON.stringify(chunkInfo)};
+      var PLOVR_MODULE_URIS=${JSON.stringify(chunkUris)};
       ${entryConfig.debug ? "var PLOVR_MODULE_USE_DEBUG_MODE=true;" : ""}
       ${wrapper}`;
     }
@@ -350,7 +350,7 @@ function createBaseOutputWrapper(
 function findTransitiveDeps(
   sortedChunkIds: readonly string[],
   dependencies: readonly depGraph.Dependency[],
-  modules: {
+  chunks: {
     [id: string]: { inputs: readonly string[]; deps: readonly string[] };
   }
 ): Map<string, Set<string>> {
@@ -361,7 +361,7 @@ function findTransitiveDeps(
   const graph = new depGraph.Graph(dependencies);
   const chunkToTransitiveDepPathSet: Map<string, Set<string>> = new Map();
   sortedChunkIds.forEach((chunkId) => {
-    const chunkConfig = modules[chunkId];
+    const chunkConfig = chunks[chunkId];
     const entryPoints = chunkConfig.inputs.map((input) =>
       assertNonNullable(
         pathToDep.get(input),
@@ -431,24 +431,24 @@ function splitDepsIntoChunks(
   return chunkToInputPathSet;
 }
 
-export function convertModuleInfos(
+export function convertChunkInfos(
   entryConfig: EntryConfig,
-  createModuleUris: (id: string) => string[]
+  createChunkUris: (id: string) => string[]
 ): {
-  moduleInfo: { [id: string]: string[] };
-  moduleUris: { [id: string]: string[] };
+  chunkInfo: { [id: string]: string[] };
+  chunkUris: { [id: string]: string[] };
 } {
-  const modules = assertNonNullable(entryConfig.modules);
-  const moduleInfo: { [id: string]: string[] } = {};
-  const moduleUris: { [id: string]: string[] } = {};
-  for (const id in modules) {
-    if (Object.prototype.hasOwnProperty.call(modules, id)) {
-      const module = modules[id];
-      moduleInfo[id] = module.deps.slice();
-      moduleUris[id] = createModuleUris(id);
+  const chunks = assertNonNullable(entryConfig.chunks);
+  const chunkInfo: { [id: string]: string[] } = {};
+  const chunkUris: { [id: string]: string[] } = {};
+  for (const id in chunks) {
+    if (Object.prototype.hasOwnProperty.call(chunks, id)) {
+      const chunk = chunks[id];
+      chunkInfo[id] = chunk.deps.slice();
+      chunkUris[id] = createChunkUris(id);
     }
   }
-  return { moduleInfo, moduleUris };
+  return { chunkInfo, chunkUris };
 }
 
 function createWarningsWhitelist(

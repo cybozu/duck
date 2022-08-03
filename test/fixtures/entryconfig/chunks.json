@@ -2,7 +2,7 @@
   "id": "chunks",
   "mode": "RAW",
   "paths": ["../path1"],
-  "modules": {
+  "chunks": {
     "base": {
       "inputs": ["../js/base.js"],
       "deps": []
@@ -12,6 +12,6 @@
       "deps": ["base"]
     }
   },
-  "module-output-path": "../chunks/%s.js",
-  "module-production-uri": "../output/%s.js"
+  "chunk-output-path": "../chunks/%s.js",
+  "chunk-production-uri": "../output/%s.js"
 }

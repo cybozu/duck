@@ -3,7 +3,7 @@
   "mode": "RAW",
   "paths": ["../path1"],
   "test-excludes": "../",
-  "modules": {
+  "chunks": {
     "base": {
       "inputs": "../js/base.js"
     },
