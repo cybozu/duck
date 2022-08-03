@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.34.0](https://github.com/cybozu/duck/compare/v0.33.3...v0.34.0) (2022-08-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename module to chunk (#744)
+* **compiler:** rename deprecated `module` to `chunk` for closure compiler v20210505+ (#708)
+* **soy:** remove soyOptions.inputPrefix for old closure-templates option (#743)
+* support google-closure-deps v20210406+ (#717)
+* support Node v16+ (#693)
+
+### Bug Fixes
+
+* **compiler:** rename deprecated `module` to `chunk` for closure compiler v20210505+ ([#708](https://github.com/cybozu/duck/issues/708)) ([cc0274b](https://github.com/cybozu/duck/commit/cc0274b4ed35ee0b0282606d1e705070bb252ade))
+* **deps:** update dependency @types/pino to ^6.3.12 ([#660](https://github.com/cybozu/duck/issues/660)) ([42148b1](https://github.com/cybozu/duck/commit/42148b1a972407058789b85b280bee8c0d25225b))
+* **deps:** update dependency array.prototype.flat to ^1.2.5 ([#653](https://github.com/cybozu/duck/issues/653)) ([9071cd3](https://github.com/cybozu/duck/commit/9071cd3d9ff070209941cb114d6273f83634d3e0))
+* **deps:** update dependency chokidar to ^3.5.3 ([#700](https://github.com/cybozu/duck/issues/700)) ([5380f09](https://github.com/cybozu/duck/commit/5380f0907e239cb6638efacbd2d3eaa913a9b5d7))
+* **deps:** update dependency common-tags to ^1.8.1 ([#668](https://github.com/cybozu/duck/issues/668)) ([fec86a1](https://github.com/cybozu/duck/commit/fec86a1b5bbda1ae13d7db63a8afdd59c796bf17))
+* **deps:** update dependency common-tags to ^1.8.2 ([#670](https://github.com/cybozu/duck/issues/670)) ([cc69f7e](https://github.com/cybozu/duck/commit/cc69f7e73a03531f838aa8a95338e61ee88e781f))
+* **deps:** update dependency fast-glob to ^3.2.11 ([#701](https://github.com/cybozu/duck/issues/701)) ([f57ae98](https://github.com/cybozu/duck/commit/f57ae9806b1b8891ad427c16c00c6a62d2f76d29))
+* **deps:** update dependency fast-glob to ^3.2.8 ([#675](https://github.com/cybozu/duck/issues/675)) ([3ada810](https://github.com/cybozu/duck/commit/3ada8106882fcbdc7b95d6647aa31f2ab059b98e))
+* **deps:** update dependency p-limit to ^3.1.0 ([#544](https://github.com/cybozu/duck/issues/544)) ([17f1103](https://github.com/cybozu/duck/commit/17f110392d9721aac84b5aae9a10b520c3ea9be0))
+* **deps:** update dependency pino to ^6.13.4 ([#674](https://github.com/cybozu/duck/issues/674)) ([f1fd644](https://github.com/cybozu/duck/commit/f1fd644a12187a2dff1257653c04fae6ce80b3be))
+* **deps:** update dependency pino to ^6.14.0 ([#702](https://github.com/cybozu/duck/issues/702)) ([8dcae12](https://github.com/cybozu/duck/commit/8dcae12a99479fa2ace01a64194ae2d0de28c114))
+* **deps:** update dependency semver to ^7.3.7 ([#703](https://github.com/cybozu/duck/issues/703)) ([3476255](https://github.com/cybozu/duck/commit/347625566443383bbc0d33b5ec0bf3be829ab3b0))
+* **deps:** update dependency serve-static to ^1.14.2 ([#676](https://github.com/cybozu/duck/issues/676)) ([5489a62](https://github.com/cybozu/duck/commit/5489a6268dd2d198a695ce62d9edc2164dac7a6b))
+* **deps:** update dependency serve-static to ^1.15.0 ([#728](https://github.com/cybozu/duck/issues/728)) ([a3f0b07](https://github.com/cybozu/duck/commit/a3f0b070038cfa6fef029c5ff08f35ca0d954b93))
+* **deps:** update dependency split2 to v4 ([#734](https://github.com/cybozu/duck/issues/734)) ([87460e4](https://github.com/cybozu/duck/commit/87460e4a18eda1063d7adc41708a8f1abc8d1136))
+* **deps:** update dependency workerpool to ^6.2.1 ([#704](https://github.com/cybozu/duck/issues/704)) ([4883c43](https://github.com/cybozu/duck/commit/4883c4331132df9030f3d7657d0c1c14600d45cf))
+* **deps:** update dependency yargs to v17 ([#737](https://github.com/cybozu/duck/issues/737)) ([edd03cb](https://github.com/cybozu/duck/commit/edd03cb1df2dd3ea1dd0ca5d24757bd5f8501f99))
+* **deps:** update fastify to v3 ([#731](https://github.com/cybozu/duck/issues/731)) ([d99ae7f](https://github.com/cybozu/duck/commit/d99ae7f6d5caad0c94a49534e74d9300ffd05f11))
+* **deps:** update fastify to v4 ([#732](https://github.com/cybozu/duck/issues/732)) ([9f7f7db](https://github.com/cybozu/duck/commit/9f7f7db631a23b29dd94b40a1ceff1cc14c75313))
+* **dep:** update pino and pino-pretty to v8 ([#733](https://github.com/cybozu/duck/issues/733)) ([971f33c](https://github.com/cybozu/duck/commit/971f33c1547f59d911aa5437b1b1f69c5409732a))
+* rename module to chunk ([#744](https://github.com/cybozu/duck/issues/744)) ([4a9e4e7](https://github.com/cybozu/duck/commit/4a9e4e72a2485883687cf68d03f867a75f2509ad))
+* **soy:** remove soyOptions.inputPrefix for old closure-templates option ([#743](https://github.com/cybozu/duck/issues/743)) ([aa5e1ce](https://github.com/cybozu/duck/commit/aa5e1ce3348e5094fd4efee4ea0282568111321c))
+* support google-closure-deps v20210406+ ([#717](https://github.com/cybozu/duck/issues/717)) ([ad050cf](https://github.com/cybozu/duck/commit/ad050cff46ac29b8e4704757400812360d7823ed))
+* use native array .flat() instead shim library ([#723](https://github.com/cybozu/duck/issues/723)) ([004a281](https://github.com/cybozu/duck/commit/004a281455241277a6bdbe62403a3131de900569))
+
+
+* support Node v16+ ([#693](https://github.com/cybozu/duck/issues/693)) ([38f1420](https://github.com/cybozu/duck/commit/38f142040cb10200d1cae663293720d171f58284))
+
 ### [0.33.3](https://github.com/cybozu/duck/compare/v0.33.2...v0.33.3) (2021-10-06)
 
 
