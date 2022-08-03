@@ -1,12 +1,10 @@
 import execa from "execa";
-import path from "path";
 import { resultInfoLogType } from "./cli";
 import { DuckConfig } from "./duckconfig";
 import { logger } from "./logger";
 
 export interface SoyToJsOptions {
   outputPathFormat: string;
-  inputPrefix?: string;
   shouldGenerateGoogMsgDefs?: boolean;
   shouldGenerateJsdoc?: boolean;
   shouldProvideRequireSoyNamespaces?: boolean;
@@ -58,10 +56,6 @@ export function toSoyArgs(
       throw new TypeError(`Unsupported soy config value: "${key}: ${value}"`);
     }
   });
-  if (soyOptions.inputPrefix) {
-    const { inputPrefix } = soyOptions;
-    soyFiles = soyFiles.map((filepath) => path.relative(inputPrefix, filepath));
-  }
   args.push("--srcs", soyFiles.join(","));
   return args;
 }

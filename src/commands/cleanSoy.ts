@@ -6,12 +6,8 @@ import { logger } from "../logger";
 export type CleanSoyConfig = Required<Pick<DuckConfig, "soyOptions">>;
 
 export async function cleanSoy(config: CleanSoyConfig): Promise<string> {
-  const { outputPathFormat, inputPrefix } = config.soyOptions;
-  let outputPath = outputPathFormat;
-  if (inputPrefix) {
-    outputPath = outputPath.replace("{INPUT_PREFIX}", inputPrefix);
-  }
-  outputPath = outputPath
+  const { outputPathFormat } = config.soyOptions;
+  const outputPath = outputPathFormat
     .replace("{INPUT_DIRECTORY}", "/**/")
     .replace("{INPUT_FILE_NAME}", "*")
     .replace("{INPUT_FILE_NAME_NO_EXT}", "*")
