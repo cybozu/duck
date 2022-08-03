@@ -111,7 +111,7 @@ async function compile(
     compiler.JAR_PATH = null;
     try {
       const { getNativeImagePath } = await import(
-        "google-closure-compiler/lib/utils"
+        "google-closure-compiler/lib/utils.js"
       );
       compiler.javaPath = getNativeImagePath();
     } catch {
