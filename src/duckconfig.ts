@@ -20,6 +20,10 @@ export interface DuckConfig {
   soyFileRoots?: readonly string[];
   concurrency?: number;
   batch?: "aws" | "local";
+  batchAwsCustomCompiler?: {
+    name: string;
+    version: string;
+  };
   batchOptions?: import("faastjs").AwsOptions | import("faastjs").LocalOptions;
   reporters?: Array<"json" | "text" | "xunit">;
   reporterOptions?: {
@@ -92,6 +96,18 @@ export function loadConfig(opts: any = {}): DuckConfig {
     }
   }
 
+  if (result.batchAwsCustomCompiler) {
+    if (!result.batchAwsCustomCompiler.name) {
+      throw new TypeError(
+        "batchAwsCustomCompiler.name is required in duck.config"
+      );
+    }
+    if (!result.batchAwsCustomCompiler.version) {
+      throw new TypeError(
+        "batchAwsCustomCompiler.version is required in duck.config"
+      );
+    }
+  }
   return result;
 }
 

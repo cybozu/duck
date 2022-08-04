@@ -9,4 +9,12 @@ module.exports = {
   //   keyPath: "./duck-key.pem",
   //   certPath: "./duck-cert.pem",
   // },
+  batchOptions: {
+    region: "ap-northeast-1",
+    awsLambdaOptions: {
+      Runtime: "nodejs16.x",
+    },
+    include: ["js", "node_modules/google-closure-library"],
+    exclude: [],
+  },
 };
