@@ -201,17 +201,12 @@ export function createCompilerOptionsForPage(
   if (wrapper && wrapper !== wrapperMarker) {
     compilerOptions.output_wrapper = wrapper;
   }
-  const extendedOpts: ExtendedCompilerOptions = { compilerOptions };
-  if (entryConfig.warningsWhitelist) {
-    extendedOpts.warningsWhitelist = createWarningsWhitelist(
-      entryConfig.warningsWhitelist,
-      duckConfig
-    );
-  }
-  if (duckConfig.batch) {
-    extendedOpts.batch = duckConfig.batch;
-  }
-  return extendedOpts;
+  const options: ExtendedCompilerOptions = createExtendedCompilerOptions(
+    compilerOptions,
+    duckConfig,
+    entryConfig
+  );
+  return options;
 }
 
 export async function createCompilerOptionsForChunks(
@@ -269,6 +264,21 @@ export async function createCompilerOptionsForChunks(
     convertCompilerOptionsToRelative(compilerOptions);
   }
 
+  const options: ExtendedCompilerOptions = createExtendedCompilerOptions(
+    compilerOptions,
+    duckConfig,
+    entryConfig
+  );
+  return { options, sortedChunkIds, rootChunkId: sortedChunkIds[0] };
+}
+
+const wrapperMarker = "%output%";
+
+function createExtendedCompilerOptions(
+  compilerOptions: CompilerOptions,
+  duckConfig: DuckConfig,
+  entryConfig: EntryConfig
+) {
   const options: ExtendedCompilerOptions = {
     compilerOptions,
   };
@@ -281,10 +291,11 @@ export async function createCompilerOptionsForChunks(
   if (duckConfig.batch) {
     options.batch = duckConfig.batch;
   }
-  return { options, sortedChunkIds, rootChunkId: sortedChunkIds[0] };
+  if (duckConfig.batchAwsCustomCompiler) {
+    options.batchAwsCustomCompiler = duckConfig.batchAwsCustomCompiler;
+  }
+  return options;
 }
-
-const wrapperMarker = "%output%";
 
 function createOutputWrapper(
   entryConfig: EntryConfig,

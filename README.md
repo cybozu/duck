@@ -116,7 +116,7 @@ module.exports = {
   soyJarPath: "lib/closure-templates.jar",
   // (Required) Directories where Closure Templates .soy files are stored
   soyFileRoots: ["src/soy"],
-  // Classpaths for Closure Templates 
+  // Classpaths for Closure Templates
   soyClasspaths: ["lib/plugin.jar"],
   // CLI options for Closure Templates
   soyOptions: {
@@ -130,6 +130,11 @@ module.exports = {
   concurrency: 4,
   // Build in batch mode with faast.js on "aws" for production or "local" for debug (default: disabled)
   batch: "aws",
+  // Custom Closure Compiler published npm pacakge in AWS batch (default: google-closure-compiler-linux)
+  batchAwsCustomCompiler: {
+    name: "my-custom-closure-compiler",
+    version: "^1.0.0",
+  },
   // Options for faast.js in batch mode. See https://faastjs.org/docs/api/faastjs.awsoptions
   batchOptions: {},
   // Reporters (choose from "json", "text" or "xunit")
@@ -153,7 +158,7 @@ module.exports = {
   // Hostname for serve command (default: 0.0.0.0)
   host: "localhost",
   // Port number for serve command (default: 9810)
-  port:  1234,
+  port: 1234,
   // Use HTTP/2 in serve command (deafult: false)
   http2: true,
   // Settings for HTTPS (HTTP/2) (default: not specified, HTTP is used)
@@ -163,7 +168,7 @@ module.exports = {
     // A path to a self-signed certificate
     certPath: "path/to/cert.pem",
   },
-}
+};
 ```
 
 Also see [`examples`](examples).
@@ -186,27 +191,30 @@ duck provides batch mode that compiles all entry points simultaneously in parall
 
 1. Setting AWS credentials in Node.js (See [AWS document](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html))
 2. Configure `batchOptions` in `duck.config.js`. It's used for faast.js as [AWSOptions](https://faastjs.org/docs/api/faastjs.awsoptions).
+
 ```js
-const closureVersion = require('google-closure-compiler/package.json').version;
+const closureVersion = require("google-closure-compiler/package.json").version;
 
 module.exports = {
   batchOptions: {
-    region: 'ap-northeast-1',
+    region: "ap-northeast-1",
     awsLambdaOptions: {
-      Runtime: 'nodejs10.x',
+      Runtime: "nodejs10.x",
     },
-    include: ['path/to/your/source/**/*.js'],
-    exclude: ['**/*_spec.js'],
+    include: ["path/to/your/source/**/*.js"],
+    exclude: ["**/*_spec.js"],
     packageJson: {
       dependencies: {
-        'google-closure-compiler-linux': closureVersion,
-        'google-closure-library': closureVersion,
+        "google-closure-compiler-linux": closureVersion,
+        "google-closure-library": closureVersion,
       },
     },
   },
 };
 ```
+
 3. Run `build` or `build:js` command with `--batch aws`.
+
 ```console
 $ duck build --batch aws
 ```
@@ -216,7 +224,7 @@ $ duck build --batch aws
 - Use `--batch local` for [local debugging](https://faastjs.org/docs/local)
 - Use `DEBUG=faast:info` or [other log level](https://faastjs.org/docs/workflow#debug-environment-variable) to get more debug information
 - Get `logUrl` from debug info and view it in CloudWatch logs
-- Use `FAAST_PACKAGE_DIR=foo/bar` to investigate a package sent to Lambda 
+- Use `FAAST_PACKAGE_DIR=foo/bar` to investigate a package sent to Lambda
 
 Also see [faast.js document](https://faastjs.org/docs/api/faastjs.awsoptions) for more information.
 
@@ -234,9 +242,9 @@ Then specify them and enable `http2` in `duck.config.js`.
 module.exports = {
   http2: true,
   https: {
-    keyPath: './path/to/duck-key.pem',
-    certPath: './path/to/duck-cert.pem'
-  }
+    keyPath: "./path/to/duck-key.pem",
+    certPath: "./path/to/duck-cert.pem",
+  },
 };
 ```
 

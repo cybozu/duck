@@ -49,18 +49,32 @@ function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
   );
 }
 
+function getNativeCompilerPackageForBatch(config: DuckConfig): {
+  name: string;
+  version: string;
+} {
+  const { batch, batchAwsCustomCompiler } = config;
+  if (batch === "aws" && batchAwsCustomCompiler) {
+    return { ...batchAwsCustomCompiler };
+  }
+  const name = `google-closure-compiler-${getOsForNativeImage(config)}`;
+  // This is run in local context and it (osx/windows) is probably different
+  // platform from AWS (linux). `google-closure-compiler-linux` is not
+  // available in macOS / Windows, so use the version of the parent package
+  // `google-closure-compiler`.
+  const { version } = require("google-closure-compiler/package.json");
+  const major = semver.major(version);
+  return { name, version: `^${major}.0.0` };
+}
+
 function defaultBatchOptions(config: DuckConfig): AwsOptions {
-  const closureVersion =
-    require("google-closure-compiler/package.json").version;
-  const major = semver.major(closureVersion);
+  const compiler = getNativeCompilerPackageForBatch(config);
   return {
     packageJson: {
       // To suppress npm warnings
       private: true,
       dependencies: {
-        [`google-closure-compiler-${getOsForNativeImage(
-          config
-        )}`]: `^${major}.0.0`,
+        [compiler.name]: compiler.version,
       },
     },
     webpackOptions: {

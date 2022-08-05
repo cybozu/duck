@@ -2,9 +2,12 @@ import fs from "fs";
 import { compiler as ClosureCompiler } from "google-closure-compiler";
 import { dirname } from "path";
 import * as tempy from "tempy";
+import { DuckConfig } from "./duckconfig";
 import { WarningsWhitelistItem } from "./entryconfig";
 import { logger } from "./logger";
 import { CompileErrorItem } from "./report";
+
+declare const __non_webpack_require__: NodeRequire;
 
 export interface CompilerOptions {
   [idx: string]: any;
@@ -53,11 +56,10 @@ export type CompilerOptionsFormattingType =
   | "PRINT_INPUT_DELIMITER"
   | "SINGLE_QUOTES";
 
-export interface ExtendedCompilerOptions {
+export type ExtendedCompilerOptions = {
   compilerOptions: CompilerOptions;
-  batch?: "aws" | "local";
   warningsWhitelist?: WarningsWhitelistItem[];
-}
+} & Pick<DuckConfig, "batch" | "batchAwsCustomCompiler">;
 
 export interface CompilerOutput {
   path: string;
@@ -109,16 +111,7 @@ async function compile(
   const compiler = new ClosureCompiler(opts as any);
   if (extendedOpts.batch) {
     compiler.JAR_PATH = null;
-    try {
-      const { getNativeImagePath } = await import(
-        "google-closure-compiler/lib/utils.js"
-      );
-      compiler.javaPath = getNativeImagePath();
-    } catch {
-      throw new Error(
-        "Installed google-closure-compiler is too old for batch mode."
-      );
-    }
+    compiler.javaPath = getNativeImagePath(extendedOpts);
   }
   return new Promise((resolve, reject) => {
     compiler.run((exitCode: number, stdout: string, stderr?: string) => {
@@ -135,21 +128,35 @@ function isInAwsLambda(): boolean {
 }
 
 function rewriteNodePathForAwsLambda(options: CompilerOptions): void {
+  assertRunInWebpack();
   if (options.js) {
-    // google-closure-library is installed as a Lambda Layer.
+    // google-closure-library maybe installed as a Lambda Layer.
     // It's extracted in /opt/nodejs/node_modules/google-closure-library.
     // But working directory is /var/task in Lambda.
     // The relative path is different from local environment.
     // So convert options.js paths.
     const closureLibraryDir = dirname(
-      // use `eval` to avoid webpack replacement
-      // eslint-disable-next-line no-eval
-      eval("require.resolve")("google-closure-library/package.json")
+      __non_webpack_require__.resolve("google-closure-library/package.json")
     );
     options.js = options.js.map((js) =>
       js.replace(/^node_modules\/google-closure-library/, closureLibraryDir)
     );
   }
+}
+
+function getNativeImagePath({
+  batch,
+  batchAwsCustomCompiler,
+}: ExtendedCompilerOptions): string {
+  assertRunInWebpack();
+  if (batch === "aws" && batchAwsCustomCompiler) {
+    return __non_webpack_require__(batchAwsCustomCompiler.name);
+  } else if (process.platform === "darwin") {
+    return __non_webpack_require__(`google-closure-compiler-osx`);
+  } else if (process.platform === "win32") {
+    return __non_webpack_require__(`google-closure-compiler-windows`);
+  }
+  return __non_webpack_require__(`google-closure-compiler-linux`);
 }
 
 export class CompilerError extends Error {
@@ -158,6 +165,12 @@ export class CompilerError extends Error {
     super(msg);
     this.name = "CompilerError";
     this.exitCode = exitCode;
+  }
+}
+
+function assertRunInWebpack(): void {
+  if (typeof __non_webpack_require__ === undefined) {
+    throw new TypeError("This function must be run in webpack context.");
   }
 }
 
