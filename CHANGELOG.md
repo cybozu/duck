@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.34.1](https://github.com/cybozu/duck/compare/v0.34.0...v0.34.1) (2022-08-05)
+
+
+### Features
+
+* **batch:** add batchAwsCustomCompiler option to duck.config.js ([#749](https://github.com/cybozu/duck/issues/749)) ([d18d68c](https://github.com/cybozu/duck/commit/d18d68c7e3bcebcea63a3aafec8de38233c06d37))
+
+
+### Bug Fixes
+
+* @typescript-eslint/no-non-null-assertion warnings ([#746](https://github.com/cybozu/duck/issues/746)) ([9c055d9](https://github.com/cybozu/duck/commit/9c055d9dea5d281f0f12dac7fd5dbe408cfffa2a))
+* **deps:** update dependency @fastify/cors to ^8.1.0 ([#747](https://github.com/cybozu/duck/issues/747)) ([378c731](https://github.com/cybozu/duck/commit/378c731f90258e95a79479ce9e04a62319135609))
+* **deps:** update dependency pino to ^8.4.0 ([#727](https://github.com/cybozu/duck/issues/727)) ([9879a53](https://github.com/cybozu/duck/commit/9879a537a054d7eef92df576271bc489ff5b1905))
+
 ## [0.34.0](https://github.com/cybozu/duck/compare/v0.33.3...v0.34.0) (2022-08-03)
 
 
