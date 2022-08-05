@@ -116,9 +116,9 @@ module.exports = {
   soyJarPath: "lib/closure-templates.jar",
   // (Required) Directories where Closure Templates .soy files are stored
   soyFileRoots: ["src/soy"],
-  // Classpaths for Closure Templates
+  // Classpaths for Closure Templates plugins
   soyClasspaths: ["lib/plugin.jar"],
-  // CLI options for Closure Templates
+  // Options for Closure Templates CLI
   soyOptions: {
     shouldGenerateJsdoc: true,
   },
@@ -128,9 +128,9 @@ module.exports = {
    */
   // Concurrency of Closure Compiler (default: 1,000 if AWS batch mode, otherwise 1)
   concurrency: 4,
-  // Build in batch mode with faast.js on "aws" for production or "local" for debug (default: disabled)
+  // Build in batch mode with faast.js on "aws" for production or "local" for debug (default: undefined)
   batch: "aws",
-  // Custom Closure Compiler published npm pacakge in AWS batch (default: google-closure-compiler-linux)
+  // Custom Closure Compiler package used in AWS batch mode (default: undefined)
   batchAwsCustomCompiler: {
     name: "my-custom-closure-compiler",
     version: "^1.0.0",

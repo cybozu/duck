@@ -8,34 +8,106 @@ import { XUnitReporterOptions } from "./reporters/xunit-reporter";
 import { SoyToJsOptions } from "./soy";
 
 export interface DuckConfig {
+  /**
+   * (Required) A path to Closure Library direcotry
+   * @example "node_modules/google-closure-library"
+   */
   closureLibraryDir: string;
-  inputsRoot: string;
-  depsJs?: string;
-  depsJsIgnoreDirs: readonly string[];
-  depsWorkers?: number;
+  /**
+   * (Required) A directory where entry config JSONs are stored flat
+   */
   entryConfigDir: string;
-  soyJarPath?: string;
-  soyClasspaths: readonly string[];
-  soyOptions?: SoyToJsOptions;
+  /**
+   * (Required) A root directory scanned to build deps.js and delivered as static assets
+   */
+  inputsRoot: string;
+  /**
+   * A path to deps.js to save and load in build and serve commands
+   * @example "dist/deps.js"
+   */
+  depsJs?: string;
+  /**
+   * Directories ignored when building deps.js
+   */
+  depsJsIgnoreDirs: readonly string[];
+  /**
+   * The number of worker threads to build deps.js (default: 4)
+   */
+  depsWorkers?: number;
+  /**
+   * Directories where .soy files are stored. Required if use soy.
+   */
   soyFileRoots?: readonly string[];
+  /**
+   * A path to Closure Templates JAR. Required if use soy.
+   */
+  soyJarPath?: string;
+  /**
+   * Classpaths for Closure Templates plugins
+   * @example ["lib/plugin.jar"]
+   */
+  soyClasspaths: readonly string[];
+  /**
+   * Options for Closure Templates CLI
+   */
+  soyOptions?: SoyToJsOptions;
+  /**
+   * Concurrency of Closure Compiler (default: 1,000 if AWS batch mode, otherwise 1)
+   */
   concurrency?: number;
+  /**
+   * Build in batch mode with faast.js on "aws" for production or "local" for debug (default: undefined)
+   */
   batch?: "aws" | "local";
+  /**
+   * Custom Closure Compiler package used in AWS batch mode (default: undefined)
+   * It must be published as a public npm pacakge.
+   * @example {name: "my-custom-closure-compiler", version: "^1.0.0"}
+   */
   batchAwsCustomCompiler?: {
     name: string;
     version: string;
   };
+  /**
+   * Options for faast.js in batch mode.
+   * @see https://faastjs.org/docs/api/faastjs.awsoptions
+   */
   batchOptions?: import("faastjs").AwsOptions | import("faastjs").LocalOptions;
+  /**
+   * Reporters (choose from "json", "text" or "xunit")
+   */
   reporters?: Array<"json" | "text" | "xunit">;
+  /**
+   * Options for each test reporter
+   */
   reporterOptions?: {
     json?: JsonReporterOptions;
     text?: TextReporterOptions;
     xunit?: XUnitReporterOptions;
   };
+  /**
+   * Hostname for serve command (default: 0.0.0.0)
+   */
   host: string;
+  /**
+   * Port number for serve command (default: 9810)
+   */
   port: number;
+  /**
+   * Use HTTP/2 in serve command (deafult: false)
+   */
   http2?: boolean;
+  /**
+   * Settings for HTTPS (HTTP/2) (default: not specified, HTTP is used)
+   */
   https?: {
+    /**
+     * A path to a private key
+     */
     keyPath: string;
+    /**
+     * A path to a self-signed certificate
+     */
     certPath: string;
   };
 }
