@@ -73,7 +73,7 @@
     "@types/semver": "^7.3.10",
     "@types/split2": "^3.2.1",
     "@types/workerpool": "^6.1.0",
-    "@types/yargs": "^17.0.10",
+    "@types/yargs": "^17.0.11",
     "codecov": "^3.8.3",
     "eslint": "^8.21.0",
     "espower-typescript": "^10.0.1",
