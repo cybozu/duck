@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.34.3](https://github.com/cybozu/duck/compare/v0.34.2...v0.34.3) (2022-08-06)
+
+
+### Features
+
+* **soy:** add soySrcsRelativeFrom option to DuckConfig ([#754](https://github.com/cybozu/duck/issues/754)) ([cba65d1](https://github.com/cybozu/duck/commit/cba65d1bd902eb389813551e72486eb1cc93db21))
+
 ### [0.34.2](https://github.com/cybozu/duck/compare/v0.34.1...v0.34.2) (2022-08-06)
 
 
