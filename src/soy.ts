@@ -1,3 +1,4 @@
+import assert from "assert";
 import execa from "execa";
 import path from "path";
 import { assertString } from "./assert";
@@ -15,8 +16,9 @@ type SoyToJsOptionsCore = {
 export type SoyToJsOptions = SoyToJsOptionsCore &
   Record<string, boolean | string | number | string[]>;
 
-type SoyConfig = Required<
-  Pick<DuckConfig, "soyJarPath" | "soyClasspaths" | "soyOptions">
+type SoyConfig = Pick<
+  DuckConfig,
+  "soyJarPath" | "soyClasspaths" | "soyOptions" | "soySrcsRelativeFrom"
 >;
 
 export async function compileSoy(
@@ -35,19 +37,42 @@ export async function compileSoy(
     return;
   }
   logger.info("Compiling soy templates");
-  await execa("java", soyArgs);
+  let opt: execa.Options = {};
+  if (config.soySrcsRelativeFrom) {
+    opt = { cwd: config.soySrcsRelativeFrom };
+  }
+  await execa("java", soyArgs, opt);
 }
 
 export function toSoyArgs(
   soyFiles: readonly string[],
-  { soyJarPath, soyClasspaths, soyOptions }: SoyConfig
+  { soyJarPath, soyClasspaths, soyOptions, soySrcsRelativeFrom }: SoyConfig
 ): string[] {
+  assert(soyJarPath);
+  soyOptions = { ...soyOptions };
   const classpaths = [soyJarPath, ...soyClasspaths].join(":");
   const args = [
     "-classpath",
     classpaths,
     "com.google.template.soy.SoyToJsSrcCompiler",
   ];
+  if (soySrcsRelativeFrom) {
+    soyFiles = soyFiles.map((soyFile) =>
+      path.relative(soySrcsRelativeFrom, soyFile)
+    );
+    const { outputDirectory, inputRoots } = soyOptions;
+    if (outputDirectory) {
+      soyOptions.outputDirectory = path.relative(
+        soySrcsRelativeFrom,
+        outputDirectory
+      );
+    }
+    if (inputRoots) {
+      soyOptions.inputRoots = inputRoots.map((inputRoot) =>
+        path.relative(soySrcsRelativeFrom, inputRoot)
+      );
+    }
+  }
   Object.entries(soyOptions).forEach(([key, value]) => {
     if (typeof value === "boolean" && value) {
       args.push(`--${key}`);
@@ -135,8 +160,8 @@ export function normalizeSoyOptoins(config: DuckConfig, configDir: string) {
   if (typeof soyOptions.inputRoots === "string") {
     soyOptions.inputRoots = (soyOptions.inputRoots as string).split(",");
   }
+  // NOTE: cannot change outputPathFormat to absolute.
   toAbsPath(soyOptions as SoyToJsOptionsCore, configDir, "outputDirectory");
-  toAbsPath(soyOptions as SoyToJsOptionsCore, configDir, "outputPathFormat");
   toAbsPathArray(soyOptions as SoyToJsOptionsCore, configDir, "inputRoots");
 }
 

@@ -5,13 +5,12 @@ describe("soy", () => {
   describe("toSoyArgs", () => {
     it("converts SoyConfig", () => {
       const config = {
-        soyFileRoots: [],
         soyJarPath: "/soy.jar",
         soyClasspaths: ["/plugin1.jar", "/plugin2.jar"],
         soyOptions: {
           outputPathFormat: "{INPUT_DIRECTORY}/{INPUT_FILE_NAME_NO_EXT}.soy.js",
-          shouldProvideRequireSoyNamespaces: true,
-          bidiGlobalDir: 1 as const,
+          dependOnCssHeader: true,
+          bidiGlobalDir: 1,
           pluginModules: ["com.example.Foo", "com.example.Bar"],
         },
       };
@@ -21,7 +20,7 @@ describe("soy", () => {
         "com.google.template.soy.SoyToJsSrcCompiler",
         "--outputPathFormat",
         "{INPUT_DIRECTORY}/{INPUT_FILE_NAME_NO_EXT}.soy.js",
-        "--shouldProvideRequireSoyNamespaces",
+        "--dependOnCssHeader",
         "--bidiGlobalDir",
         "1",
         "--pluginModules",
@@ -29,6 +28,31 @@ describe("soy", () => {
         "--srcs",
         "/js/foo.soy,/js/bar.soy",
       ]);
+    });
+    it("soySrcsRelativeFrom", () => {
+      const config = {
+        soyJarPath: "/soy.jar",
+        soySrcsRelativeFrom: "/a",
+        soyClasspaths: [],
+        soyOptions: {
+          outputDirectory: "/a/b/out",
+          inputRoots: ["/a/b"],
+        },
+      };
+      assert.deepEqual(
+        toSoyArgs(["/a/b/c/foo.soy", "/a/b/d/bar.soy"], config),
+        [
+          "-classpath",
+          "/soy.jar",
+          "com.google.template.soy.SoyToJsSrcCompiler",
+          "--outputDirectory",
+          "b/out",
+          "--inputRoots",
+          "b",
+          "--srcs",
+          "b/c/foo.soy,b/d/bar.soy",
+        ]
+      );
     });
   });
   describe("calcOutputPath", () => {

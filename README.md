@@ -115,12 +115,15 @@ module.exports = {
   // (Required) A path to Closure Templates JAR
   soyJarPath: "lib/closure-templates.jar",
   // (Required) Directories where Closure Templates .soy files are stored
-  soyFileRoots: ["src/soy"],
+  soyFileRoots: ["src/js"],
   // Classpaths for Closure Templates plugins
   soyClasspaths: ["lib/plugin.jar"],
+  // Send srcs to closure-templates as relative paths from this.
+  // Also change cwd to this and run closure-templates. (default: undefined)
+  soySrcsRelativeFrom: "src",
   // Options for Closure Templates CLI
   soyOptions: {
-    shouldGenerateJsdoc: true,
+    outputDirectory: "src/js/soy",
   },
 
   /**
