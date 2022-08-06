@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.34.2](https://github.com/cybozu/duck/compare/v0.34.1...v0.34.2) (2022-08-06)
+
+
+### Features
+
+* **soy:** support soyOptions.outputDirectory ([#753](https://github.com/cybozu/duck/issues/753)) ([5159c63](https://github.com/cybozu/duck/commit/5159c63a980a365b42d1aa80c085f7313375cb2d))
+
+
+### Bug Fixes
+
+* **duckconfig:** remove validation logic for unsupported old compiler ([#752](https://github.com/cybozu/duck/issues/752)) ([3f58a10](https://github.com/cybozu/duck/commit/3f58a10eb924165d3d43e55cab5070323f58c1ef))
+
 ### [0.34.1](https://github.com/cybozu/duck/compare/v0.34.0...v0.34.1) (2022-08-05)
 
 
