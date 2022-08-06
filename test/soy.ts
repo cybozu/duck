@@ -59,6 +59,20 @@ describe("soy", () => {
         assert.equal(actual, "/src/js/path/to/file.soy.js");
       });
     });
-    describe("outputPathFormat", () => {});
+    describe("outputPathFormat", () => {
+      it("replaces `INPUT_DIRECTORY` and `INPUT_DIRECTORY`", () => {
+        const actual = calcOutputPath("/aaa/bbb/ccc/ddd/file.name.soy", {
+          outputPathFormat: "{INPUT_DIRECTORY}{INPUT_FILE_NAME}.js",
+        });
+        assert.equal(actual, "/aaa/bbb/ccc/ddd/file.name.soy.js");
+      });
+      it("replaces `INPUT_FILE_NAME_NO_EXT`", () => {
+        const actual = calcOutputPath("/aaa/bbb/ccc/ddd/file.name.soy", {
+          outputPathFormat:
+            "{INPUT_DIRECTORY}yyy/zzz/{INPUT_FILE_NAME_NO_EXT}.js",
+        });
+        assert.equal(actual, "/aaa/bbb/ccc/ddd/yyy/zzz/file.name.js");
+      });
+    });
   });
 });

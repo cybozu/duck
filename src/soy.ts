@@ -91,7 +91,7 @@ function calcOutputPathFormat(
   soyOptions: DuckConfig["soyOptions"]
 ): string {
   const { outputPathFormat } = soyOptions;
-  const inputDirectory = path.dirname(soyFilePath);
+  const inputDirectory = path.dirname(soyFilePath) + path.sep;
   const inputFileName = path.basename(soyFilePath);
   const inputFileNameNoExt = inputFileName.slice(
     0,
