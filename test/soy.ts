@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { toSoyArgs } from "../src/soy";
+import { calcOutputPath, toSoyArgs } from "../src/soy";
 
 describe("soy", () => {
   describe("toSoyArgs", () => {
@@ -30,5 +30,35 @@ describe("soy", () => {
         "/js/foo.soy,/js/bar.soy",
       ]);
     });
+  });
+  describe("calcOutputPath", () => {
+    it("throws an error when srcs is relative", () => {
+      assert.throws(() => {
+        calcOutputPath("src/js/file.soy", {});
+      }, /absolute/i);
+    });
+    describe("outputDirectory", () => {
+      it("ignores outputDirectory when inputRoots is not specified", () => {
+        const actual = calcOutputPath("/src/js/file.soy", {
+          outputDirectory: "/src/js/soy",
+        });
+        assert.equal(actual, "/src/js/file.soy.js");
+      });
+      it("joins outputDirectory and a relative path from inputRoots to srcs", () => {
+        const actual = calcOutputPath("/src/js/path/to/file.soy", {
+          outputDirectory: "/src/js/soy",
+          inputRoots: ["/src/js"],
+        });
+        assert.equal(actual, "/src/js/soy/path/to/file.soy.js");
+      });
+      it("ignores an inputRoot when srcs doesn't start with it", () => {
+        const actual = calcOutputPath("/src/js/path/to/file.soy", {
+          outputDirectory: "/src/js/soy",
+          inputRoots: ["/hoge", "/fuga"],
+        });
+        assert.equal(actual, "/src/js/path/to/file.soy.js");
+      });
+    });
+    describe("outputPathFormat", () => {});
   });
 });

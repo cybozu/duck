@@ -1,11 +1,10 @@
-import compilerPakageJson from "google-closure-compiler/package.json";
 import path from "path";
-import semver from "semver";
 import { assertString } from "./assert";
+import { toAbsPath, toAbsPathArray } from "./pathutils";
 import { JsonReporterOptions } from "./reporters/json-reporter";
 import { TextReporterOptions } from "./reporters/text-reporter";
 import { XUnitReporterOptions } from "./reporters/xunit-reporter";
-import { SoyToJsOptions } from "./soy";
+import { normalizeSoyOptoins, SoyToJsOptions } from "./soy";
 
 export interface DuckConfig {
   /**
@@ -37,7 +36,7 @@ export interface DuckConfig {
   /**
    * Directories where .soy files are stored. Required if use soy.
    */
-  soyFileRoots?: readonly string[];
+  soyFileRoots: readonly string[];
   /**
    * A path to Closure Templates JAR. Required if use soy.
    */
@@ -50,7 +49,7 @@ export interface DuckConfig {
   /**
    * Options for Closure Templates CLI
    */
-  soyOptions?: SoyToJsOptions;
+  soyOptions: SoyToJsOptions;
   /**
    * Concurrency of Closure Compiler (default: 1,000 if AWS batch mode, otherwise 1)
    */
@@ -131,10 +130,9 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPath(config, configDir, "soyJarPath");
     toAbsPath(config, configDir, "depsJs");
     toAbsPathArray(config, configDir, "depsJsIgnoreDirs");
-    config.depsJsIgnoreDirs = config.depsJsIgnoreDirs || [];
     toAbsPathArray(config, configDir, "soyClasspaths");
-    config.soyClasspaths = config.soyClasspaths || [];
     toAbsPathArray(config, configDir, "soyFileRoots");
+    normalizeSoyOptoins(config, configDir);
     if (config.https) {
       assertString(
         config.https.keyPath,
@@ -173,36 +171,3 @@ export function loadConfig(opts: any = {}): DuckConfig {
   }
   return result;
 }
-
-function toAbsPath<T>(
-  config: T,
-  baseDir: string,
-  key: PickKeysByValue<Required<T>, string>
-) {
-  const value = config[key];
-  if (typeof value === "string") {
-    // "as any": TypeScript can not handle conditional type
-    config[key] = path.resolve(baseDir, value) as any;
-  }
-}
-
-function toAbsPathArray<T>(
-  config: T,
-  baseDir: string,
-  key: PickKeysByValue<Required<T>, string[] | readonly string[]>
-) {
-  const values = config[key];
-  if (Array.isArray(values)) {
-    // "as any": TypeScript can not handle conditional type
-    config[key] = values.map((value) => path.resolve(baseDir, value)) as any;
-  }
-}
-/**
- * @example
- * type Props = {name: string; age: number; visible: boolean};
- * // Keys: 'name' | 'age'
- * type Keys = PickKeysByValue<Props, string | number>;
- */
-type PickKeysByValue<T, ValueType> = {
-  [Key in keyof T]: T[Key] extends ValueType ? Key : never;
-}[keyof T];

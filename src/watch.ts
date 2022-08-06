@@ -5,7 +5,7 @@ import { clearEntryIdToChunkCache } from "./commands/serve";
 import { DuckConfig } from "./duckconfig";
 import { removeDepCacheByPath } from "./gendeps";
 import { logger } from "./logger";
-import { compileSoy } from "./soy";
+import { calcOutputPath, compileSoy } from "./soy";
 
 const chokidarEvents = ["add", "change", "unlink"] as const;
 
@@ -82,25 +82,6 @@ async function handleSoyUpdated(
 
 async function handleSoyDeleted(config: SoyConfig, filepath: string) {
   logger.info(`[SOY_DELETED]: ${path.relative(process.cwd(), filepath)}`);
-  const outputPath = calcOutputPath(filepath, config);
+  const outputPath = calcOutputPath(filepath, config.soyOptions);
   await fs.unlink(outputPath);
-  logger.info(`Removed: ${outputPath}`);
-}
-
-/**
- * NOTE: This logic doesn't support {LOCALE} and {LOCALE_LOWER_CASE}.
- * This is temporary work around because the latest Closure Templates no longer has this feature.
- */
-function calcOutputPath(
-  inputPath: string,
-  config: Required<Pick<DuckConfig, "soyOptions">>
-) {
-  const { outputPathFormat } = config.soyOptions;
-  const inputDirectory = path.dirname(inputPath);
-  const filename = path.basename(inputPath);
-  const filenameNoExt = filename.slice(0, -path.extname(filename).length);
-  return outputPathFormat
-    .replace("{INPUT_DIRECTORY}", inputDirectory)
-    .replace("{INPUT_FILE_NAME}", filename)
-    .replace("{INPUT_FILE_NAME_NO_EXT}", filenameNoExt);
 }

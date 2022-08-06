@@ -227,8 +227,10 @@ export function run(processArgv: readonly string[]): void {
       },
       async (argv) => {
         const config = loadConfig(argv);
-        const hasSoyConfig: boolean = Boolean(
-          config.soyJarPath && config.soyFileRoots && config.soyOptions
+        const hasSoyConfig = Boolean(
+          config.soyJarPath &&
+            config.soyFileRoots.length > 0 &&
+            config.soyOptions
         );
         const tasks = listr(
           [
@@ -271,7 +273,7 @@ export function run(processArgv: readonly string[]): void {
                 argv.skipInitialBuild ||
                 !(
                   config.soyJarPath &&
-                  config.soyFileRoots &&
+                  config.soyFileRoots.length > 0 &&
                   config.soyOptions
                 ),
               task: wrap(() =>
