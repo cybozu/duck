@@ -38,6 +38,11 @@ export interface DuckConfig {
    */
   soyFileRoots: readonly string[];
   /**
+   * Send srcs to closure-templates as relative paths from this.
+   * Also change cwd to this and run closure-templates. (default: undefined)
+   */
+  soySrcsRelativeFrom?: string;
+  /**
    * A path to Closure Templates JAR. Required if use soy.
    */
   soyJarPath?: string;
@@ -128,6 +133,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPath(config, configDir, "inputsRoot");
     toAbsPath(config, configDir, "entryConfigDir");
     toAbsPath(config, configDir, "soyJarPath");
+    toAbsPath(config, configDir, "soySrcsRelativeFrom");
     toAbsPath(config, configDir, "depsJs");
     toAbsPathArray(config, configDir, "depsJsIgnoreDirs");
     toAbsPathArray(config, configDir, "soyClasspaths");
