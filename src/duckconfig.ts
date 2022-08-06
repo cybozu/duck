@@ -159,15 +159,6 @@ export function loadConfig(opts: any = {}): DuckConfig {
     result.concurrency = 1000;
   }
 
-  if (result.batch) {
-    const { version } = compilerPakageJson;
-    if (!semver.satisfies(version, ">=20180716")) {
-      throw new Error(
-        `Installed google-closure-compiler@${version} is too old for batch mode. Use v20180716 or later.`
-      );
-    }
-  }
-
   if (result.batchAwsCustomCompiler) {
     if (!result.batchAwsCustomCompiler.name) {
       throw new TypeError(
