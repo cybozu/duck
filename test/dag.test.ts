@@ -1,4 +1,5 @@
 import { strict as assert } from "assert";
+import { describe, it } from "vitest";
 import { Dag, Node } from "../src/dag";
 
 describe("Dag", () => {

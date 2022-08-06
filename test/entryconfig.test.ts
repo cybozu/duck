@@ -1,5 +1,6 @@
 import { strict as assert } from "assert";
 import path from "path";
+import { describe, it } from "vitest";
 import { loadEntryConfigById, PlovrMode } from "../src/entryconfig";
 
 const fixturesBaseDir = path.join(__dirname, "fixtures");

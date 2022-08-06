@@ -39,8 +39,11 @@ setGlobalLogger(logger);
 function wrap(task: () => Promise<any>): () => Observable<string> {
   return () => {
     // Run the task in the next tick to register the observable to listr before the first logging.
-    const await = Promise.resolve().then(task);
-    return streamToObservable(logStream, { await, endEvent: false }).pipe(
+    const doingTask = Promise.resolve().then(task);
+    return streamToObservable(logStream, {
+      await: doingTask,
+      endEvent: false,
+    }).pipe(
       map<any, string>((obj) => {
         if (obj.msg) {
           return String(obj.msg);

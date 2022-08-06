@@ -2,6 +2,7 @@ import { strict as assert } from "assert";
 import fs from "fs";
 import path from "path";
 import tempy from "tempy";
+import { beforeEach, describe, it } from "vitest";
 import { CompilerOutput, compileToJson } from "../src/compiler";
 import { CompileErrorItem } from "../src/report";
 
@@ -33,7 +34,7 @@ describe("compiler output", () => {
   describe("outputs & warnings", () => {
     let outputs: CompilerOutput[] = [];
     let warnings: CompileErrorItem[] = [];
-    before(async () => {
+    beforeEach(async () => {
       const js = path.resolve(__dirname, "./fixtures/compiler-output/error.js");
       const whitelist = tempy.file({ name: "warnings-whitelist.txt" });
       fs.writeFileSync(whitelist, `${js}:7  inconsistent return type`);
@@ -71,7 +72,7 @@ describe("compiler output", () => {
     let first: string = "";
     let second: string = "";
     let rest: string[] = [];
-    before(async () => {
+    beforeEach(async () => {
       try {
         await compileToJson({
           compilerOptions: {
