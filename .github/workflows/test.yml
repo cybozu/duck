@@ -43,6 +43,6 @@ jobs:
           npm run build:ci
       - name: Report coverage to codecov
         if: matrix.node-version == '16.x'
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: npx codecov
+        uses: codecov/codecov-action@v3
+        with:
+          verbose: true # optional (default = false)
