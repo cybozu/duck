@@ -2,9 +2,9 @@ import streamToObservable from "@teppeis/stream-to-observable";
 import Listr from "listr";
 import os from "os";
 import path from "path";
-import pino from "pino";
+import { pino } from "pino";
 import type { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { map } from "rxjs/operators/index.js";
 import split from "split2";
 import yargs from "yargs";
 import { assertNonNullable, assertString } from "./assert.js";
@@ -199,7 +199,7 @@ const buildDepsOptions = {
 } as const;
 
 export function run(processArgv: readonly string[]): void {
-  yargs
+  yargs(processArgv)
     .command(
       "serve [entryConfigDir]",
       "Start dev server",
@@ -429,7 +429,7 @@ export function run(processArgv: readonly string[]): void {
     .showHelpOnFail(false, "Specify --help or -h for available options")
     .alias("v", "version")
     .alias("h", "help")
-    .parse(processArgv);
+    .parse();
 }
 
 function listr<T>(
