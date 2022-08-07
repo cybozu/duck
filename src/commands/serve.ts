@@ -2,11 +2,11 @@ import cors from "@fastify/cors";
 import serveStatic from "@fastify/static";
 import { stripIndents } from "common-tags";
 import type { FastifyInstance, FastifyReply } from "fastify";
-import fastify from "fastify";
+import { fastify } from "fastify";
 import { promises as fs } from "fs";
 import type http2 from "http2";
 import path from "path";
-import pino from "pino";
+import { pino } from "pino";
 import { assertNonNullable, assertString } from "../assert.js";
 import type { CompilerOutput } from "../compiler.js";
 import {
@@ -361,7 +361,7 @@ async function createServer(config: DuckConfig): Promise<FastifyInstance> {
   }
 
   // enable CORS at first
-  server.register(cors);
+  server.register(cors as any);
 
   // customize log output
   server.addHook("onRequest", async ({ raw, log }, reply) => {
