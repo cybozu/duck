@@ -9,7 +9,7 @@
     "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
-      "*": ["types/*"]
+      "*": ["types/*.d.ts", "types/*/index.d.ts"]
     },
     "declaration": true,
     "outDir": "./dist",
