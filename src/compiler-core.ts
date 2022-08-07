@@ -4,7 +4,7 @@
  */
 
 import fs from "fs";
-import { compiler as ClosureCompiler } from "google-closure-compiler";
+import closureCompiler from "google-closure-compiler";
 import { dirname } from "path";
 import * as tempy from "tempy";
 import type { DuckConfig } from "./duckconfig.js";
@@ -13,6 +13,7 @@ import { logger } from "./logger.js";
 import type { CompileErrorItem } from "./report.js";
 
 declare const __non_webpack_require__: NodeRequire;
+const ClosureCompiler = closureCompiler.compiler;
 
 export interface CompilerOptions {
   [idx: string]: any;
