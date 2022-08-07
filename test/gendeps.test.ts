@@ -1,8 +1,9 @@
-import assert = require("assert");
+import { strict as assert } from "assert";
 import { promises as fs } from "fs";
 import { depGraph } from "google-closure-deps";
 import path from "path";
 import tempy from "tempy";
+import { beforeEach, describe, it } from "vitest";
 import {
   clearDepCache,
   countDepCache,

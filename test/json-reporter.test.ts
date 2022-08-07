@@ -1,7 +1,8 @@
 import { strict as assert } from "assert";
-import { promises as fs, existsSync } from "fs";
+import { existsSync, promises as fs } from "fs";
 import path from "path";
 import tempy from "tempy";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { JsonReporter } from "../src/reporters/json-reporter";
 
 describe("JsonReporter", () => {

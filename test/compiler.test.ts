@@ -2,6 +2,7 @@ import { strict as assert } from "assert";
 import { stripIndents } from "common-tags";
 import { readFileSync } from "fs";
 import path from "path";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import {
   convertToFlagfile,
   createCompilerOptionsForPage,

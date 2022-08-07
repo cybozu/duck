@@ -1,4 +1,5 @@
 import { strict as assert } from "assert";
+import { beforeEach, describe, it } from "vitest";
 import { TextReporter } from "../src/reporters/text-reporter";
 
 describe("TextReporter", () => {

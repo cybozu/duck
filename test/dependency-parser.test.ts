@@ -1,6 +1,7 @@
 import { strict as assert } from "assert";
 import { depGraph } from "google-closure-deps";
 import path from "path";
+import { afterEach, beforeEach, describe, it } from "vitest";
 import { parseDependency } from "../src/dependency-parser";
 import { DependencyParserWithWorkers } from "../src/dependency-parser-wrapper";
 
