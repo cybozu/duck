@@ -1,13 +1,6 @@
 {
   "extends": "@cybozu/eslint-config/presets/node-typescript-prettier",
   "root": true,
-  "env": {
-    "mocha": true
-  },
-  "globals": {
-    "describe": "readonly",
-    "it": "readonly"
-  },
   "rules": {
     "no-process-exit": "off",
     "no-shadow": "off",
