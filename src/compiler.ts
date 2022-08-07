@@ -1,6 +1,6 @@
 import { stripIndents } from "common-tags";
 import compilerPkg from "google-closure-compiler/package.json";
-import { depGraph } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
 import path from "path";
 import semver from "semver";
 import { assertNonNullable } from "./assert.js";
@@ -15,6 +15,8 @@ import type { DuckConfig } from "./duckconfig.js";
 import type { EntryConfig, WarningsWhitelistItem } from "./entryconfig.js";
 import { createDag, PlovrMode } from "./entryconfig.js";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps.js";
+
+import depGraph = closureDeps.depGraph;
 
 export {
   CompilerError,

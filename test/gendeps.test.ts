@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { promises as fs } from "fs";
-import { depGraph } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
 import path from "path";
 import tempy from "tempy";
 import { beforeEach, describe, it } from "vitest";
@@ -14,6 +14,8 @@ import {
   restoreDepsJs,
   writeCachedDepsOnDisk,
 } from "../src/gendeps.js";
+
+import depGraph = closureDeps.depGraph;
 
 const fixturesBaseDir = path.join(__dirname, "fixtures");
 

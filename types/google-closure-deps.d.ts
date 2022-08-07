@@ -1,7 +1,8 @@
 /**
  * Types for google-closure-deps
  */
-export namespace parser {
+
+namespace GoogleClosureDeps.parser {
   export class ParseResult {
     /** @const */
     dependencies: depGraph.Dependency[];
@@ -34,7 +35,7 @@ export namespace parser {
     }
   }
 
-  export class ParseError {
+  class ParseError {
     /** @const */
     fatal: boolean;
     /** @const */
@@ -55,19 +56,16 @@ export namespace parser {
     );
   }
 
-  export function parseFileAsync(path: string): Promise<ParseResult>;
+  function parseFileAsync(path: string): Promise<ParseResult>;
 
   /**
    * Parses a file that contains only goog.addDependency statements. This is regex
    * based to be lightweight and avoid addtional dependencies.
    */
-  export function parseDependencyFile(
-    text: string,
-    filePath: string
-  ): ParseResult;
+  function parseDependencyFile(text: string, filePath: string): ParseResult;
 }
 
-export namespace depGraph {
+namespace GoogleClosureDeps.depGraph {
   export enum DependencyType {
     /** A file containing goog.provide statements. */
     CLOSURE_PROVIDE = "closure provide",
@@ -82,7 +80,7 @@ export namespace depGraph {
   /**
    * A Dependency in the dependency graph (a vertex).
    */
-  export class Dependency {
+  class Dependency {
     /** @const */
     type: DependencyType;
     /**
@@ -128,7 +126,7 @@ export namespace depGraph {
   /**
    * A dependency that was parsed from an goog.addDependnecy call.
    */
-  export class ParsedDependency extends Dependency {
+  class ParsedDependency extends Dependency {
     /**
      * Relative path from Closure Library to this file.
      * @const
@@ -140,7 +138,7 @@ export namespace depGraph {
    * Generic super class for all types of imports. This acts as an edge in the
    * dependency graph between two dependencies.
    */
-  export abstract class Import {
+  abstract class Import {
     /**
      * Dependency this import is contained in.
      */
@@ -161,13 +159,13 @@ export namespace depGraph {
     abstract isEs6Import(): boolean;
   }
 
-  export class GoogRequire extends Import {
+  class GoogRequire extends Import {
     validate(to: Dependency): void;
     isGoogRequire(): true;
     isEs6Import(): false;
   }
 
-  export class Es6Import extends Import {
+  class Es6Import extends Import {
     validate(to: Dependency): void;
     isGoogRequire(): true;
     isEs6Import(): false;
@@ -176,7 +174,7 @@ export namespace depGraph {
   /**
    * Interface for resolving module specifiers.
    */
-  export interface ModuleResolver {
+  interface ModuleResolver {
     /**
      * @param fromPath The path of the module that is doing the
      *     importing.
@@ -193,7 +191,7 @@ export namespace depGraph {
    * A dependency graph is not validated by default, you must call validate() if
    * you wish to perform validation.
    */
-  export class Graph {
+  class Graph {
     /** @const */
     depsBySymbol: Map<string, Dependency>;
     /** @const */
@@ -224,7 +222,7 @@ export namespace depGraph {
   }
 }
 
-export namespace depFile {
+namespace GoogleClosureDeps.depFile {
   /**
    * Gets the text of a dependency file for the given dependencies.
    *
@@ -240,3 +238,5 @@ export namespace depFile {
     moduleResolver?: depGraph.ModuleResolver
   ): string;
 }
+
+export default GoogleClosureDeps;

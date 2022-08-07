@@ -1,6 +1,8 @@
-import { depGraph } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
 import path from "path";
 import workerpool from "workerpool";
+
+import depGraph = closureDeps.depGraph;
 
 // find from the parent directory for ts-node based testing
 const script = path.join(__dirname, "../dist/dependency-parser-worker.js");

@@ -1,9 +1,11 @@
 import { strict as assert } from "assert";
-import { depGraph } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
 import path from "path";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { parseDependency } from "../src/dependency-parser.js";
 import { DependencyParserWithWorkers } from "../src/dependency-parser-wrapper.js";
+import { parseDependency } from "../src/dependency-parser.js";
+
+import depGraph = closureDeps.depGraph;
 
 const fixturesBaseDir = path.join(__dirname, "fixtures");
 
