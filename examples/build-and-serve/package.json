@@ -5,6 +5,7 @@
   "engines": {
     "node": ">=10.12"
   },
+  "type": "commonjs",
   "scripts": {
     "build": "duck build",
     "build:ci": "duck build --batch local -n",
