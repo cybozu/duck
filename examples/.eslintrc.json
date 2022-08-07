@@ -1,5 +1,20 @@
 {
+  "extends": "plugin:node/recommended-script",
+  "globals": {
+    "app": true,
+    "goog": "readonly"
+  },
   "rules": {
-    "dot-notation": "off"
-  }
+    "dot-notation": "off",
+    "node/no-exports-assign": "off",
+    "node/no-unsupported-features/es-syntax": "off"
+  },
+  "overrides": [
+    {
+      "files": ["./build-deps/esm*.js"],
+      "parserOptions": {
+        "sourceType": "module"
+      }
+    }
+  ]
 }
