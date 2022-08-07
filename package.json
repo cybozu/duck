@@ -23,7 +23,7 @@
     "build": "tsc",
     "clean": "rimraf dist lib .tsbuildinfo",
     "lint": "run-p lint:*",
-    "lint:tsc": "tsc --noEmit",
+    "lint:tsc": "tsc -p tsconfig.test.json",
     "lint:eslint": "eslint --ext js,ts src test types examples",
     "fix": "npm run lint:eslint -- --fix",
     "test": "npm-run-all clean -p lint build -s unit:coverage --aggregate-output -l",
