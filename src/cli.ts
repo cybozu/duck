@@ -3,7 +3,7 @@ import Listr from "listr";
 import os from "os";
 import path from "path";
 import pino from "pino";
-import { Observable } from "rxjs";
+import type { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import split from "split2";
 import yargs from "yargs";
@@ -14,13 +14,17 @@ import {
 } from "./assert";
 import { buildDeps } from "./commands/buildDeps";
 import { buildJs, BuildJsCompilationError } from "./commands/buildJs";
-import { buildSoy, BuildSoyConfig } from "./commands/buildSoy";
+import type { BuildSoyConfig } from "./commands/buildSoy";
+import { buildSoy } from "./commands/buildSoy";
 import { cleanDeps } from "./commands/cleanDeps";
-import { cleanSoy, CleanSoyConfig } from "./commands/cleanSoy";
+import type { CleanSoyConfig } from "./commands/cleanSoy";
+import { cleanSoy } from "./commands/cleanSoy";
 import { serve } from "./commands/serve";
-import { DuckConfig, loadConfig } from "./duckconfig";
+import type { DuckConfig } from "./duckconfig";
+import { loadConfig } from "./duckconfig";
 import { setGlobalLogger } from "./logger";
-import { ErrorReason, reportTestResults } from "./report";
+import type { ErrorReason } from "./report";
+import { reportTestResults } from "./report";
 
 assertNodeVersionGte(process.version, 10);
 

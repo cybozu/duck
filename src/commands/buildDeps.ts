@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { resultInfoLogType } from "../cli";
-import { DuckConfig } from "../duckconfig";
+import type { DuckConfig } from "../duckconfig";
 import { generateDepFileTextFromDeps, getDependencies } from "../gendeps";
 import { logger } from "../logger";
 

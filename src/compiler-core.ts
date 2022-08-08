@@ -2,10 +2,10 @@ import fs from "fs";
 import { compiler as ClosureCompiler } from "google-closure-compiler";
 import { dirname } from "path";
 import * as tempy from "tempy";
-import { DuckConfig } from "./duckconfig";
-import { WarningsWhitelistItem } from "./entryconfig";
+import type { DuckConfig } from "./duckconfig";
+import type { WarningsWhitelistItem } from "./entryconfig";
 import { logger } from "./logger";
-import { CompileErrorItem } from "./report";
+import type { CompileErrorItem } from "./report";
 
 declare const __non_webpack_require__: NodeRequire;
 

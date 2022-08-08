@@ -1,5 +1,5 @@
 import path from "path";
-import { ErrorReason } from "../report";
+import type { ErrorReason } from "../report";
 import { BaseReporter } from "./base-reporter";
 
 export interface JsonReporterOptions {

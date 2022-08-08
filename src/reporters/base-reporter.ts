@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { ErrorReason } from "../report";
+import type { ErrorReason } from "../report";
 
 export abstract class BaseReporter {
   private stderr: boolean;

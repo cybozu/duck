@@ -1,4 +1,4 @@
-import pino from "pino";
+import type pino from "pino";
 
 export let logger: pino.Logger;
 

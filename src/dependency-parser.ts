@@ -1,4 +1,5 @@
-import { depGraph, parser } from "google-closure-deps";
+import type { depGraph } from "google-closure-deps";
+import { parser } from "google-closure-deps";
 
 /**
  * Parse a script file including such as `goog.provide` and generate a `Dependency`.

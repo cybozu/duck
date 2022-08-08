@@ -1,4 +1,4 @@
-import { DuckConfig } from "./duckconfig";
+import type { DuckConfig } from "./duckconfig";
 import { JsonReporter } from "./reporters/json-reporter";
 import { TextReporter } from "./reporters/text-reporter";
 import { XUnitReporter } from "./reporters/xunit-reporter";

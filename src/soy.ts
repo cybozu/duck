@@ -3,7 +3,7 @@ import execa from "execa";
 import path from "path";
 import { assertString } from "./assert";
 import { resultInfoLogType } from "./cli";
-import { DuckConfig } from "./duckconfig";
+import type { DuckConfig } from "./duckconfig";
 import { logger } from "./logger";
 import { toAbsPath, toAbsPathArray } from "./pathutils";
 

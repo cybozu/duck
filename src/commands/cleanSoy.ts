@@ -1,7 +1,7 @@
 import rimraf from "rimraf";
 import util from "util";
 import { assertString } from "../assert";
-import { DuckConfig } from "../duckconfig";
+import type { DuckConfig } from "../duckconfig";
 import { logger } from "../logger";
 import { resolveOutputPathFormat } from "../soy";
 
