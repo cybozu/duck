@@ -1,10 +1,12 @@
+import type { AwsOptions, LocalOptions } from "faastjs";
 import path from "path";
 import { assertString } from "./assert";
 import { toAbsPath, toAbsPathArray } from "./pathutils";
-import { JsonReporterOptions } from "./reporters/json-reporter";
-import { TextReporterOptions } from "./reporters/text-reporter";
-import { XUnitReporterOptions } from "./reporters/xunit-reporter";
-import { normalizeSoyOptoins, SoyToJsOptions } from "./soy";
+import type { JsonReporterOptions } from "./reporters/json-reporter";
+import type { TextReporterOptions } from "./reporters/text-reporter";
+import type { XUnitReporterOptions } from "./reporters/xunit-reporter";
+import type { SoyToJsOptions } from "./soy";
+import { normalizeSoyOptoins } from "./soy";
 
 export interface DuckConfig {
   /**
@@ -76,7 +78,7 @@ export interface DuckConfig {
    * Options for faast.js in batch mode.
    * @see https://faastjs.org/docs/api/faastjs.awsoptions
    */
-  batchOptions?: import("faastjs").AwsOptions | import("faastjs").LocalOptions;
+  batchOptions?: AwsOptions | LocalOptions;
   /**
    * Reporters (choose from "json", "text" or "xunit")
    */

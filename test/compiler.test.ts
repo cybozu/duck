@@ -7,8 +7,8 @@ import {
   convertToFlagfile,
   createCompilerOptionsForPage,
 } from "../src/compiler";
-import { ExtendedCompilerOptions } from "../src/compiler-core";
-import { DuckConfig } from "../src/duckconfig";
+import type { ExtendedCompilerOptions } from "../src/compiler-core";
+import type { DuckConfig } from "../src/duckconfig";
 import { PlovrMode } from "../src/entryconfig";
 
 const emptyDuckConfig: DuckConfig = {} as DuckConfig;

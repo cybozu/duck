@@ -4,20 +4,16 @@ import { depGraph } from "google-closure-deps";
 import path from "path";
 import semver from "semver";
 import { assertNonNullable } from "./assert";
-import {
+import type {
   CompilationLevel,
   CompilerOptions,
   CompilerOptionsFormattingType,
   ExtendedCompilerOptions,
 } from "./compiler-core";
-import { Dag } from "./dag";
-import { DuckConfig } from "./duckconfig";
-import {
-  createDag,
-  EntryConfig,
-  PlovrMode,
-  WarningsWhitelistItem,
-} from "./entryconfig";
+import type { Dag } from "./dag";
+import type { DuckConfig } from "./duckconfig";
+import type { EntryConfig, WarningsWhitelistItem } from "./entryconfig";
+import { createDag, PlovrMode } from "./entryconfig";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
 
 export {

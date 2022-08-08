@@ -2,7 +2,7 @@ import chokidar from "chokidar";
 import { promises as fs } from "fs";
 import path from "path";
 import { clearEntryIdToChunkCache } from "./commands/serve";
-import { DuckConfig } from "./duckconfig";
+import type { DuckConfig } from "./duckconfig";
 import { removeDepCacheByPath } from "./gendeps";
 import { logger } from "./logger";
 import { calcOutputPath, compileSoy } from "./soy";

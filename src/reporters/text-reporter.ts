@@ -1,4 +1,4 @@
-import { CompileErrorCase, ErrorReason } from "../report";
+import type { CompileErrorCase, ErrorReason } from "../report";
 import { BaseReporter } from "./base-reporter";
 
 export interface TextReporterOptions {

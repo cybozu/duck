@@ -1,5 +1,5 @@
 import recursive from "recursive-readdir";
-import { DuckConfig } from "../duckconfig";
+import type { DuckConfig } from "../duckconfig";
 import { logger } from "../logger";
 import { compileSoy } from "../soy";
 

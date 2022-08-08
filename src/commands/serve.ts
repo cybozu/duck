@@ -1,26 +1,23 @@
 import cors from "@fastify/cors";
 import serveStatic from "@fastify/static";
 import { stripIndents } from "common-tags";
-import fastify, { FastifyInstance, FastifyReply } from "fastify";
+import type { FastifyInstance, FastifyReply } from "fastify";
+import fastify from "fastify";
 import { promises as fs } from "fs";
 import type http2 from "http2";
 import path from "path";
 import pino from "pino";
 import { assertNonNullable, assertString } from "../assert";
+import type { CompilerOutput } from "../compiler";
 import {
-  CompilerOutput,
   compileToJson,
   convertChunkInfos,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
 } from "../compiler";
-import { DuckConfig } from "../duckconfig";
-import {
-  createDag,
-  EntryConfig,
-  loadEntryConfigById,
-  PlovrMode,
-} from "../entryconfig";
+import type { DuckConfig } from "../duckconfig";
+import type { EntryConfig, PlovrMode } from "../entryconfig";
+import { createDag, loadEntryConfigById } from "../entryconfig";
 import {
   generateDepFileText,
   restoreDepsJs,

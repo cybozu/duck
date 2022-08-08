@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import { depFile, depGraph, parser } from "google-closure-deps";
 import path from "path";
 import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
-import { EntryConfig } from "./entryconfig";
+import type { EntryConfig } from "./entryconfig";
 import { googBaseUrlPath, inputsUrlPath } from "./urls";
 
 const pathToDependencyCache: Map<

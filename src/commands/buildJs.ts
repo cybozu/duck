@@ -1,21 +1,23 @@
+import type { FaastModule } from "faastjs";
 import { promises as fs } from "fs";
 import pSettled from "p-settle";
 import path from "path";
 import recursive from "recursive-readdir";
 import { assertNonNullable, assertString } from "../assert";
 import { resultInfoLogType } from "../cli";
+import type { CompilerError } from "../compiler";
 import {
-  CompilerError,
   compileToJson,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
 } from "../compiler";
-import * as compilerCoreFunctions from "../compiler-core";
-import { DuckConfig } from "../duckconfig";
-import { EntryConfig, loadEntryConfig } from "../entryconfig";
+import type * as compilerCoreFunctions from "../compiler-core";
+import type { DuckConfig } from "../duckconfig";
+import type { EntryConfig } from "../entryconfig";
+import { loadEntryConfig } from "../entryconfig";
 import { restoreDepsJs } from "../gendeps";
 import { logger } from "../logger";
-import { CompileErrorItem, ErrorReason } from "../report";
+import type { CompileErrorItem, ErrorReason } from "../report";
 
 /**
  * @throws If compiler throws errors
@@ -26,9 +28,7 @@ export async function buildJs(
   printConfig = false
 ): Promise<ErrorReason[]> {
   let compileFn = compileToJson;
-  let faastModule:
-    | import("faastjs").FaastModule<typeof compilerCoreFunctions>
-    | null = null;
+  let faastModule: FaastModule<typeof compilerCoreFunctions> | null = null;
   if (config.batch) {
     const { getFaastCompiler } = await import("../batch.js");
     faastModule = await getFaastCompiler(config);

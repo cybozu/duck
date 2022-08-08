@@ -1,17 +1,15 @@
-import {
+import type {
   AwsOptions,
   CommonOptions,
-  faastAws,
-  faastLocal,
   FaastModuleProxy,
   LocalOptions,
-  log,
 } from "faastjs";
+import { faastAws, faastLocal, log } from "faastjs";
 import mergeOptions from "merge-options";
 import semver from "semver";
 import { assertNonNullable } from "./assert";
 import * as compilerFaastFunctions from "./compiler-core";
-import { DuckConfig } from "./duckconfig";
+import type { DuckConfig } from "./duckconfig";
 import { logger } from "./logger";
 
 // change to stdout

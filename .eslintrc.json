@@ -6,6 +6,7 @@
     "no-shadow": "off",
     "default-param-last": "off",
     "no-param-reassign": "off",
+    "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/class-name-casing": "off",
     "node/no-exports-assign": "off",
