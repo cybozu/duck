@@ -1,5 +1,7 @@
+import { Buffer } from "buffer";
 import type {
   AwsOptions,
+  CleanupOptions,
   CommonOptions,
   FaastModuleProxy,
   LocalOptions,
@@ -8,14 +10,34 @@ import { faastAws, faastLocal, log } from "faastjs";
 import mergeOptions from "merge-options";
 import semver from "semver";
 import { assertNonNullable } from "./assert";
-import * as compilerFaastFunctions from "./compiler-core";
+import * as compilerFaastFunctions from "./compiler-batch-wrapper";
+import type { compileToJson } from "./compiler-core";
 import type { DuckConfig } from "./duckconfig";
 import { logger } from "./logger";
 
 // change to stdout
 log.info.log = console.log.bind(console);
 
-export async function getFaastCompiler(
+export async function createCompileFunction(config: DuckConfig): Promise<{
+  compileToJson: typeof compileToJson;
+  cleanup: (userCleanupOptions?: CleanupOptions) => Promise<void>;
+}> {
+  const faastModule = await getFaastCompiler(config);
+  const cleanup = (opt?: CleanupOptions) => faastModule.cleanup(opt);
+  const compile: typeof compileToJson = async (extendedOpts) => {
+    const gen = faastModule.functions.compileToJsonStringChunks(extendedOpts);
+    const chunks: string[] = [];
+    for await (const chunk of gen) {
+      logger.debug(`chunk size: ${Buffer.byteLength(chunk)}`);
+      chunks.push(chunk);
+    }
+    return JSON.parse(chunks.join(""));
+  };
+
+  return { compileToJson: compile, cleanup };
+}
+
+async function getFaastCompiler(
   config: DuckConfig
 ): Promise<
   FaastModuleProxy<typeof compilerFaastFunctions, CommonOptions, any>

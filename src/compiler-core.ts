@@ -1,3 +1,8 @@
+/**
+ * @fileoverview This file could be bundled with webpack and executed in AWS
+ * Lambda. Exports and dependencies in this file should be kept to a minimum.
+ */
+
 import fs from "fs";
 import { compiler as ClosureCompiler } from "google-closure-compiler";
 import { dirname } from "path";
