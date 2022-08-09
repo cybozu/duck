@@ -7,11 +7,7 @@ import type { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import split from "split2";
 import yargs from "yargs";
-import {
-  assertNodeVersionGte,
-  assertNonNullable,
-  assertString,
-} from "./assert";
+import { assertNonNullable, assertString } from "./assert";
 import { buildDeps } from "./commands/buildDeps";
 import { buildJs, BuildJsCompilationError } from "./commands/buildJs";
 import type { BuildSoyConfig } from "./commands/buildSoy";
@@ -25,8 +21,6 @@ import { loadConfig } from "./duckconfig";
 import { setGlobalLogger } from "./logger";
 import type { ErrorReason } from "./report";
 import { reportTestResults } from "./report";
-
-assertNodeVersionGte(process.version, 10);
 
 /**
  * Transform ndjson (Newline Delimited JSON) stream to JSON object stream.

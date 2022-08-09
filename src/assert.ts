@@ -21,19 +21,3 @@ export function assertNonNullable<T>(
   }
   return arg as NonNullable<T>;
 }
-
-/**
- * Assert current Node version is greator than or equal to `minMajorVer`.
- *
- * @param ver like `v10.1.2`
- * @param minMajorVer
- */
-export function assertNodeVersionGte(ver: string, minMajorVer: number): void {
-  const [, majorVer = null] = /^v?(\d+)\./.exec(ver) || [];
-  if (Number(majorVer) < minMajorVer) {
-    console.error(
-      `Error: duck requires Node v${minMajorVer} or higer, but the current version is ${ver}`
-    );
-    process.exit(1);
-  }
-}
