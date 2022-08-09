@@ -1,6 +1,0 @@
-{
-  "require": ["espower-typescript/guess"],
-  "extension": ["ts"],
-  "spec": ["test", "test/bin-test"],
-  "watch-files": ["src", "test", "types"]
-}
