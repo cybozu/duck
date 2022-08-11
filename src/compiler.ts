@@ -1,6 +1,6 @@
 import { stripIndents } from "common-tags";
-import compilerPkg from "google-closure-compiler/package.json";
 import closureDeps from "google-closure-deps";
+import { createRequire } from "module";
 import path from "path";
 import semver from "semver";
 import { assertNonNullable } from "./assert.js";
@@ -17,6 +17,7 @@ import { createDag, PlovrMode } from "./entryconfig.js";
 import { getClosureLibraryDependencies, getDependencies } from "./gendeps.js";
 
 import depGraph = closureDeps.depGraph;
+const nodeRequire = createRequire(import.meta.url);
 
 export {
   CompilerError,
@@ -99,6 +100,7 @@ function createBaseOptions(
     // for pages
     // `STRICT` was deprecated with `PRUNE` in google-closure-compiler@v20181125 and removed in v20200101.
     // See: https://github.com/google/closure-compiler/commit/0c8ae0ec822e89aa82f8b7604fd5a68bc30f77ea
+    const compilerPkg = nodeRequire("google-closure-compiler/package.json");
     opts.dependency_mode = semver.lt(compilerPkg.version, "20181125.0.0")
       ? "STRICT"
       : "PRUNE";
