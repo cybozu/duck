@@ -195,13 +195,13 @@ it("batch: aws", async () => {
   assert.deepEqual(actual, expected);
 });
 describe("convertToFlagfile()", () => {
-  let debugOrig: any;
+  let consoleInfoOrig: any;
   beforeEach(() => {
-    debugOrig = console.debug;
-    console.debug = () => {};
+    consoleInfoOrig = console.info;
+    console.info = () => {};
   });
   afterEach(() => {
-    console.debug = debugOrig;
+    console.info = consoleInfoOrig;
   });
   it("converts empty options", () => {
     const { flagfile } = convertToFlagfile({});
