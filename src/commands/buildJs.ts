@@ -1,9 +1,9 @@
-import type { FaastModule } from "faastjs";
+import type { CleanupOptions } from "faastjs";
 import { promises as fs } from "fs";
 import pSettled from "p-settle";
 import path from "path";
 import recursive from "recursive-readdir";
-import { assertNonNullable, assertString } from "../assert";
+import { assertString } from "../assert";
 import { resultInfoLogType } from "../cli";
 import type { CompilerError } from "../compiler";
 import {
@@ -28,12 +28,12 @@ export async function buildJs(
   printConfig = false
 ): Promise<ErrorReason[]> {
   let compileFn = compileToJson;
-  let faastModule: FaastModule<typeof compilerCoreFunctions> | null = null;
+  let cleanup: ((opt?: CleanupOptions) => Promise<void>) | null = null;
   if (config.batch) {
-    const { getFaastCompiler } = await import("../batch.js");
-    faastModule = await getFaastCompiler(config);
-    assertNonNullable(faastModule);
-    compileFn = faastModule.functions.compileToJson;
+    const { createCompileFunction } = await import("../batch.js");
+    const func = await createCompileFunction(config);
+    compileFn = func.compileToJson;
+    cleanup = func.cleanup;
   }
   let restoringDepsJs: Promise<void> | null = null;
   const entryConfigPaths = entryConfigs
@@ -98,8 +98,8 @@ export async function buildJs(
       config
     );
   } finally {
-    if (faastModule) {
-      await faastModule.cleanup();
+    if (cleanup) {
+      await cleanup();
     }
   }
 
