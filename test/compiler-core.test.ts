@@ -31,7 +31,7 @@ const assertCompileErrorItem = (item: any) => {
   }
 };
 
-describe("compiler output", () => {
+describe("compiler-core", () => {
   describe("outputs & warnings", () => {
     let outputs: CompilerOutput[] = [];
     let warnings: CompileErrorItem[] = [];
