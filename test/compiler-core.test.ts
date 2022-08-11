@@ -4,7 +4,7 @@ import path from "path";
 import tempy from "tempy";
 import { beforeEach, describe, it } from "vitest";
 import type { CompilerOutput } from "../src/compiler";
-import { compileToJson } from "../src/compiler";
+import { compileToJson } from "../src/compiler-core";
 import type { CompileErrorItem } from "../src/report";
 
 const assertCompileErrorItem = (item: any) => {
@@ -31,7 +31,7 @@ const assertCompileErrorItem = (item: any) => {
   }
 };
 
-describe("compiler output", () => {
+describe("compiler-core", () => {
   describe("outputs & warnings", () => {
     let outputs: CompilerOutput[] = [];
     let warnings: CompileErrorItem[] = [];
@@ -94,7 +94,7 @@ describe("compiler output", () => {
       }
 
       assert.fail("compileToJson must throw error in this test");
-    });
+    }, 20000);
 
     it("first line is the command excuted by compileToJson", () => {
       assert(/^java -jar/.test(first));
