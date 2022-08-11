@@ -13,7 +13,7 @@ import {
   getDependencies,
   restoreDepsJs,
   writeCachedDepsOnDisk,
-} from "../src/gendeps";
+} from "../src/gendeps.js";
 
 const fixturesBaseDir = path.join(__dirname, "fixtures");
 

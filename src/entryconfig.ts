@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import stripJsonComments from "strip-json-comments";
-import { Dag, Node } from "./dag";
+import { Dag, Node } from "./dag.js";
 
 export interface EntryConfig {
   id: string;

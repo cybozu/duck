@@ -1,6 +1,6 @@
 import path from "path";
-import type { ErrorReason } from "../report";
-import { BaseReporter } from "./base-reporter";
+import type { ErrorReason } from "../report.js";
+import { BaseReporter } from "./base-reporter.js";
 
 export interface JsonReporterOptions {
   stderr?: boolean;

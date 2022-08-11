@@ -6,10 +6,10 @@ import { afterEach, beforeEach, describe, it } from "vitest";
 import {
   convertToFlagfile,
   createCompilerOptionsForPage,
-} from "../src/compiler";
-import type { ExtendedCompilerOptions } from "../src/compiler-core";
-import type { DuckConfig } from "../src/duckconfig";
-import { PlovrMode } from "../src/entryconfig";
+} from "../src/compiler.js";
+import type { ExtendedCompilerOptions } from "../src/compiler-core.js";
+import type { DuckConfig } from "../src/duckconfig.js";
+import { PlovrMode } from "../src/entryconfig.js";
 
 const emptyDuckConfig: DuckConfig = {} as DuckConfig;
 

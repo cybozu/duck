@@ -1,7 +1,7 @@
-import type { DuckConfig } from "./duckconfig";
-import { JsonReporter } from "./reporters/json-reporter";
-import { TextReporter } from "./reporters/text-reporter";
-import { XUnitReporter } from "./reporters/xunit-reporter";
+import type { DuckConfig } from "./duckconfig.js";
+import { JsonReporter } from "./reporters/json-reporter.js";
+import { TextReporter } from "./reporters/text-reporter.js";
+import { XUnitReporter } from "./reporters/xunit-reporter.js";
 
 export type CompileErrorItem = CompileErrorCase | CompileErrorInfo;
 export interface CompileErrorCase {

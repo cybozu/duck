@@ -1,5 +1,5 @@
-import type { CompileErrorCase, ErrorReason } from "../report";
-import { BaseReporter } from "./base-reporter";
+import type { CompileErrorCase, ErrorReason } from "../report.js";
+import { BaseReporter } from "./base-reporter.js";
 
 export interface TextReporterOptions {
   stderr?: boolean;

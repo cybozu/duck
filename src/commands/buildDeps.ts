@@ -1,9 +1,9 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { resultInfoLogType } from "../cli";
-import type { DuckConfig } from "../duckconfig";
-import { generateDepFileTextFromDeps, getDependencies } from "../gendeps";
-import { logger } from "../logger";
+import { resultInfoLogType } from "../cli.js";
+import type { DuckConfig } from "../duckconfig.js";
+import { generateDepFileTextFromDeps, getDependencies } from "../gendeps.js";
+import { logger } from "../logger.js";
 
 export async function buildDeps(config: DuckConfig): Promise<void> {
   const paths = [config.inputsRoot];

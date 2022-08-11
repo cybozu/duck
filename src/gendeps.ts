@@ -2,9 +2,9 @@ import fg from "fast-glob";
 import { promises as fs } from "fs";
 import { depFile, depGraph, parser } from "google-closure-deps";
 import path from "path";
-import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
-import type { EntryConfig } from "./entryconfig";
-import { googBaseUrlPath, inputsUrlPath } from "./urls";
+import { DependencyParserWithWorkers } from "./dependency-parser-wrapper.js";
+import type { EntryConfig } from "./entryconfig.js";
+import { googBaseUrlPath, inputsUrlPath } from "./urls.js";
 
 const pathToDependencyCache: Map<
   string,

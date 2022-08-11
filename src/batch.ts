@@ -9,11 +9,11 @@ import type {
 import { faastAws, faastLocal, log } from "faastjs";
 import mergeOptions from "merge-options";
 import semver from "semver";
-import { assertNonNullable } from "./assert";
-import * as compilerFaastFunctions from "./compiler-batch-wrapper";
-import type { compileToJson } from "./compiler-core";
-import type { DuckConfig } from "./duckconfig";
-import { logger } from "./logger";
+import { assertNonNullable } from "./assert.js";
+import * as compilerFaastFunctions from "./compiler-batch-wrapper.js";
+import type { compileToJson } from "./compiler-core.js";
+import type { DuckConfig } from "./duckconfig.js";
+import { logger } from "./logger.js";
 
 // change to stdout
 log.info.log = console.log.bind(console);

@@ -1,11 +1,11 @@
 import assert from "assert";
 import execa from "execa";
 import path from "path";
-import { assertString } from "./assert";
-import { resultInfoLogType } from "./cli";
-import type { DuckConfig } from "./duckconfig";
-import { logger } from "./logger";
-import { toAbsPath, toAbsPathArray } from "./pathutils";
+import { assertString } from "./assert.js";
+import { resultInfoLogType } from "./cli.js";
+import type { DuckConfig } from "./duckconfig.js";
+import { logger } from "./logger.js";
+import { toAbsPath, toAbsPathArray } from "./pathutils.js";
 
 type SoyToJsOptionsCore = {
   outputPathFormat?: string;

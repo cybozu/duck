@@ -7,31 +7,31 @@ import { promises as fs } from "fs";
 import type http2 from "http2";
 import path from "path";
 import pino from "pino";
-import { assertNonNullable, assertString } from "../assert";
-import type { CompilerOutput } from "../compiler";
+import { assertNonNullable, assertString } from "../assert.js";
+import type { CompilerOutput } from "../compiler.js";
 import {
   compileToJson,
   convertChunkInfos,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
-} from "../compiler";
-import type { DuckConfig } from "../duckconfig";
-import type { EntryConfig, PlovrMode } from "../entryconfig";
-import { createDag, loadEntryConfigById } from "../entryconfig";
+} from "../compiler.js";
+import type { DuckConfig } from "../duckconfig.js";
+import type { EntryConfig, PlovrMode } from "../entryconfig.js";
+import { createDag, loadEntryConfigById } from "../entryconfig.js";
 import {
   generateDepFileText,
   restoreDepsJs,
   writeCachedDepsOnDisk,
-} from "../gendeps";
-import { logger, setGlobalLogger } from "../logger";
+} from "../gendeps.js";
+import { logger, setGlobalLogger } from "../logger.js";
 import {
   closureLibraryUrlPath,
   compileUrlPath,
   depsUrlPath,
   googBaseUrlPath,
   inputsUrlPath,
-} from "../urls";
-import { watchJsAndSoy } from "../watch";
+} from "../urls.js";
+import { watchJsAndSoy } from "../watch.js";
 
 const entryIdToChunkCache: Map<
   string,

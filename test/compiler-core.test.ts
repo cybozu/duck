@@ -3,9 +3,9 @@ import fs from "fs";
 import path from "path";
 import tempy from "tempy";
 import { beforeEach, describe, it } from "vitest";
-import type { CompilerOutput } from "../src/compiler";
-import { compileToJson } from "../src/compiler-core";
-import type { CompileErrorItem } from "../src/report";
+import type { CompilerOutput } from "../src/compiler.js";
+import { compileToJson } from "../src/compiler-core.js";
+import type { CompileErrorItem } from "../src/report.js";
 
 const assertCompileErrorItem = (item: any) => {
   assert(typeof item === "object");

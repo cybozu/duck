@@ -3,7 +3,7 @@ import { existsSync, promises as fs } from "fs";
 import path from "path";
 import tempy from "tempy";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { JsonReporter } from "../src/reporters/json-reporter";
+import { JsonReporter } from "../src/reporters/json-reporter.js";
 
 const entryConfigPath = "/path/to/entry.json";
 const command = "java -jar compiler.jar";

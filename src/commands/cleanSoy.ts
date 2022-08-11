@@ -1,9 +1,9 @@
 import rimraf from "rimraf";
 import util from "util";
-import { assertString } from "../assert";
-import type { DuckConfig } from "../duckconfig";
-import { logger } from "../logger";
-import { resolveOutputPathFormat } from "../soy";
+import { assertString } from "../assert.js";
+import type { DuckConfig } from "../duckconfig.js";
+import { logger } from "../logger.js";
+import { resolveOutputPathFormat } from "../soy.js";
 
 export type CleanSoyConfig = Required<Pick<DuckConfig, "soyOptions">>;
 

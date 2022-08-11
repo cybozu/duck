@@ -3,18 +3,18 @@ import compilerPkg from "google-closure-compiler/package.json";
 import { depGraph } from "google-closure-deps";
 import path from "path";
 import semver from "semver";
-import { assertNonNullable } from "./assert";
+import { assertNonNullable } from "./assert.js";
 import type {
   CompilationLevel,
   CompilerOptions,
   CompilerOptionsFormattingType,
   ExtendedCompilerOptions,
-} from "./compiler-core";
-import type { Dag } from "./dag";
-import type { DuckConfig } from "./duckconfig";
-import type { EntryConfig, WarningsWhitelistItem } from "./entryconfig";
-import { createDag, PlovrMode } from "./entryconfig";
-import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
+} from "./compiler-core.js";
+import type { Dag } from "./dag.js";
+import type { DuckConfig } from "./duckconfig.js";
+import type { EntryConfig, WarningsWhitelistItem } from "./entryconfig.js";
+import { createDag, PlovrMode } from "./entryconfig.js";
+import { getClosureLibraryDependencies, getDependencies } from "./gendeps.js";
 
 export {
   CompilerError,
@@ -22,7 +22,7 @@ export {
   CompilerOutput,
   compileToJson,
   convertToFlagfile,
-} from "./compiler-core";
+} from "./compiler-core.js";
 
 /**
  * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.

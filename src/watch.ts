@@ -1,11 +1,11 @@
 import chokidar from "chokidar";
 import { promises as fs } from "fs";
 import path from "path";
-import { clearEntryIdToChunkCache } from "./commands/serve";
-import type { DuckConfig } from "./duckconfig";
-import { removeDepCacheByPath } from "./gendeps";
-import { logger } from "./logger";
-import { calcOutputPath, compileSoy } from "./soy";
+import { clearEntryIdToChunkCache } from "./commands/serve.js";
+import type { DuckConfig } from "./duckconfig.js";
+import { removeDepCacheByPath } from "./gendeps.js";
+import { logger } from "./logger.js";
+import { calcOutputPath, compileSoy } from "./soy.js";
 
 const chokidarEvents = ["add", "change", "unlink"] as const;
 
