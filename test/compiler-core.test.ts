@@ -31,92 +31,88 @@ const assertCompileErrorItem = (item: any) => {
   }
 };
 
-describe("compiler-core", () => {
-  describe("outputs & warnings", () => {
-    let outputs: CompilerOutput[] = [];
-    let warnings: CompileErrorItem[] = [];
-    beforeEach(async () => {
-      const js = path.resolve(__dirname, "./fixtures/compiler-output/error.js");
-      const whitelist = tempy.file({ name: "warnings-whitelist.txt" });
-      fs.writeFileSync(whitelist, `${js}:7  inconsistent return type`);
+describe("outputs & warnings", () => {
+  let outputs: CompilerOutput[] = [];
+  let warnings: CompileErrorItem[] = [];
+  beforeEach(async () => {
+    const js = path.resolve(__dirname, "./fixtures/compiler-output/error.js");
+    const whitelist = tempy.file({ name: "warnings-whitelist.txt" });
+    fs.writeFileSync(whitelist, `${js}:7  inconsistent return type`);
 
-      const [o, w] = await compileToJson({
-        compilerOptions: {
-          js: [js],
-          jscomp_error: ["checkTypes"],
-          js_output_file: "out.js",
-          warnings_whitelist_file: whitelist,
-        },
-      });
-      outputs = o;
-      warnings = w;
+    const [o, w] = await compileToJson({
+      compilerOptions: {
+        js: [js],
+        jscomp_error: ["checkTypes"],
+        js_output_file: "out.js",
+        warnings_whitelist_file: whitelist,
+      },
     });
-
-    it("outputs is a CompilerOutput[]", () => {
-      assert(Array.isArray(outputs));
-      for (const output of outputs) {
-        assert(typeof output.path === "string");
-        assert(typeof output.src === "string");
-        assert(typeof output.source_map === "string");
-      }
-    });
-
-    it("warnings is a CompileErrorItem[]", () => {
-      assert(Array.isArray(warnings) && warnings.length > 0);
-      for (const warning of warnings) {
-        assertCompileErrorItem(warning);
-      }
-    });
+    outputs = o;
+    warnings = w;
   });
 
-  describe("err.message", () => {
-    let first: string = "";
-    let second: string = "";
-    let rest: string[] = [];
-    beforeEach(async () => {
-      try {
-        await compileToJson({
-          compilerOptions: {
-            js: [
-              path.resolve(__dirname, "./fixtures/compiler-output/error.js"),
-            ],
-            jscomp_error: ["checkTypes"],
-            js_output_file: "out.js",
-          },
-        });
-      } catch (err: any) {
-        assert(err instanceof Error);
-        const [f, s, ...r] = err.message.split("\n");
-        first = f;
-        second = s;
-        rest = r;
-        return;
+  it("outputs is a CompilerOutput[]", () => {
+    assert(Array.isArray(outputs));
+    for (const output of outputs) {
+      assert(typeof output.path === "string");
+      assert(typeof output.src === "string");
+      assert(typeof output.source_map === "string");
+    }
+  });
+
+  it("warnings is a CompileErrorItem[]", () => {
+    assert(Array.isArray(warnings) && warnings.length > 0);
+    for (const warning of warnings) {
+      assertCompileErrorItem(warning);
+    }
+  });
+});
+
+describe("err.message", () => {
+  let first: string = "";
+  let second: string = "";
+  let rest: string[] = [];
+  beforeEach(async () => {
+    try {
+      await compileToJson({
+        compilerOptions: {
+          js: [path.resolve(__dirname, "./fixtures/compiler-output/error.js")],
+          jscomp_error: ["checkTypes"],
+          js_output_file: "out.js",
+        },
+      });
+    } catch (err: any) {
+      assert(err instanceof Error);
+      const [f, s, ...r] = err.message.split("\n");
+      first = f;
+      second = s;
+      rest = r;
+      return;
+    }
+
+    assert.fail("compileToJson must throw error in this test");
+  }, 20000);
+
+  it("first line is the command excuted by compileToJson", () => {
+    assert(/^java -jar/.test(first));
+  });
+
+  it("second line is empty", () => {
+    assert(second === "");
+  });
+
+  describe("rest", () => {
+    it("can be parsed as JSON", () => {
+      JSON.parse(rest.join("\n"));
+    });
+
+    it("JSON is a CompilerErrorItem[]", () => {
+      const json = JSON.parse(rest.join("\n"));
+      assert(Array.isArray(json));
+
+      for (const item of json) {
+        assertCompileErrorItem(item);
       }
-
-      assert.fail("compileToJson must throw error in this test");
-    }, 20000);
-
-    it("first line is the command excuted by compileToJson", () => {
-      assert(/^java -jar/.test(first));
-    });
-
-    it("second line is empty", () => {
-      assert(second === "");
-    });
-
-    describe("rest", () => {
-      it("can be parsed as JSON", () => {
-        JSON.parse(rest.join("\n"));
-      });
-
-      it("JSON is a CompilerErrorItem[]", () => {
-        const json = JSON.parse(rest.join("\n"));
-        assert(Array.isArray(json));
-
-        for (const item of json) {
-          assertCompileErrorItem(item);
-        }
-      });
     });
   });
 });
