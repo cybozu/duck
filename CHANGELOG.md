@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.34.4](https://github.com/cybozu/duck/compare/v0.34.3...v0.34.4) (2022-08-11)
+
+
+### Bug Fixes
+
+* **batch:** update faastjs to v6 and use async generator for faastjs module function ([#764](https://github.com/cybozu/duck/issues/764)) ([2196634](https://github.com/cybozu/duck/commit/219663416ce1e7715152c2904839998053e44749))
+* **deps:** update dependency fastify to ^4.4.0 ([#757](https://github.com/cybozu/duck/issues/757)) ([8d0a02e](https://github.com/cybozu/duck/commit/8d0a02e5ef3e7e89d2ad946b0de4401a5705076b))
+* **deps:** update dependency google-closure-deps to v20220719 ([#758](https://github.com/cybozu/duck/issues/758)) ([1981bac](https://github.com/cybozu/duck/commit/1981bac452d1ddffa3f2cefb2c07c4c7d5577466))
+* enable @typescript-eslint/consistent-type-imports ([#756](https://github.com/cybozu/duck/issues/756)) ([5682ff2](https://github.com/cybozu/duck/commit/5682ff2352b6ae7e2d3bdbcab951d14cd8d47237))
+
 ### [0.34.3](https://github.com/cybozu/duck/compare/v0.34.2...v0.34.3) (2022-08-06)
 
 
