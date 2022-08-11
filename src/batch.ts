@@ -8,6 +8,7 @@ import type {
 } from "faastjs";
 import { faastAws, faastLocal, log } from "faastjs";
 import mergeOptions from "merge-options";
+import { createRequire } from "module";
 import semver from "semver";
 import { assertNonNullable } from "./assert.js";
 import * as compilerFaastFunctions from "./compiler-batch-wrapper.js";
@@ -15,6 +16,7 @@ import type { compileToJson } from "./compiler-core.js";
 import type { DuckConfig } from "./duckconfig.js";
 import { logger } from "./logger.js";
 
+const nodeRequire = createRequire(import.meta.url);
 // change to stdout
 log.info.log = console.log.bind(console);
 
@@ -82,7 +84,7 @@ function getNativeCompilerPackageForBatch(config: DuckConfig): {
   // platform from AWS (linux). `google-closure-compiler-linux` is not
   // available in macOS / Windows, so use the version of the parent package
   // `google-closure-compiler`.
-  const { version } = require("google-closure-compiler/package.json");
+  const { version } = nodeRequire("google-closure-compiler/package.json");
   const major = semver.major(version);
   return { name, version: `^${major}.0.0` };
 }
