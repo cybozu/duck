@@ -1,8 +1,10 @@
 import { strict as assert } from "assert";
 import path from "path";
+import { fileURLToPath } from "url";
 import { describe, it } from "vitest";
 import { loadEntryConfigById, PlovrMode } from "../src/entryconfig.js";
 
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const fixturesBaseDir = path.join(__dirname, "fixtures");
 const fixturesDir = path.join(fixturesBaseDir, "entryconfig");
 
