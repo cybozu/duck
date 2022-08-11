@@ -9,6 +9,8 @@ import { splitIntoChunks } from "./compiler-batch-utils.js";
 import type { ExtendedCompilerOptions } from "./compiler-core.js";
 import { compileToJson } from "./compiler-core.js";
 
+export const FAAST_URL = import.meta.url;
+
 /**
  * The maximum return value size is 256kb.
  * It includes metadata or characters for JSON syntax,
