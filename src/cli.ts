@@ -26,7 +26,7 @@ import { reportTestResults } from "./report";
  * Transform ndjson (Newline Delimited JSON) stream to JSON object stream.
  */
 const logStream = split(JSON.parse);
-const logger = pino(logStream);
+const logger = pino({ level: process.env.DEBUG ? "debug" : "info" }, logStream);
 setGlobalLogger(logger);
 
 /**

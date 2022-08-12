@@ -290,6 +290,9 @@ function createExtendedCompilerOptions(
   if (duckConfig.batchAwsCustomCompiler) {
     options.batchAwsCustomCompiler = duckConfig.batchAwsCustomCompiler;
   }
+  if (duckConfig.batchMaxChunkSize != null) {
+    options.batchMaxChunkSize = duckConfig.batchMaxChunkSize;
+  }
   return options;
 }
 

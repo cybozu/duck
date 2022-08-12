@@ -75,6 +75,11 @@ export interface DuckConfig {
     version: string;
   };
   /**
+   * Max chunk size in bytes for spliting return value from faastjs module.
+   * The upper limit is 256kb. (default: 204,800 (200kb))
+   */
+  batchMaxChunkSize?: number;
+  /**
    * Options for faast.js in batch mode.
    * @see https://faastjs.org/docs/api/faastjs.awsoptions
    */

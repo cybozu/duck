@@ -64,7 +64,7 @@ export type CompilerOptionsFormattingType =
 export type ExtendedCompilerOptions = {
   compilerOptions: CompilerOptions;
   warningsWhitelist?: WarningsWhitelistItem[];
-} & Pick<DuckConfig, "batch" | "batchAwsCustomCompiler">;
+} & Pick<DuckConfig, "batch" | "batchAwsCustomCompiler" | "batchMaxChunkSize">;
 
 export interface CompilerOutput {
   path: string;
