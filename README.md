@@ -138,6 +138,8 @@ module.exports = {
     name: "my-custom-closure-compiler",
     version: "^1.0.0",
   },
+  // Max chunk size in bytes for spliting return value from faastjs module (default: 204,800 (200kb))
+  batchMaxChunkSize?: number;
   // Options for faast.js in batch mode. See https://faastjs.org/docs/api/faastjs.awsoptions
   batchOptions: {},
   // Reporters (choose from "json", "text" or "xunit")
