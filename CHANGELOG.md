@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.34.5](https://github.com/cybozu/duck/compare/v0.34.4...v0.34.5) (2022-08-12)
+
+
+### Features
+
+* **batch:** add batchMaxChunkSize option and change default to 200kb ([#771](https://github.com/cybozu/duck/issues/771)) ([b69fb86](https://github.com/cybozu/duck/commit/b69fb863b4a2d084d0ac1a84a7dd95447f745192))
+
 ### [0.34.4](https://github.com/cybozu/duck/compare/v0.34.3...v0.34.4) (2022-08-11)
 
 

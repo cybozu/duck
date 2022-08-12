@@ -1,7 +1,7 @@
 {
   "name": "@cybozu/duck",
   "description": "Serves and builds an app with Google Closure Compiler/Library/Templates. An alternative to plovr.",
-  "version": "0.34.4",
+  "version": "0.34.5",
   "author": "Cybozu, Inc.",
   "publishConfig": {
     "access": "public"
