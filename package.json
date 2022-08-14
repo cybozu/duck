@@ -54,7 +54,7 @@
     "semver": "^7.3.7",
     "split2": "^4.1.0",
     "strip-json-comments": "^5.0.0",
-    "tempy": "^1.0.1",
+    "tempy": "^3.0.0",
     "workerpool": "^6.2.1",
     "xmlbuilder": "^15.1.1",
     "yargs": "^17.5.1",
