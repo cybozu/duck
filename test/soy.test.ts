@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { describe, it } from "vitest";
-import { calcOutputPath, toSoyArgs } from "../src/soy";
+import { calcOutputPath, toSoyArgs } from "../src/soy.js";
 
 describe("toSoyArgs", () => {
   it("converts SoyConfig", () => {

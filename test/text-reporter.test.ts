@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { TextReporter } from "../src/reporters/text-reporter";
+import { TextReporter } from "../src/reporters/text-reporter.js";
 
 describe("format()", () => {
   const entryConfigPath = "/path/to/entryConfig.json";

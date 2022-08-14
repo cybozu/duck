@@ -1,10 +1,13 @@
 import { strict as assert } from "assert";
-import { depGraph } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
 import path from "path";
+import { fileURLToPath } from "url";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { parseDependency } from "../src/dependency-parser";
-import { DependencyParserWithWorkers } from "../src/dependency-parser-wrapper";
+import { DependencyParserWithWorkers } from "../src/dependency-parser-wrapper.js";
+import { parseDependency } from "../src/dependency-parser.js";
 
+import depGraph = closureDeps.depGraph;
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const fixturesBaseDir = path.join(__dirname, "fixtures");
 
 const variousModulesFixturesDir = path.join(fixturesBaseDir, "various-modules");

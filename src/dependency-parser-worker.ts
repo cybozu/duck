@@ -2,8 +2,8 @@
 // This is exected in a worker, sot it's hard to instrument.
 
 import workerpool from "workerpool";
-import { parseDependency } from "./dependency-parser";
-import type { DependencyTransferData } from "./dependency-parser-wrapper";
+import { parseDependency } from "./dependency-parser.js";
+import type { DependencyTransferData } from "./dependency-parser-wrapper.js";
 
 async function parse(filepath: string): Promise<DependencyTransferData> {
   const dep = await parseDependency(filepath);

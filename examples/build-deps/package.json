@@ -2,6 +2,7 @@
   "name": "closure-scripts",
   "version": "1.0.0",
   "author": "Cybozu, Inc.",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "deps": "duck build:deps",

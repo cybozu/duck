@@ -4,4 +4,5 @@
 declare namespace Zet {
   export function intersection<T>(...sets: Array<Set<T>>): Set<T>;
 }
-export = Zet;
+// actually native ESM files are provided
+export default Zet;

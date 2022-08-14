@@ -1,5 +1,5 @@
 import Zet from "zet";
-import { assertNonNullable } from "./assert";
+import { assertNonNullable } from "./assert.js";
 
 export class Node {
   id: string;

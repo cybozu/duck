@@ -1,7 +1,7 @@
 import recursive from "recursive-readdir";
-import type { DuckConfig } from "../duckconfig";
-import { logger } from "../logger";
-import { compileSoy } from "../soy";
+import type { DuckConfig } from "../duckconfig.js";
+import { logger } from "../logger.js";
+import { compileSoy } from "../soy.js";
 
 export type BuildSoyConfig = Required<
   Pick<

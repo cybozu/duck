@@ -1,12 +1,15 @@
 import type { AwsOptions, LocalOptions } from "faastjs";
+import { createRequire } from "module";
 import path from "path";
-import { assertString } from "./assert";
-import { toAbsPath, toAbsPathArray } from "./pathutils";
-import type { JsonReporterOptions } from "./reporters/json-reporter";
-import type { TextReporterOptions } from "./reporters/text-reporter";
-import type { XUnitReporterOptions } from "./reporters/xunit-reporter";
-import type { SoyToJsOptions } from "./soy";
-import { normalizeSoyOptoins } from "./soy";
+import { assertString } from "./assert.js";
+import { toAbsPath, toAbsPathArray } from "./pathutils.js";
+import type { JsonReporterOptions } from "./reporters/json-reporter.js";
+import type { TextReporterOptions } from "./reporters/text-reporter.js";
+import type { XUnitReporterOptions } from "./reporters/xunit-reporter.js";
+import type { SoyToJsOptions } from "./soy.js";
+import { normalizeSoyOptoins } from "./soy.js";
+
+const nodeRequire = createRequire(import.meta.url);
 
 export interface DuckConfig {
   /**
@@ -133,7 +136,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
   }
   let result: DuckConfig = opts;
   try {
-    const config: DuckConfig = require(configPath);
+    const config: DuckConfig = nodeRequire(configPath);
     const configDir = path.dirname(configPath);
     // resolve relative path to absolute
     toAbsPath(config, configDir, "closureLibraryDir");

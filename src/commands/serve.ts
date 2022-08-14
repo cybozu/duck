@@ -2,36 +2,36 @@ import cors from "@fastify/cors";
 import serveStatic from "@fastify/static";
 import { stripIndents } from "common-tags";
 import type { FastifyInstance, FastifyReply } from "fastify";
-import fastify from "fastify";
+import { fastify } from "fastify";
 import { promises as fs } from "fs";
 import type http2 from "http2";
 import path from "path";
-import pino from "pino";
-import { assertNonNullable, assertString } from "../assert";
-import type { CompilerOutput } from "../compiler";
+import { pino } from "pino";
+import { assertNonNullable, assertString } from "../assert.js";
+import type { CompilerOutput } from "../compiler.js";
 import {
   compileToJson,
   convertChunkInfos,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
-} from "../compiler";
-import type { DuckConfig } from "../duckconfig";
-import type { EntryConfig, PlovrMode } from "../entryconfig";
-import { createDag, loadEntryConfigById } from "../entryconfig";
+} from "../compiler.js";
+import type { DuckConfig } from "../duckconfig.js";
+import type { EntryConfig, PlovrMode } from "../entryconfig.js";
+import { createDag, loadEntryConfigById } from "../entryconfig.js";
 import {
   generateDepFileText,
   restoreDepsJs,
   writeCachedDepsOnDisk,
-} from "../gendeps";
-import { logger, setGlobalLogger } from "../logger";
+} from "../gendeps.js";
+import { logger, setGlobalLogger } from "../logger.js";
 import {
   closureLibraryUrlPath,
   compileUrlPath,
   depsUrlPath,
   googBaseUrlPath,
   inputsUrlPath,
-} from "../urls";
-import { watchJsAndSoy } from "../watch";
+} from "../urls.js";
+import { watchJsAndSoy } from "../watch.js";
 
 const entryIdToChunkCache: Map<
   string,
@@ -361,7 +361,7 @@ async function createServer(config: DuckConfig): Promise<FastifyInstance> {
   }
 
   // enable CORS at first
-  server.register(cors);
+  server.register(cors as any);
 
   // customize log output
   server.addHook("onRequest", async ({ raw, log }, reply) => {

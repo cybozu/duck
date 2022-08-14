@@ -2,25 +2,25 @@ import streamToObservable from "@teppeis/stream-to-observable";
 import Listr from "listr";
 import os from "os";
 import path from "path";
-import pino from "pino";
+import { pino } from "pino";
 import type { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { map } from "rxjs/operators/index.js";
 import split from "split2";
 import yargs from "yargs";
-import { assertNonNullable, assertString } from "./assert";
-import { buildDeps } from "./commands/buildDeps";
-import { buildJs, BuildJsCompilationError } from "./commands/buildJs";
-import type { BuildSoyConfig } from "./commands/buildSoy";
-import { buildSoy } from "./commands/buildSoy";
-import { cleanDeps } from "./commands/cleanDeps";
-import type { CleanSoyConfig } from "./commands/cleanSoy";
-import { cleanSoy } from "./commands/cleanSoy";
-import { serve } from "./commands/serve";
-import type { DuckConfig } from "./duckconfig";
-import { loadConfig } from "./duckconfig";
-import { setGlobalLogger } from "./logger";
-import type { ErrorReason } from "./report";
-import { reportTestResults } from "./report";
+import { assertNonNullable, assertString } from "./assert.js";
+import { buildDeps } from "./commands/buildDeps.js";
+import { buildJs, BuildJsCompilationError } from "./commands/buildJs.js";
+import type { BuildSoyConfig } from "./commands/buildSoy.js";
+import { buildSoy } from "./commands/buildSoy.js";
+import { cleanDeps } from "./commands/cleanDeps.js";
+import type { CleanSoyConfig } from "./commands/cleanSoy.js";
+import { cleanSoy } from "./commands/cleanSoy.js";
+import { serve } from "./commands/serve.js";
+import type { DuckConfig } from "./duckconfig.js";
+import { loadConfig } from "./duckconfig.js";
+import { setGlobalLogger } from "./logger.js";
+import type { ErrorReason } from "./report.js";
+import { reportTestResults } from "./report.js";
 
 /**
  * Transform ndjson (Newline Delimited JSON) stream to JSON object stream.
@@ -199,7 +199,7 @@ const buildDepsOptions = {
 } as const;
 
 export function run(processArgv: readonly string[]): void {
-  yargs
+  yargs(processArgv)
     .command(
       "serve [entryConfigDir]",
       "Start dev server",
@@ -429,7 +429,7 @@ export function run(processArgv: readonly string[]): void {
     .showHelpOnFail(false, "Specify --help or -h for available options")
     .alias("v", "version")
     .alias("h", "help")
-    .parse(processArgv);
+    .parse();
 }
 
 function listr<T>(

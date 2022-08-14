@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { splitIntoChunks } from "../src/compiler-batch-utils";
+import { splitIntoChunks } from "../src/compiler-batch-utils.js";
 
 describe("splitIntoChunks", () => {
   it("returns an empty array for an empty string", () => {

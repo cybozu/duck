@@ -1,20 +1,23 @@
 import { stripIndents } from "common-tags";
-import compilerPkg from "google-closure-compiler/package.json";
-import { depGraph } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
+import { createRequire } from "module";
 import path from "path";
 import semver from "semver";
-import { assertNonNullable } from "./assert";
+import { assertNonNullable } from "./assert.js";
 import type {
   CompilationLevel,
   CompilerOptions,
   CompilerOptionsFormattingType,
   ExtendedCompilerOptions,
-} from "./compiler-core";
-import type { Dag } from "./dag";
-import type { DuckConfig } from "./duckconfig";
-import type { EntryConfig, WarningsWhitelistItem } from "./entryconfig";
-import { createDag, PlovrMode } from "./entryconfig";
-import { getClosureLibraryDependencies, getDependencies } from "./gendeps";
+} from "./compiler-core.js";
+import type { Dag } from "./dag.js";
+import type { DuckConfig } from "./duckconfig.js";
+import type { EntryConfig, WarningsWhitelistItem } from "./entryconfig.js";
+import { createDag, PlovrMode } from "./entryconfig.js";
+import { getClosureLibraryDependencies, getDependencies } from "./gendeps.js";
+
+import depGraph = closureDeps.depGraph;
+const nodeRequire = createRequire(import.meta.url);
 
 export {
   CompilerError,
@@ -22,7 +25,7 @@ export {
   CompilerOutput,
   compileToJson,
   convertToFlagfile,
-} from "./compiler-core";
+} from "./compiler-core.js";
 
 /**
  * Used for `rename_prefix_namespace` if `global-scope-name` is enabled in entry config.
@@ -97,6 +100,7 @@ function createBaseOptions(
     // for pages
     // `STRICT` was deprecated with `PRUNE` in google-closure-compiler@v20181125 and removed in v20200101.
     // See: https://github.com/google/closure-compiler/commit/0c8ae0ec822e89aa82f8b7604fd5a68bc30f77ea
+    const compilerPkg = nodeRequire("google-closure-compiler/package.json");
     opts.dependency_mode = semver.lt(compilerPkg.version, "20181125.0.0")
       ? "STRICT"
       : "PRUNE";

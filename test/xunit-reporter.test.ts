@@ -4,7 +4,7 @@ import { existsSync, promises as fs } from "fs";
 import path from "path";
 import tempy from "tempy";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import { XUnitReporter } from "../src/reporters/xunit-reporter";
+import { XUnitReporter } from "../src/reporters/xunit-reporter.js";
 
 const entryConfigPath = "/path/to/entry.json";
 const command = "java -jar compiler.jar";

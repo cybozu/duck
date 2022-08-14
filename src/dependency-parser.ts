@@ -1,5 +1,6 @@
-import type { depGraph } from "google-closure-deps";
-import { parser } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
+
+import depGraph = closureDeps.depGraph;
 
 /**
  * Parse a script file including such as `goog.provide` and generate a `Dependency`.
@@ -7,7 +8,7 @@ import { parser } from "google-closure-deps";
 export async function parseDependency(
   filepath: string
 ): Promise<depGraph.Dependency> {
-  const result = await parser.parseFileAsync(filepath);
+  const result = await closureDeps.parser.parseFileAsync(filepath);
   if (result.hasFatalError) {
     throw new Error(`Fatal parse error in ${filepath}: ${result.errors}`);
   }

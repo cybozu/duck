@@ -9,6 +9,7 @@
   "engines": {
     "node": ">=16"
   },
+  "type": "module",
   "main": "dist/compiler.js",
   "types": "dist/compiler.d.ts",
   "bin": {

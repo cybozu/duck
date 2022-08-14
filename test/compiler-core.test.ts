@@ -2,10 +2,13 @@ import { strict as assert } from "assert";
 import fs from "fs";
 import path from "path";
 import tempy from "tempy";
+import { fileURLToPath } from "url";
 import { beforeEach, describe, it } from "vitest";
-import type { CompilerOutput } from "../src/compiler";
-import { compileToJson } from "../src/compiler-core";
-import type { CompileErrorItem } from "../src/report";
+import { compileToJson } from "../src/compiler-core.js";
+import type { CompilerOutput } from "../src/compiler.js";
+import type { CompileErrorItem } from "../src/report.js";
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 const assertCompileErrorItem = (item: any) => {
   assert(typeof item === "object");

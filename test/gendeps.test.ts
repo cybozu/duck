@@ -1,8 +1,9 @@
 import { strict as assert } from "assert";
 import { promises as fs } from "fs";
-import { depGraph } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
 import path from "path";
 import tempy from "tempy";
+import { fileURLToPath } from "url";
 import { beforeEach, describe, it } from "vitest";
 import {
   clearDepCache,
@@ -13,8 +14,10 @@ import {
   getDependencies,
   restoreDepsJs,
   writeCachedDepsOnDisk,
-} from "../src/gendeps";
+} from "../src/gendeps.js";
 
+import depGraph = closureDeps.depGraph;
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const fixturesBaseDir = path.join(__dirname, "fixtures");
 
 const variousModulesFixturesDir = path.join(fixturesBaseDir, "various-modules");

@@ -3,21 +3,21 @@ import { promises as fs } from "fs";
 import pSettled from "p-settle";
 import path from "path";
 import recursive from "recursive-readdir";
-import { assertString } from "../assert";
-import { resultInfoLogType } from "../cli";
-import type { CompilerError } from "../compiler";
+import { assertString } from "../assert.js";
+import { resultInfoLogType } from "../cli.js";
+import type { CompilerError } from "../compiler.js";
 import {
   compileToJson,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
-} from "../compiler";
-import type * as compilerCoreFunctions from "../compiler-core";
-import type { DuckConfig } from "../duckconfig";
-import type { EntryConfig } from "../entryconfig";
-import { loadEntryConfig } from "../entryconfig";
-import { restoreDepsJs } from "../gendeps";
-import { logger } from "../logger";
-import type { CompileErrorItem, ErrorReason } from "../report";
+} from "../compiler.js";
+import type * as compilerCoreFunctions from "../compiler-core.js";
+import type { DuckConfig } from "../duckconfig.js";
+import type { EntryConfig } from "../entryconfig.js";
+import { loadEntryConfig } from "../entryconfig.js";
+import { restoreDepsJs } from "../gendeps.js";
+import { logger } from "../logger.js";
+import type { CompileErrorItem, ErrorReason } from "../report.js";
 
 /**
  * @throws If compiler throws errors

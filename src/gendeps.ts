@@ -1,10 +1,13 @@
 import fg from "fast-glob";
 import { promises as fs } from "fs";
-import { depFile, depGraph, parser } from "google-closure-deps";
+import closureDeps from "google-closure-deps";
 import path from "path";
-import { DependencyParserWithWorkers } from "./dependency-parser-wrapper";
-import type { EntryConfig } from "./entryconfig";
-import { googBaseUrlPath, inputsUrlPath } from "./urls";
+import { DependencyParserWithWorkers } from "./dependency-parser-wrapper.js";
+import type { EntryConfig } from "./entryconfig.js";
+import { googBaseUrlPath, inputsUrlPath } from "./urls.js";
+
+import depGraph = closureDeps.depGraph;
+import depFile = closureDeps.depFile;
 
 const pathToDependencyCache: Map<
   string,
@@ -94,7 +97,7 @@ function parseDepsJs(
   depsJsPath: string,
   closureLibraryDir: string
 ): depGraph.Dependency[] {
-  const result = parser.parseDependencyFile(depsJsText, depsJsPath);
+  const result = closureDeps.parser.parseDependencyFile(depsJsText, depsJsPath);
   if (result.hasFatalError) {
     throw new Error(`Fatal parse error in ${depsJsPath}: ${result.errors}`);
   }

@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { describe, it } from "vitest";
-import { Dag, Node } from "../src/dag";
+import { Dag, Node } from "../src/dag.js";
 
 describe("Dag", () => {
   describe("constructor()", () => {
