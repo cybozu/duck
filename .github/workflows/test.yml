@@ -15,7 +15,6 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 18.x]
-
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -27,20 +26,35 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
-      - name: Test examples
+      - name: Test example (build-deps)
         run: |
-          cd examples/build-and-serve
+          cd examples/build-deps
           npm i
-          npm run build:ci
-      - name: Test in the oldest Google Closure Tools
+          npm test
+      - name: Test example (build-js)
+        run: |
+          cd examples/build-js
+          npm i
+          npm test
+      - name: Test examples (build-js-chunk)
+        run: |
+          cd examples/build-js-chunk
+          npm i
+          npm test
+      - name: Test example (build-soy)
+        run: |
+          cd examples/build-soy
+          npm i
+          npm test
+      - name: Test in the oldest Closure Tools
         run: |
           npm i --no-save google-closure-compiler@20180910 google-closure-deps@20210406
           OLDEST_COMPILER=1 npm run unit
-      - name: Test examples in the oldest Google Closure Tools
+      - name: Test examples in the oldest Closure Tools (build-js)
         run: |
-          cd examples/build-and-serve
+          cd examples/build-js
           npm i --no-save google-closure-library@20180910
-          npm run build:ci
+          npm test
       - name: Report coverage to codecov
         if: matrix.node-version == '16.x'
         uses: codecov/codecov-action@v3

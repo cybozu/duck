@@ -11,7 +11,8 @@
     "build:ci": "duck build --batch local -n",
     "serve": "duck serve",
     "start": "run-p static serve",
-    "static": "st"
+    "static": "st",
+    "test": "npm run build:ci"
   },
   "dependencies": {
     "google-closure-library": "^20200204.0.0"
