@@ -14,12 +14,12 @@
     "static": "st"
   },
   "dependencies": {
-    "google-closure-library": "^20200101.0.0"
+    "google-closure-library": "^20220719.0.0"
   },
   "devDependencies": {
     "@cybozu/duck": "file:../..",
     "npm-run-all": "^4.1.5",
-    "st": "^1.2.2"
+    "st": "^3.0.0"
   },
   "keywords": [],
   "license": "MIT"
