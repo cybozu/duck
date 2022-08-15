@@ -1,5 +1,6 @@
 import assert from "assert";
-import execa from "execa";
+import type { Options as ExecaOptions } from "execa";
+import { execa } from "execa";
 import path from "path";
 import { assertString } from "./assert.js";
 import { resultInfoLogType } from "./cli.js";
@@ -37,7 +38,7 @@ export async function compileSoy(
     return;
   }
   logger.info("Compiling soy templates");
-  let opt: execa.Options = {};
+  let opt: ExecaOptions = {};
   if (config.soySrcsRelativeFrom) {
     opt = { cwd: config.soySrcsRelativeFrom };
   }
