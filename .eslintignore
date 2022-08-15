@@ -1,5 +1,6 @@
 /test/fixtures
 /dist
+/examples/build-soy/closure-templates
 deps.js
 node_modules
 build
