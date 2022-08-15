@@ -1,0 +1,20 @@
+{
+  "name": "build-deps",
+  "version": "1.0.0",
+  "author": "Cybozu, Inc.",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "deps": "duck build:deps",
+    "clean": "duck clean:deps",
+    "closure-make-deps": "closure-make-deps --root js --exclude node_modules --exclude build --closure-path node_modules/google-closure-library/closure/goog --no-validate > build/closure-make-deps.deps.js",
+    "closure-make-deps:validate": "closure-make-deps --root js --exclude build --closure-path node_modules/google-closure-library/closure/goog"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "devDependencies": {
+    "@cybozu/duck": "file:../..",
+    "google-closure-library": "^20220719.0.0",
+    "st": "^3.0.0"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "mode": "ADVANCED",
+  "paths": [
+    "../js",
+    "../closure-templates",
+    "../node_modules/google-closure-library"
+  ]
+}

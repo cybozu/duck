@@ -1,0 +1,14 @@
+{namespace app.soy.foo.call}
+
+import * as bar from 'foo/bar/bar.soy';
+
+/**
+ * Demo a 'call' out to a template defined in another file.
+ */
+{template demoCallOtherFile}
+
+  // Call template defined in a different file.
+  {call bar.hello /}
+  <br>
+
+{/template}
