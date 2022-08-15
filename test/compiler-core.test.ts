@@ -1,7 +1,7 @@
 import { strict as assert } from "assert";
 import fs from "fs";
 import path from "path";
-import tempy from "tempy";
+import { temporaryFile } from "tempy";
 import { fileURLToPath } from "url";
 import { beforeEach, describe, it } from "vitest";
 import { compileToJson } from "../src/compiler-core.js";
@@ -39,7 +39,7 @@ describe("outputs & warnings", () => {
   let warnings: CompileErrorItem[] = [];
   beforeEach(async () => {
     const js = path.resolve(__dirname, "./fixtures/compiler-output/error.js");
-    const whitelist = tempy.file({ name: "warnings-whitelist.txt" });
+    const whitelist = temporaryFile({ name: "warnings-whitelist.txt" });
     fs.writeFileSync(whitelist, `${js}:7  inconsistent return type`);
 
     const [o, w] = await compileToJson({

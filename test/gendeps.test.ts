@@ -2,7 +2,7 @@ import { strict as assert } from "assert";
 import { promises as fs } from "fs";
 import closureDeps from "google-closure-deps";
 import path from "path";
-import tempy from "tempy";
+import { temporaryFile } from "tempy";
 import { fileURLToPath } from "url";
 import { beforeEach, describe, it } from "vitest";
 import {
@@ -207,7 +207,7 @@ describe("writeCachedDepsOnDisk()", () => {
     const originalDepsJs = path.join(fixturesDir, "deps.js");
     const closureLibraryDir = path.join(fixturesDir, "closure");
     await restoreDepsJs(originalDepsJs, closureLibraryDir);
-    const actualDepsJsPath = tempy.file({
+    const actualDepsJsPath = temporaryFile({
       name: "writeCachedDepsOnDisk-deps.js",
     });
     await writeCachedDepsOnDisk(actualDepsJsPath, closureLibraryDir);

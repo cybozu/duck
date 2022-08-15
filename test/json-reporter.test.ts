@@ -1,7 +1,7 @@
 import { strict as assert } from "assert";
 import { existsSync, promises as fs } from "fs";
 import path from "path";
-import tempy from "tempy";
+import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { JsonReporter } from "../src/reporters/json-reporter.js";
 
@@ -14,7 +14,7 @@ describe("output()", () => {
   let actualMessage: string | undefined;
   const originalConsoleError = console.error;
   beforeEach(() => {
-    outputDir = tempy.directory();
+    outputDir = temporaryDirectory();
     reporter = new JsonReporter({ outputDir });
     actualMessage = undefined;
     console.error = (message: string) => (actualMessage = message);
