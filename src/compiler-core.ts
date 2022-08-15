@@ -6,7 +6,7 @@
 import fs from "fs";
 import closureCompiler from "google-closure-compiler";
 import { dirname } from "path";
-import * as tempy from "tempy";
+import { temporaryFile } from "tempy";
 import type { DuckConfig } from "./duckconfig.js";
 import type { WarningsWhitelistItem } from "./entryconfig.js";
 import { logger } from "./logger.js";
@@ -185,7 +185,7 @@ function assertRunInWebpack(): void {
  * transfer compiler options via a flagfile instead of CLI arguments.
  */
 export function convertToFlagfile(opts: CompilerOptions): { flagfile: string } {
-  const flagfile = tempy.file({
+  const flagfile = temporaryFile({
     name: `${new Date().toISOString().replace(/[^\w]/g, "")}.closure.conf`,
   });
   const lines: string[] = [];
@@ -228,7 +228,7 @@ function createWarningsWhitelistFile(
         `${file}:${line ? line : ""}  ${description}`
     )
     .join("\n");
-  const file = tempy.file({ name: "warnings-whitelist.txt" });
+  const file = temporaryFile({ name: "warnings-whitelist.txt" });
   fs.writeFileSync(file, content);
   return file;
 }
