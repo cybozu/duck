@@ -39,7 +39,7 @@
     "@teppeis/stream-to-observable": "^0.3.1",
     "chokidar": "^3.5.3",
     "common-tags": "^1.8.2",
-    "execa": "^5.1.1",
+    "execa": "^6.1.0",
     "faastjs": "^6.3.1",
     "fast-glob": "^3.2.11",
     "fastify": "^4.4.0",
