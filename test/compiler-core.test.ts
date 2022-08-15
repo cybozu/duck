@@ -52,7 +52,7 @@ describe("outputs & warnings", () => {
     });
     outputs = o;
     warnings = w;
-  });
+  }, 20000);
 
   it("outputs is a CompilerOutput[]", () => {
     assert(Array.isArray(outputs));
