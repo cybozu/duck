@@ -14,4 +14,4 @@ $ npm install
 $ npm start
 ```
 
-and open `http://localhost:1337/chunks.html` in your browser.
+and open `http://localhost:1337/page1.html` or `/page2.html` in your browser.
