@@ -2,7 +2,7 @@ import { strict as assert } from "assert";
 import { oneLineTrim } from "common-tags";
 import { existsSync, promises as fs } from "fs";
 import path from "path";
-import tempy from "tempy";
+import { temporaryDirectory } from "tempy";
 import { afterEach, beforeEach, describe, it } from "vitest";
 import { XUnitReporter } from "../src/reporters/xunit-reporter.js";
 
@@ -15,7 +15,7 @@ describe("output()", () => {
   let actualMessage: string | undefined;
   const originalConsoleError = console.error;
   beforeEach(() => {
-    outputDir = tempy.directory();
+    outputDir = temporaryDirectory();
     reporter = new XUnitReporter({ outputDir });
     actualMessage = undefined;
     console.error = (message: string) => (actualMessage = message);
