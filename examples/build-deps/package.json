@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "author": "Cybozu, Inc.",
   "type": "commonjs",
+  "engines": {
+    "node": ">=16"
+  },
   "main": "index.js",
   "scripts": {
     "deps": "duck build:deps",
