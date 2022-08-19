@@ -47,7 +47,7 @@
     "listr": "^0.14.3",
     "merge-options": "^3.0.4",
     "p-settle": "^5.1.0",
-    "pino": "^8.4.1",
+    "pino": "^8.4.2",
     "pino-pretty": "^9.0.1",
     "recursive-readdir": "^2.2.2",
     "rxjs": "^6.6.7",
