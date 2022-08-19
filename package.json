@@ -84,7 +84,7 @@
     "rimraf": "^3.0.2",
     "standard-version": "^9.3.2",
     "typescript": "^4.7.4",
-    "vite": "^3.0.8",
+    "vite": "^3.0.9",
     "vitest": "^0.22.1"
   },
   "homepage": "https://github.com/cybozu/duck",
