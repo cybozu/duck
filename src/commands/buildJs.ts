@@ -1,17 +1,19 @@
+import { strict as assert } from "assert";
 import type { CleanupOptions } from "faastjs";
+import { FaastError } from "faastjs";
 import { promises as fs } from "fs";
 import pSettled from "p-settle";
 import path from "path";
 import recursive from "recursive-readdir";
 import { assertString } from "../assert.js";
 import { resultInfoLogType } from "../cli.js";
-import type { CompilerError } from "../compiler.js";
+import type * as compilerCoreFunctions from "../compiler-core.js";
 import {
+  CompilerError,
   compileToJson,
   createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
 } from "../compiler.js";
-import type * as compilerCoreFunctions from "../compiler-core.js";
 import type { DuckConfig } from "../duckconfig.js";
 import type { EntryConfig } from "../entryconfig.js";
 import { loadEntryConfig } from "../entryconfig.js";
@@ -147,7 +149,7 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
         };
       }
       // has some errors
-      const reason = result.reason as CompilerError;
+      const reason = result.reason as any;
       try {
         const { command, items } = parseErrorReason(reason, config);
         return {
@@ -167,11 +169,25 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
   return reasons;
 
   function parseErrorReason(
-    reason: CompilerError & { info?: Record<string, any> },
+    reason: any,
     config: DuckConfig
   ): { command: string; items: CompileErrorItem[] } {
-    const { message: stderr, info } = reason;
-    const message = config.batch && info ? info.message : stderr;
+    let message: string;
+    if (config.batch) {
+      assert(reason instanceof FaastError);
+      assert.equal(reason.name, "CompilerError");
+      // In batch mode, faast.js surrounds an error with a FaastError that
+      // is a subclass of VError. `.jse_shortmsg` is a property of VError for
+      // debug. The original error message is only stored this prop.
+      // `.message` is transformed into a string concatenated with `cause`,
+      // so it cannot be used.
+      // https://github.com/TritonDataCenter/node-verror/blob/v1.10.1/lib/verror.js#L167-L172
+      message = (reason as any).jse_shortmsg;
+    } else if (reason instanceof CompilerError) {
+      message = reason.message;
+    } else {
+      throw new TypeError(`reason is an unexpected error`);
+    }
     const [command, , ...messages] = message.split("\n");
     return { command, items: JSON.parse(messages.join("\n")) };
   }
