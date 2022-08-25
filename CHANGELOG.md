@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.35.2](https://github.com/cybozu/duck/compare/v0.35.1...v0.35.2) (2022-08-25)
+
+
+### Bug Fixes
+
+* **soy:** clean:soy throws an error when outputDirectory used ([#795](https://github.com/cybozu/duck/issues/795)) ([7f9cd55](https://github.com/cybozu/duck/commit/7f9cd55192ce76631923b412219ef3baeb7d1cbc))
+
 ### [0.35.1](https://github.com/cybozu/duck/compare/v0.35.0...v0.35.1) (2022-08-25)
 
 
