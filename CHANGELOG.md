@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.35.1](https://github.com/cybozu/duck/compare/v0.35.0...v0.35.1) (2022-08-25)
+
+
+### Bug Fixes
+
+* **batch:** handle compile errors in batch mode ([#794](https://github.com/cybozu/duck/issues/794)) ([12e5ce4](https://github.com/cybozu/duck/commit/12e5ce4737aec67b07c585c1d8c489d4a8b884b3))
+
 ## [0.35.0](https://github.com/cybozu/duck/compare/v0.34.5...v0.35.0) (2022-08-25)
 
 
