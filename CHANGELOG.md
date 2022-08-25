@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.35.0](https://github.com/cybozu/duck/compare/v0.34.5...v0.35.0) (2022-08-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate to ESM (#774)
+
+### Bug Fixes
+
+* **deps:** update dependency execa to v6 ([#671](https://github.com/cybozu/duck/issues/671)) ([b55158c](https://github.com/cybozu/duck/commit/b55158c726ac163a8e7888973e1230dd7a3e534e))
+* **deps:** update dependency faastjs to ^6.3.2 ([#786](https://github.com/cybozu/duck/issues/786)) ([8915352](https://github.com/cybozu/duck/commit/891535207019fe48ed47f881730b0a005d4e3659))
+* **deps:** update dependency p-settle to v5 ([#725](https://github.com/cybozu/duck/issues/725)) ([95065d3](https://github.com/cybozu/duck/commit/95065d31eac9d77709006170c427fe260b877981))
+* **deps:** update dependency pino to ^8.4.1 ([#772](https://github.com/cybozu/duck/issues/772)) ([dbc47cf](https://github.com/cybozu/duck/commit/dbc47cf22d675efad965cf96e2f542041c703be1))
+* **deps:** update dependency pino to ^8.4.2 ([#788](https://github.com/cybozu/duck/issues/788)) ([a4bdd65](https://github.com/cybozu/duck/commit/a4bdd6563ead3154279816647744a1cc877db276))
+* **deps:** update dependency pino-pretty to ^9.0.1 ([#781](https://github.com/cybozu/duck/issues/781)) ([a82fd7d](https://github.com/cybozu/duck/commit/a82fd7d503697be9cc6946ae045e145399882df3))
+* **deps:** update dependency pino-pretty to v9 ([#762](https://github.com/cybozu/duck/issues/762)) ([ebecf46](https://github.com/cybozu/duck/commit/ebecf46a2731471b86f2e6b9ad14d7290a3e1447))
+* **deps:** update dependency strip-json-comments to v5 ([#735](https://github.com/cybozu/duck/issues/735)) ([554859c](https://github.com/cybozu/duck/commit/554859cdbcc4544d99e2aa1f202aca0a1cc44647))
+* **deps:** update dependency tempy to v3 ([#736](https://github.com/cybozu/duck/issues/736)) ([5047aad](https://github.com/cybozu/duck/commit/5047aad0083b7903c0e778c4ebb7b307b55f9810))
+
+
+* migrate to ESM ([#774](https://github.com/cybozu/duck/issues/774)) ([8f38d66](https://github.com/cybozu/duck/commit/8f38d66c9066f984bcfe503ec9b0d4dd6123b103))
+
 ### [0.34.5](https://github.com/cybozu/duck/compare/v0.34.4...v0.34.5) (2022-08-12)
 
 
