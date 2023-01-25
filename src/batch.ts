@@ -101,7 +101,6 @@ function defaultBatchOptions(config: DuckConfig): AwsOptions {
     },
     webpackOptions: {
       externals: [
-        /^aws-sdk\/?/,
         "google-closure-compiler-js",
         "google-closure-compiler-linux",
         "google-closure-compiler-osx",
