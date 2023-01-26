@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.35.3](https://github.com/cybozu/duck/compare/v0.35.2...v0.35.3) (2023-01-26)
+
+
+### Bug Fixes
+
+* **batch:** remove aws-sdk from externals in webpackOptions ([#838](https://github.com/cybozu/duck/issues/838)) ([81f74f2](https://github.com/cybozu/duck/commit/81f74f246d1c8e5942983ce952f21b0373f95532))
+* **deps:** update dependency @fastify/cors to ^8.1.1 ([#824](https://github.com/cybozu/duck/issues/824)) ([3558c35](https://github.com/cybozu/duck/commit/3558c3564ecb5315820b7d721fe59d1534eb0ebc))
+* **deps:** update dependency faastjs to ^6.3.3 ([#825](https://github.com/cybozu/duck/issues/825)) ([01a50d0](https://github.com/cybozu/duck/commit/01a50d02f9827ed52df11369512f605ceaccee56))
+* **deps:** update dependency faastjs to ^6.3.4 ([#829](https://github.com/cybozu/duck/issues/829)) ([ecf3eb2](https://github.com/cybozu/duck/commit/ecf3eb29b82a8c6bb597edec26c694348713e5ee))
+* **deps:** update dependency fast-glob to ^3.2.12 ([#803](https://github.com/cybozu/duck/issues/803)) ([cf55e03](https://github.com/cybozu/duck/commit/cf55e03fa2f89aa5f00ea43f52016fc6e0f03a3c))
+* **deps:** update dependency recursive-readdir to ^2.2.3 ([#826](https://github.com/cybozu/duck/issues/826)) ([65b848f](https://github.com/cybozu/duck/commit/65b848f5b3a866b759c8307ebacd632c6d564c47))
+* **deps:** update dependency semver to ^7.3.8 ([#816](https://github.com/cybozu/duck/issues/816)) ([b17e4e1](https://github.com/cybozu/duck/commit/b17e4e1c44d84f6f63bf183eb666a884115d2441))
+* **deps:** update dependency yargs to ^17.6.0 ([#817](https://github.com/cybozu/duck/issues/817)) ([3e38569](https://github.com/cybozu/duck/commit/3e38569ce264dcb59f1411dd8f55c2ad3dd79787))
+* **deps:** update dependency yargs to ^17.6.2 ([#833](https://github.com/cybozu/duck/issues/833)) ([b3e2942](https://github.com/cybozu/duck/commit/b3e2942b16e14fdd330196817e911b0fbf8f9075))
+
 ### [0.35.2](https://github.com/cybozu/duck/compare/v0.35.1...v0.35.2) (2022-08-25)
 
 
