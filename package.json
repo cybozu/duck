@@ -42,7 +42,7 @@
     "execa": "^6.1.0",
     "faastjs": "^6.3.4",
     "fast-glob": "^3.2.12",
-    "fastify": "^4.4.0",
+    "fastify": "^4.15.0",
     "google-closure-deps": ">=20210406.0.0",
     "listr": "^0.14.3",
     "merge-options": "^3.0.4",
