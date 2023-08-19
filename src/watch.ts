@@ -34,7 +34,7 @@ export function watchJsAndSoy(config: DuckConfig) {
 }
 
 function handleChokidarEvent(
-  event: typeof chokidarEvents[number],
+  event: (typeof chokidarEvents)[number],
   config: SoyConfig | null,
   filepath: string
 ): void {
