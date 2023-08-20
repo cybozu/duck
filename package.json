@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^8.1.1",
-    "@fastify/static": "^6.5.0",
+    "@fastify/static": "^6.5.1",
     "@teppeis/stream-to-observable": "^0.3.1",
     "chokidar": "^3.5.3",
     "common-tags": "^1.8.2",
