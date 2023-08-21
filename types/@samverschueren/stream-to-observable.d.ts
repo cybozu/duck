@@ -45,7 +45,7 @@ interface Options {
  */
 declare function streamToObservable(
   stream: NodeJS.ReadableStream,
-  options?: Options
+  options?: Options,
 ): Observable<any>;
 
 export = streamToObservable;

@@ -6,7 +6,7 @@ import depGraph = closureDeps.depGraph;
  * Parse a script file including such as `goog.provide` and generate a `Dependency`.
  */
 export async function parseDependency(
-  filepath: string
+  filepath: string,
 ): Promise<depGraph.Dependency> {
   const result = await closureDeps.parser.parseFileAsync(filepath);
   if (result.hasFatalError) {

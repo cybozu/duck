@@ -33,7 +33,7 @@ export abstract class BaseReporter {
       if (this.outputDir) {
         const subDir = path.join(
           this.outputDir,
-          path.basename(reason.entryConfigPath, ".json")
+          path.basename(reason.entryConfigPath, ".json"),
         );
         await fs.mkdir(subDir, { recursive: true });
         await fs.writeFile(path.join(subDir, this.resultFilename), content);

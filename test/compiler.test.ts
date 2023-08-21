@@ -35,7 +35,7 @@ describe("createComiplerOptionsForPage()", () => {
         inputs: ["/input1.js"],
       },
       emptyDuckConfig,
-      false
+      false,
     );
     const expected: ExtendedCompilerOptions = {
       compilerOptions: {
@@ -61,7 +61,7 @@ describe("createComiplerOptionsForPage()", () => {
         },
       },
       emptyDuckConfig,
-      false
+      false,
     );
     const expected: ExtendedCompilerOptions = {
       compilerOptions: {
@@ -88,7 +88,7 @@ describe("createComiplerOptionsForPage()", () => {
         ],
       },
       emptyDuckConfig,
-      false
+      false,
     );
     assert.deepEqual(actual.warningsWhitelist, [
       { file: "/path/to/file1.js", line: 1, description: "Error1" },
@@ -127,7 +127,7 @@ describe("createComiplerOptionsForPage()", () => {
         },
       },
       emptyDuckConfig,
-      true
+      true,
     );
     const expected: ExtendedCompilerOptions = {
       compilerOptions: {
@@ -171,7 +171,7 @@ it("batch: aws", async () => {
       ],
     },
     { batch: "aws" } as DuckConfig,
-    false
+    false,
   );
   const expected: ExtendedCompilerOptions = {
     compilerOptions: {
@@ -221,7 +221,7 @@ describe("convertToFlagfile()", () => {
           --compilation_level "ADVANCED"
           --js_output_file "/a b\\".js"
           --js "/a b\\".js"
-          --js "/c d\\".js"`
+          --js "/c d\\".js"`,
     );
   });
 });

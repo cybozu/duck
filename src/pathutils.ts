@@ -7,7 +7,7 @@ import path from "path";
 export function toAbsPath<T>(
   config: T,
   baseDir: string,
-  key: PickKeysByValue<Required<T>, string>
+  key: PickKeysByValue<Required<T>, string>,
 ) {
   const value = config[key];
   if (typeof value === "string") {
@@ -26,7 +26,7 @@ export function toAbsPath<T>(
 export function toAbsPathArray<T>(
   config: T,
   baseDir: string,
-  key: PickKeysByValue<Required<T>, string[] | readonly string[]>
+  key: PickKeysByValue<Required<T>, string[] | readonly string[]>,
 ) {
   config[key] ||= [] as any;
   const values = config[key];

@@ -1,5 +1,4 @@
-Example for `build:deps` with various module types
-===
+# Example for `build:deps` with various module types
 
 ## How to `duck build:deps`
 

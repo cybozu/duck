@@ -77,7 +77,7 @@ describe("loadEntryConfig", () => {
   it("inherits parent configs", async () => {
     const config = await loadEntryConfigById(
       "grandchild",
-      path.join(fixturesDir, "child", "grandchild")
+      path.join(fixturesDir, "child", "grandchild"),
     );
     assert.deepEqual(config, {
       id: "grandchild",

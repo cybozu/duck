@@ -17,7 +17,7 @@ namespace GoogleClosureDeps.parser {
     constructor(
       dependencies: depGraph.Dependency[],
       errors: ParseError[],
-      source: ParseResult.Source
+      source: ParseResult.Source,
     );
   }
 
@@ -52,7 +52,7 @@ namespace GoogleClosureDeps.parser {
       message: string,
       sourceName: string,
       line: number,
-      lineOffset: number
+      lineOffset: number,
     );
   }
 
@@ -109,7 +109,7 @@ namespace GoogleClosureDeps.depGraph {
       filepath: string,
       closureSymbols: string[],
       imports: Import[],
-      language?: string
+      language?: string,
     );
 
     /**
@@ -201,7 +201,7 @@ namespace GoogleClosureDeps.depGraph {
 
     constructor(
       dependencies: readonly Dependency[],
-      moduleResolver?: ModuleResolver
+      moduleResolver?: ModuleResolver,
     );
 
     /**
@@ -235,7 +235,7 @@ namespace GoogleClosureDeps.depFile {
   export function getDepFileText(
     pathToClosure: string,
     dependencies: depGraph.Dependency[],
-    moduleResolver?: depGraph.ModuleResolver
+    moduleResolver?: depGraph.ModuleResolver,
   ): string;
 }
 

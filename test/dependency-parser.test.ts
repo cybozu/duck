@@ -16,40 +16,40 @@ const expectedVariousModulesDeps = [
     depGraph.DependencyType.CLOSURE_MODULE,
     `${variousModulesFixturesDir}/closuremodule.js`,
     ["closuremodule"],
-    [new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")],
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_PROVIDE,
     `${variousModulesFixturesDir}/closureprovide.js`,
     ["closureprovide"],
-    [new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")],
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.ES6_MODULE,
     `${variousModulesFixturesDir}/esm-moduleid.js`,
     ["esm"],
     [new depGraph.Es6Import("./foo.js")],
-    "es6"
+    "es6",
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.ES6_MODULE,
     `${variousModulesFixturesDir}/esm.js`,
     [],
     [new depGraph.Es6Import("./foo.js")],
-    "es6"
+    "es6",
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.SCRIPT,
     `${variousModulesFixturesDir}/script.js`,
     [],
-    [new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")],
   ),
 ] as const;
 
 describe("DependencyParser()", () => {
   it("parses closure provide script", async () => {
     const actual = await parseDependency(
-      path.join(variousModulesFixturesDir, "closureprovide.js")
+      path.join(variousModulesFixturesDir, "closureprovide.js"),
     );
     assertDependencyEquals(actual, expectedVariousModulesDeps[1]);
   });
@@ -68,7 +68,7 @@ describe("DependencyParserWithWorkers()", () => {
   it("parses closure provide script with worker", async () => {
     // This requires tsc compiling before testing
     const dep = await parser.parse(
-      path.join(variousModulesFixturesDir, "closureprovide.js")
+      path.join(variousModulesFixturesDir, "closureprovide.js"),
     );
     assertDependencyEquals(dep, expectedVariousModulesDeps[1]);
   });
@@ -78,7 +78,7 @@ function assertImportEquals(
   actual: depGraph.Import,
   expected: depGraph.Import,
   brokenEs6Import: boolean,
-  msg?: string
+  msg?: string,
 ): void {
   assert(actual, msg);
   assert.equal(actual.isGoogRequire(), expected.isGoogRequire(), msg);
@@ -96,7 +96,7 @@ function assertImportEquals(
   assert(expected.from, msg);
   assert.deepEqual(
     actual.from.closureSymbols.slice().sort(),
-    expected.from.closureSymbols.slice().sort()
+    expected.from.closureSymbols.slice().sort(),
   );
 }
 
@@ -104,7 +104,7 @@ function assertDependencyEquals(
   actual: depGraph.Dependency,
   expected: depGraph.Dependency,
   brokenEs6Import: boolean = false,
-  msg?: string
+  msg?: string,
 ): void {
   assert(actual, msg);
   assert.equal(actual.type, expected.type, msg);
@@ -112,7 +112,7 @@ function assertDependencyEquals(
   assert.equal(actual.language, expected.language, msg);
   assert.deepEqual(
     actual.closureSymbols.slice().sort(),
-    expected.closureSymbols.slice().sort()
+    expected.closureSymbols.slice().sort(),
   );
   const expectedImports = expected.imports
     .slice()

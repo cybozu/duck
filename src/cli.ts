@@ -9,7 +9,7 @@ import split from "split2";
 import yargs from "yargs";
 import { assertNonNullable, assertString } from "./assert.js";
 import { buildDeps } from "./commands/buildDeps.js";
-import { buildJs, BuildJsCompilationError } from "./commands/buildJs.js";
+import { BuildJsCompilationError, buildJs } from "./commands/buildJs.js";
 import type { BuildSoyConfig } from "./commands/buildSoy.js";
 import { buildSoy } from "./commands/buildSoy.js";
 import { cleanDeps } from "./commands/cleanDeps.js";
@@ -47,7 +47,7 @@ function wrap(task: () => Promise<any>): () => Observable<string> {
           return String(obj.msg);
         }
         return String(obj);
-      })
+      }),
     );
   };
 }
@@ -70,7 +70,7 @@ function assertStringWithConfig(config: DuckConfig, key: keyof DuckConfig) {
 }
 function assertNonNullableWithConfig(
   config: DuckConfig,
-  key: keyof DuckConfig
+  key: keyof DuckConfig,
 ) {
   const value = config[key];
   return assertNonNullable(value, `'${key}' is ${value}.`);
@@ -227,31 +227,29 @@ export function run(processArgv: readonly string[]): void {
         nonTTY,
       },
       async (argv) => {
-        const config = loadConfig(argv);
+        const conf = loadConfig(argv);
         const hasSoyConfig = Boolean(
-          config.soyJarPath &&
-            config.soyFileRoots.length > 0 &&
-            config.soyOptions
+          conf.soyJarPath && conf.soyFileRoots.length > 0 && conf.soyOptions,
         );
         const tasks = listr(
           [
             {
               title: `Compile Soy templates`,
               skip: () => !hasSoyConfig || argv.skipInitialBuild,
-              task: wrap(() => buildSoy(config as BuildSoyConfig)),
+              task: wrap(() => buildSoy(conf as BuildSoyConfig)),
             },
             {
               title: `Generate deps.js`,
-              skip: () => !config.depsJs || argv.skipInitialBuild,
-              task: wrap(() => buildDeps(config)),
+              skip: () => !conf.depsJs || argv.skipInitialBuild,
+              task: wrap(() => buildDeps(conf)),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
         console.log(""); // a blank line
-        await serve(config);
-      }
+        await serve(conf);
+      },
     )
     .command(
       "build [entryConfigDir]",
@@ -264,7 +262,7 @@ export function run(processArgv: readonly string[]): void {
         nonTTY,
       },
       async (argv) => {
-        const config = loadConfig(argv);
+        const conf = loadConfig(argv);
         let warnings: ErrorReason[] = [];
         const tasks = listr(
           [
@@ -273,45 +271,45 @@ export function run(processArgv: readonly string[]): void {
               skip: () =>
                 argv.skipInitialBuild ||
                 !(
-                  config.soyJarPath &&
-                  config.soyFileRoots.length > 0 &&
-                  config.soyOptions
+                  conf.soyJarPath &&
+                  conf.soyFileRoots.length > 0 &&
+                  conf.soyOptions
                 ),
               task: wrap(() =>
-                buildSoy(config as BuildSoyConfig, argv.printConfig)
+                buildSoy(conf as BuildSoyConfig, argv.printConfig),
               ),
             },
             {
               title: `Generate deps.js`,
-              skip: () => !config.depsJs || argv.skipInitialBuild,
-              task: wrap(() => buildDeps(config)),
+              skip: () => !conf.depsJs || argv.skipInitialBuild,
+              task: wrap(() => buildDeps(conf)),
             },
             {
               title: `Compile JS files`,
               task: wrap(async () => {
                 warnings = await buildJs(
-                  config,
+                  conf,
                   argv.entryConfigs as string[],
-                  argv.printConfig
+                  argv.printConfig,
                 );
               }),
             },
           ],
-          argv
+          argv,
         );
-        await tasks.run().catch(printOnlyCompilationError(config));
+        await tasks.run().catch(printOnlyCompilationError(conf));
         printResultInfo();
         if (warnings.length > 0 && !argv.printConfig) {
-          reportTestResults(warnings, config);
+          reportTestResults(warnings, conf);
         }
-      }
+      },
     )
     .command(
       "build:js [entryConfigDir]",
       "Compile JS files",
       buildJsOptions,
       async (argv) => {
-        const config = loadConfig(argv);
+        const conf = loadConfig(argv);
         let warnings: ErrorReason[] = [];
         const tasks = listr(
           [
@@ -319,103 +317,103 @@ export function run(processArgv: readonly string[]): void {
               title: `Compile JS files`,
               task: wrap(async () => {
                 warnings = await buildJs(
-                  config,
+                  conf,
                   argv.entryConfigs as string[],
-                  argv.printConfig
+                  argv.printConfig,
                 );
               }),
             },
           ],
-          argv
+          argv,
         );
-        await tasks.run().catch(printOnlyCompilationError(config));
+        await tasks.run().catch(printOnlyCompilationError(conf));
         printResultInfo();
         if (warnings.length > 0 && !argv.printConfig) {
-          reportTestResults(warnings, config);
+          reportTestResults(warnings, conf);
         }
-      }
+      },
     )
     .command(
       "build:soy",
       "Compile Soy templates",
       buildSoyOptions,
       async (argv) => {
-        const config = loadConfig(argv);
-        assertStringWithConfig(config, "soyJarPath");
-        assertNonNullableWithConfig(config, "soyFileRoots");
-        assertNonNullableWithConfig(config, "soyOptions");
+        const conf = loadConfig(argv);
+        assertStringWithConfig(conf, "soyJarPath");
+        assertNonNullableWithConfig(conf, "soyFileRoots");
+        assertNonNullableWithConfig(conf, "soyOptions");
         const tasks = listr(
           [
             {
               title: `Compile Soy templates`,
               task: wrap(() =>
-                buildSoy(config as BuildSoyConfig, argv.printConfig)
+                buildSoy(conf as BuildSoyConfig, argv.printConfig),
               ),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
         printResultInfo();
-      }
+      },
     )
     .command(
       "build:deps",
       "Generate deps.js",
       buildDepsOptions,
       async (argv) => {
-        const config = loadConfig(argv);
+        const conf = loadConfig(argv);
         const tasks = listr(
           [
             {
               title: `Generate deps.js`,
-              task: wrap(() => buildDeps(config)),
+              task: wrap(() => buildDeps(conf)),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
         printResultInfo();
-      }
+      },
     )
     .command(
       "clean:soy",
       "Remove all compiled .soy.js",
       buildSoyOptions,
       async (argv) => {
-        const config = loadConfig(argv);
-        assertNonNullableWithConfig(config, "soyOptions");
+        const conf = loadConfig(argv);
+        assertNonNullableWithConfig(conf, "soyOptions");
         const tasks = listr(
           [
             {
               title: `Clean up soy.js`,
-              task: wrap(() => cleanSoy(config as CleanSoyConfig)),
+              task: wrap(() => cleanSoy(conf as CleanSoyConfig)),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
-      }
+      },
     )
     .command(
       "clean:deps",
       "Remove generated deps.js",
       buildDepsOptions,
       async (argv) => {
-        const config = loadConfig(argv);
+        const conf = loadConfig(argv);
         const tasks = listr(
           [
             {
-              title: `Clean up deps.js: ${config.depsJs}`,
+              title: `Clean up deps.js: ${conf.depsJs}`,
               task: wrap(() =>
-                cleanDeps(assertStringWithConfig(config, "depsJs"))
+                cleanDeps(assertStringWithConfig(conf, "depsJs")),
               ),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
-      }
+      },
     )
     .completion("completion", "Generate completion script for bash/zsh")
     .demandCommand(1, 1)
@@ -435,7 +433,7 @@ export function run(processArgv: readonly string[]): void {
 function listr<T>(
   tasks: ReadonlyArray<Listr.ListrTask<T>>,
   argv: { nonTTY: boolean },
-  options: Listr.ListrOptions<T> = {}
+  options: Listr.ListrOptions<T> = {},
 ): Listr<T> {
   return new Listr<T>(tasks, {
     ...options,
@@ -443,10 +441,10 @@ function listr<T>(
   });
 }
 
-function printOnlyCompilationError(config: DuckConfig) {
+function printOnlyCompilationError(conf: DuckConfig) {
   return async (e: any) => {
     if (e instanceof BuildJsCompilationError) {
-      await reportTestResults(e.reasons, config);
+      await reportTestResults(e.reasons, conf);
       console.log("");
       return Promise.reject();
     }

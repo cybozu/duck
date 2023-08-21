@@ -64,7 +64,7 @@ export enum PlovrMode {
 export async function loadEntryConfigById(
   id: string,
   entryConfigDir: string,
-  { mode }: { mode?: PlovrMode } = {}
+  { mode }: { mode?: PlovrMode } = {},
 ): Promise<EntryConfig> {
   return loadEntryConfig(path.join(entryConfigDir, `${id}.json`), { mode });
 }
@@ -78,27 +78,26 @@ export async function loadEntryConfigById(
  */
 export async function loadEntryConfig(
   entryConfigPath: string,
-  { mode }: { mode?: PlovrMode } = {}
+  { mode }: { mode?: PlovrMode } = {},
 ): Promise<EntryConfig> {
-  const { json: entryConfig, basedir } = await loadInheritedJson(
-    entryConfigPath
-  );
+  const { json: entryConfig, basedir } =
+    await loadInheritedJson(entryConfigPath);
   // change relative paths to abs paths
   entryConfig.paths = entryConfig.paths.map((p) => path.resolve(basedir, p));
   if (entryConfig.inputs) {
     entryConfig.inputs = entryConfig.inputs.map((input) =>
-      path.resolve(basedir, input)
+      path.resolve(basedir, input),
     );
   }
   if (entryConfig.externs) {
     entryConfig.externs = entryConfig.externs.map((extern) =>
-      path.resolve(basedir, extern)
+      path.resolve(basedir, extern),
     );
   }
   if (entryConfig["output-file"]) {
     entryConfig["output-file"] = path.resolve(
       basedir,
-      entryConfig["output-file"]
+      entryConfig["output-file"],
     );
   }
   if (entryConfig.chunks) {
@@ -113,13 +112,13 @@ export async function loadEntryConfig(
   }
   if (entryConfig["test-excludes"]) {
     entryConfig["test-excludes"] = entryConfig["test-excludes"].map((p) =>
-      path.resolve(basedir, p)
+      path.resolve(basedir, p),
     );
   }
   if (entryConfig["chunk-output-path"]) {
     entryConfig["chunk-output-path"] = path.resolve(
       basedir,
-      entryConfig["chunk-output-path"]
+      entryConfig["chunk-output-path"],
     );
   }
   if (mode) {
@@ -141,7 +140,7 @@ async function loadJson(jsonPath: string): Promise<EntryConfig> {
  */
 async function loadInheritedJson(
   jsonPath: string,
-  json: EntryConfig | null = null
+  json: EntryConfig | null = null,
 ): Promise<{ json: EntryConfig; basedir: string }> {
   if (!json) {
     json = await loadJson(jsonPath);

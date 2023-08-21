@@ -11,10 +11,10 @@ namespace GoogleClosureCompiler {
     public javaPath: string;
     constructor(
       args: { [idx: string]: string } | string[],
-      extraCommandArgs?: string[]
+      extraCommandArgs?: string[],
     );
     run(
-      callback?: (exitCode: number, stdout: string, stderr: string) => void
+      callback?: (exitCode: number, stdout: string, stderr: string) => void,
     ): ChildProcess;
   }
 }

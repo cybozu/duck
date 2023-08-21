@@ -21,7 +21,7 @@ const assertCompileErrorItem = (item: any) => {
       assert(typeof item.line === "number");
       assert(typeof item.column === "number");
       assert(
-        typeof item.context === "undefined" || typeof item.context === "string"
+        typeof item.context === "undefined" || typeof item.context === "string",
       );
       break;
 

@@ -41,7 +41,7 @@ describe("output()", () => {
     await reporter.output(reasons);
     const actual = await fs.readFile(
       path.join(outputDir, "entry", "results.json"),
-      "utf8"
+      "utf8",
     );
     assert.equal(actual, expected);
     assert.equal(actualMessage, undefined);

@@ -14,7 +14,7 @@ export class DependencyParserWithWorkers {
   constructor(numOfWorkers = 1) {
     if (numOfWorkers < 1) {
       throw new TypeError(
-        `numOfWorkers must be an integer >= 1, but "${numOfWorkers}"`
+        `numOfWorkers must be an integer >= 1, but "${numOfWorkers}"`,
       );
     }
     this.pool = workerpool.pool(script, {
@@ -41,7 +41,7 @@ export class DependencyParserWithWorkers {
       depData.path,
       depData.closureSymbols,
       imports,
-      depData.language
+      depData.language,
     );
   }
 

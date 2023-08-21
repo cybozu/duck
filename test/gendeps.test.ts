@@ -23,40 +23,40 @@ const fixturesBaseDir = path.join(__dirname, "fixtures");
 const variousModulesFixturesDir = path.join(fixturesBaseDir, "various-modules");
 const variousModulesDepsJsPath = path.join(
   fixturesBaseDir,
-  "various-modules-deps.js"
+  "various-modules-deps.js",
 );
 const expectedVariousModulesDeps = [
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_MODULE,
     `${variousModulesFixturesDir}/closuremodule.js`,
     ["closuremodule"],
-    [new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")],
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.CLOSURE_PROVIDE,
     `${variousModulesFixturesDir}/closureprovide.js`,
     ["closureprovide"],
-    [new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")],
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.ES6_MODULE,
     `${variousModulesFixturesDir}/esm-moduleid.js`,
     ["esm"],
     [new depGraph.Es6Import("./foo.js")],
-    "es6"
+    "es6",
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.ES6_MODULE,
     `${variousModulesFixturesDir}/esm.js`,
     [],
     [new depGraph.Es6Import("./foo.js")],
-    "es6"
+    "es6",
   ),
   new depGraph.Dependency(
     depGraph.DependencyType.SCRIPT,
     `${variousModulesFixturesDir}/script.js`,
     [],
-    [new depGraph.GoogRequire("goog.array")]
+    [new depGraph.GoogRequire("goog.array")],
   ),
 ] as const;
 
@@ -72,7 +72,7 @@ describe("generateDepFileText()", () => {
     };
     assert.equal(
       await generateDepFileText(entryConfig, inputsRoot, [closureDir]),
-      "goog.addDependency('../../../../foo/init.js', ['foo.init'], ['foo.bar', 'goog.array']);\n"
+      "goog.addDependency('../../../../foo/init.js', ['foo.init'], ['foo.bar', 'goog.array']);\n",
     );
   });
 });
@@ -82,17 +82,17 @@ describe("generateDepFileTextFromDeps()", () => {
       depGraph.DependencyType.SCRIPT,
       "/app/foo.js",
       [],
-      [new depGraph.GoogRequire("goog.array")]
+      [new depGraph.GoogRequire("goog.array")],
     );
     const text = await generateDepFileTextFromDeps([dep], "/closure/goog");
     assert.equal(
       text,
-      "goog.addDependency('../../app/foo.js', [], ['goog.array']);\n"
+      "goog.addDependency('../../app/foo.js', [], ['goog.array']);\n",
     );
     assert.equal(
       dep.type,
       depGraph.DependencyType.SCRIPT,
-      "dep.type should not be changed"
+      "dep.type should not be changed",
     );
   });
 });
@@ -103,7 +103,7 @@ describe("getDependencies()", () => {
       depGraph.DependencyType.SCRIPT,
       path.join(fixturesDir, filepath),
       [],
-      []
+      [],
     );
   }
   it("loads all js files in paths", async () => {
@@ -123,7 +123,7 @@ describe("getDependencies()", () => {
         createScriptDependency("path2/bar_test.js"),
         createScriptDependency("path1/path1-1/baz.js"),
         createScriptDependency("path1/path1-1/baz_test.js"),
-      ])
+      ]),
     );
   });
   it("does not load files in `ignoreDirs`: sub directory match", async () => {
@@ -142,7 +142,7 @@ describe("getDependencies()", () => {
         createScriptDependency("path1/foo_test.js"),
         createScriptDependency("path2/bar.js"),
         createScriptDependency("path2/bar_test.js"),
-      ])
+      ]),
     );
   });
   it("does not load files in `ignoreDirs`: glob match", async () => {
@@ -160,7 +160,7 @@ describe("getDependencies()", () => {
         createScriptDependency("path1/foo_test.js"),
         createScriptDependency("path1/path1-1/baz.js"),
         createScriptDependency("path1/path1-1/baz_test.js"),
-      ])
+      ]),
     );
   });
   it("does not load `*_test.js` in `test-excludes` dirs", async () => {
@@ -180,7 +180,7 @@ describe("getDependencies()", () => {
         createScriptDependency("path1/path1-1/baz.js"),
         createScriptDependency("path1/path1-1/baz_test.js"),
         createScriptDependency("path2/bar.js"),
-      ])
+      ]),
     );
   });
   it("loads various modules", async () => {
@@ -194,7 +194,7 @@ describe("getDependencies()", () => {
     if (process.env.DUMP_DEPS) {
       const text = await generateDepFileTextFromDeps(
         deps,
-        path.join(fixturesDir, "closure", "goog")
+        path.join(fixturesDir, "closure", "goog"),
       );
       await fs.writeFile(variousModulesDepsJsPath, text, "utf8");
     }
@@ -241,14 +241,14 @@ describe("getClosureLibraryDependencies()", () => {
         depGraph.DependencyType.CLOSURE_PROVIDE,
         `${closureLib1}/closure/goog/a11y/aria/aria.js`,
         ["goog.a11y.aria"],
-        [new depGraph.GoogRequire("goog.a11y.aria.Role")]
+        [new depGraph.GoogRequire("goog.a11y.aria.Role")],
       ),
       new depGraph.Dependency(
         depGraph.DependencyType.CLOSURE_MODULE,
         `${closureLib1}/closure/goog/collections/sets.js`,
         ["goog.collections.sets"],
         [],
-        "es6"
+        "es6",
       ),
     ]);
   });
@@ -258,7 +258,7 @@ function assertImportEquals(
   actual: depGraph.Import,
   expected: depGraph.Import,
   brokenEs6Import: boolean,
-  msg?: string
+  msg?: string,
 ): void {
   assert(actual, msg);
   assert.equal(actual.isGoogRequire(), expected.isGoogRequire(), msg);
@@ -276,7 +276,7 @@ function assertImportEquals(
   assert(expected.from, msg);
   assert.deepEqual(
     actual.from.closureSymbols.slice().sort(),
-    expected.from.closureSymbols.slice().sort()
+    expected.from.closureSymbols.slice().sort(),
   );
 }
 
@@ -284,7 +284,7 @@ function assertDependencyEquals(
   actual: depGraph.Dependency,
   expected: depGraph.Dependency,
   brokenEs6Import: boolean,
-  msg?: string
+  msg?: string,
 ): void {
   assert(actual, msg);
   assert.equal(actual.type, expected.type, msg);
@@ -292,7 +292,7 @@ function assertDependencyEquals(
   assert.equal(actual.language, expected.language, msg);
   assert.deepEqual(
     actual.closureSymbols.slice().sort(),
-    expected.closureSymbols.slice().sort()
+    expected.closureSymbols.slice().sort(),
   );
   const expectedImports = expected.imports
     .slice()
@@ -309,14 +309,14 @@ function assertDependencyEquals(
 function assertDependenciesEqual(
   actual: readonly depGraph.Dependency[],
   expected: readonly depGraph.Dependency[],
-  brokenEs6Import = false
+  brokenEs6Import = false,
 ): void {
   expected.forEach((e, idx) => {
     assertDependencyEquals(
       actual[idx],
       e,
       brokenEs6Import,
-      `fail in ${e.path}`
+      `fail in ${e.path}`,
     );
   });
   assert.equal(actual.length, expected.length);

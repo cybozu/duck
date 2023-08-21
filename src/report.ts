@@ -35,7 +35,7 @@ const reporterClasses = {
 
 export async function reportTestResults(
   reasons: readonly ErrorReason[],
-  config: DuckConfig
+  config: DuckConfig,
 ): Promise<void> {
   const reporters = config.reporters || ["text"];
   const promises = reporters.map((name) => {

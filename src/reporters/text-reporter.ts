@@ -26,7 +26,7 @@ export class TextReporter extends BaseReporter {
 ${command ? `\n${command}\n` : ""}
 ${items
   .map((item) =>
-    item.level === "info" ? item.description : this.formatErrorCase(item)
+    item.level === "info" ? item.description : this.formatErrorCase(item),
   )
   .join("\n\n")}\n`;
   }

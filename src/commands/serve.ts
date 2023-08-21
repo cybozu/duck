@@ -65,7 +65,7 @@ export async function serve(config: DuckConfig, watch = true) {
           ignore: "hostname,pid",
         },
       },
-    })
+    }),
   );
 
   if (watch) {
@@ -74,7 +74,7 @@ export async function serve(config: DuckConfig, watch = true) {
 
   if (config.depsJs) {
     restoreDepsJs(config.depsJs, config.closureLibraryDir).then(() =>
-      logger.debug("deps.js restored", config.depsJs)
+      logger.debug("deps.js restored", config.depsJs),
     );
   }
 
@@ -130,7 +130,7 @@ export async function serve(config: DuckConfig, watch = true) {
       const entryConfig = await loadEntryConfigById(
         request.query.id,
         config.entryConfigDir,
-        request.query
+        request.query,
       );
       if (entryConfig.mode === "RAW") {
         if (entryConfig.chunks) {
@@ -145,16 +145,16 @@ export async function serve(config: DuckConfig, watch = true) {
           assertString(request.raw.url),
           // convert number to string
           String(request.id),
-          request.query
+          request.query,
         );
       }
       return replyPageCompile(reply, entryConfig, config);
-    }
+    },
   );
 
   function inputsToUrisForRaw(
     inputs: readonly string[],
-    baseUrl: URL
+    baseUrl: URL,
   ): string[] {
     return inputs
       .map((input) => path.relative(config.inputsRoot, input))
@@ -181,18 +181,18 @@ export async function serve(config: DuckConfig, watch = true) {
     document.write('<script src="${getGoogBaseUrl(baseUrl)}"></script>');
     document.write('<script src="${getDepsUrl(
       baseUrl,
-      entryConfig.id
+      entryConfig.id,
     )}"></script>');
     document.write('<script>var PLOVR_MODULE_INFO = ${JSON.stringify(
-      chunkInfo
+      chunkInfo,
     )};</script>');
     document.write('<script>var PLOVR_MODULE_URIS = ${JSON.stringify(
-      chunkUris
+      chunkUris,
     )};</script>');
     document.write('<script>var PLOVR_MODULE_USE_DEBUG_MODE = ${!!entryConfig.debug};</script>');
     ${rootModuleUris
       .map(
-        (uri) => `document.write('<script>goog.require("${uri}")</script>');`
+        (uri) => `document.write('<script>goog.require("${uri}")</script>');`,
       )
       .join("\n")}
     `);
@@ -203,7 +203,7 @@ export async function serve(config: DuckConfig, watch = true) {
     entryConfig: EntryConfig,
     url: string,
     requestId: string,
-    query: CompileQuery
+    query: CompileQuery,
   ) {
     const { parentRequest, chunk: requestedChunkId } = query;
     if (!entryIdToChunkCache.has(entryConfig.id)) {
@@ -234,7 +234,7 @@ export async function serve(config: DuckConfig, watch = true) {
         entryConfig,
         config,
         false,
-        createModuleUris
+        createModuleUris,
       );
     updateDepsJsCache(config);
     const [chunkOutputs] = await compileToJson(options);
@@ -258,11 +258,11 @@ export async function serve(config: DuckConfig, watch = true) {
     document.write('<script src="${getGoogBaseUrl(baseUrl)}"></script>');
     document.write('<script src="${getDepsUrl(
       baseUrl,
-      entryConfig.id
+      entryConfig.id,
     )}"></script>');
     ${uris
       .map(
-        (uri) => `document.write('<script>goog.require("${uri}")</script>');`
+        (uri) => `document.write('<script>goog.require("${uri}")</script>');`,
       )
       .join("\n")}
   `);
@@ -271,17 +271,17 @@ export async function serve(config: DuckConfig, watch = true) {
   async function replyPageCompile(
     reply: FastifyReply,
     entryConfig: EntryConfig,
-    duckConfig: DuckConfig
+    duckConfig: DuckConfig,
   ) {
     const options = createCompilerOptionsForPage(
       entryConfig,
       duckConfig,
-      false
+      false,
     );
     const [compileOutputs] = await compileToJson(options);
     if (compileOutputs.length !== 1) {
       throw new Error(
-        `Unexpectedly chunkOutputs.length must be 1, but actual ${compileOutputs.length}`
+        `Unexpectedly chunkOutputs.length must be 1, but actual ${compileOutputs.length}`,
       );
     }
     reply.code(200).type("application/javascript").send(compileOutputs[0].src);
@@ -294,17 +294,17 @@ export async function serve(config: DuckConfig, watch = true) {
       const entryConfig = await loadEntryConfigById(
         request.query.id,
         config.entryConfigDir,
-        request.query
+        request.query,
       );
       const depsContent = await generateDepFileText(
         entryConfig,
         config.inputsRoot,
         config.depsJsIgnoreDirs.concat(config.closureLibraryDir),
-        config.depsWorkers
+        config.depsWorkers,
       );
       reply.code(200).type("application/javascript").send(depsContent);
       updateDepsJsCache(config);
-    }
+    },
   );
 
   // start server
@@ -327,9 +327,9 @@ function updateDepsJsCache(config: DuckConfig) {
     writeCachedDepsOnDisk(depsJs, config.closureLibraryDir).then(
       () =>
         logger.debug(
-          `[DEPSJS_UPDATED]: ${path.relative(process.cwd(), depsJs)}`
+          `[DEPSJS_UPDATED]: ${path.relative(process.cwd(), depsJs)}`,
         ),
-      (err) => logger.error({ err }, "Fail to write deps.js")
+      (err) => logger.error({ err }, "Fail to write deps.js"),
     );
   }
 }
@@ -390,7 +390,7 @@ async function createServer(config: DuckConfig): Promise<FastifyInstance> {
         statusCode: reply.statusCode,
         responseTime: `${Math.round(reply.getResponseTime())}ms`,
       },
-      "request completed"
+      "request completed",
     );
   });
   return server;

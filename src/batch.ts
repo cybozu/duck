@@ -40,7 +40,7 @@ export async function createCompileFunction(config: DuckConfig): Promise<{
 }
 
 async function getFaastCompiler(
-  config: DuckConfig
+  config: DuckConfig,
 ): Promise<
   FaastModuleProxy<typeof compilerFaastFunctions, CommonOptions, any>
 > {
@@ -52,7 +52,7 @@ async function getFaastCompiler(
 
 async function getFaastModule(
   batch: "aws" | "local",
-  batchOptions: AwsOptions | LocalOptions
+  batchOptions: AwsOptions | LocalOptions,
 ) {
   if (batch === "aws") {
     return faastAws(compilerFaastFunctions, batchOptions as AwsOptions);
@@ -67,7 +67,7 @@ function getBatchOptions(config: DuckConfig): AwsOptions | LocalOptions {
   return mergeOptions.call(
     { concatArrays: true },
     defaultBatchOptions(config),
-    batchOptions
+    batchOptions,
   );
 }
 

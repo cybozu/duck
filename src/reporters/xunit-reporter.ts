@@ -28,7 +28,7 @@ export class XUnitReporter extends BaseReporter {
       .element("testsuite")
       .attribute("name", entryConfigPath);
     const errors = items.filter(
-      (item) => item.level === "error"
+      (item) => item.level === "error",
     ) as CompileErrorCase[];
     if (errors.length > 0) {
       errors.forEach((error) => {

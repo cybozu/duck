@@ -25,7 +25,7 @@ export function watchJsAndSoy(config: DuckConfig) {
   }
   const watcher = chokidar.watch(paths, { ignored, ignoreInitial: true });
   watcher.on("ready", () =>
-    logger.info(`Watching for ${target} file changes...`)
+    logger.info(`Watching for ${target} file changes...`),
   );
   watcher.on("error", logger.error.bind(logger));
   chokidarEvents.forEach((event) => {
@@ -36,7 +36,7 @@ export function watchJsAndSoy(config: DuckConfig) {
 function handleChokidarEvent(
   event: (typeof chokidarEvents)[number],
   config: SoyConfig | null,
-  filepath: string
+  filepath: string,
 ): void {
   if (/\.js$/.test(filepath)) {
     jsHandlers[event](filepath);
@@ -74,7 +74,7 @@ type SoyConfig = Required<
 async function handleSoyUpdated(
   event: string,
   config: SoyConfig,
-  filepath: string
+  filepath: string,
 ) {
   logger.info(`[SOY_${event}]: ${path.relative(process.cwd(), filepath)}`);
   return compileSoy([filepath], config);

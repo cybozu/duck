@@ -19,7 +19,7 @@ export async function cleanSoy(config: CleanSoyConfig): Promise<string> {
       });
     } else {
       throw new TypeError(
-        "Must set either outputPathFormat or outputDirectory"
+        "Must set either outputPathFormat or outputDirectory",
       );
     }
   }

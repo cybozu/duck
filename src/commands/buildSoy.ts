@@ -17,7 +17,7 @@ export type BuildSoyConfig = Required<
  */
 export async function buildSoy(
   config: BuildSoyConfig,
-  printConfig = false
+  printConfig = false,
 ): Promise<string[]> {
   logger.info("Finding soy templates");
   const soyFiles = await findSoyFiles(config);

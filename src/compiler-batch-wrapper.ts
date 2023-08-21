@@ -20,7 +20,7 @@ export const FAAST_URL = import.meta.url;
 const maxChunkSizeInBytes = 200 * 1024;
 
 export async function* compileToJsonStringChunks(
-  extendedOpts: ExtendedCompilerOptions
+  extendedOpts: ExtendedCompilerOptions,
 ): AsyncGenerator<string, void, undefined> {
   const result = await compileToJson(extendedOpts);
   const size = extendedOpts.batchMaxChunkSize ?? maxChunkSizeInBytes;
