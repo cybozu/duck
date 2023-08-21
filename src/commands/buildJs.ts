@@ -170,10 +170,10 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
 
   function parseErrorReason(
     reason: any,
-    config: DuckConfig,
+    conf: DuckConfig,
   ): { command: string; items: CompileErrorItem[] } {
     let message: string;
-    if (config.batch) {
+    if (conf.batch) {
       assert(reason instanceof FaastError);
       assert.equal(reason.name, "CompilerError");
       // In batch mode, faast.js surrounds an error with a FaastError that
