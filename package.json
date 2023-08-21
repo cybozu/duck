@@ -34,7 +34,7 @@
     "release:dryrun": "standard-version --dry-run"
   },
   "dependencies": {
-    "@fastify/cors": "^8.1.1",
+    "@fastify/cors": "^8.3.0",
     "@fastify/static": "^6.10.2",
     "@teppeis/stream-to-observable": "^0.3.1",
     "chokidar": "^3.5.3",
