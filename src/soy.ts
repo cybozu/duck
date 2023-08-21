@@ -25,7 +25,7 @@ type SoyConfig = Pick<
 export async function compileSoy(
   soyFiles: readonly string[],
   config: SoyConfig,
-  printConfig = false
+  printConfig = false,
 ): Promise<void> {
   const soyArgs = toSoyArgs(soyFiles, config);
   if (printConfig) {
@@ -47,7 +47,7 @@ export async function compileSoy(
 
 export function toSoyArgs(
   soyFiles: readonly string[],
-  { soyJarPath, soyClasspaths, soyOptions, soySrcsRelativeFrom }: SoyConfig
+  { soyJarPath, soyClasspaths, soyOptions, soySrcsRelativeFrom }: SoyConfig,
 ): string[] {
   assert(soyJarPath);
   soyOptions = { ...soyOptions };
@@ -59,18 +59,18 @@ export function toSoyArgs(
   ];
   if (soySrcsRelativeFrom) {
     soyFiles = soyFiles.map((soyFile) =>
-      path.relative(soySrcsRelativeFrom, soyFile)
+      path.relative(soySrcsRelativeFrom, soyFile),
     );
     const { outputDirectory, inputRoots } = soyOptions;
     if (outputDirectory) {
       soyOptions.outputDirectory = path.relative(
         soySrcsRelativeFrom,
-        outputDirectory
+        outputDirectory,
       );
     }
     if (inputRoots) {
       soyOptions.inputRoots = inputRoots.map((inputRoot) =>
-        path.relative(soySrcsRelativeFrom, inputRoot)
+        path.relative(soySrcsRelativeFrom, inputRoot),
       );
     }
   }
@@ -98,7 +98,7 @@ export function toSoyArgs(
  */
 export function calcOutputPath(
   soyFilePath: string,
-  soyOptions: DuckConfig["soyOptions"]
+  soyOptions: DuckConfig["soyOptions"],
 ): string {
   if (!path.isAbsolute(soyFilePath)) {
     throw new TypeError("soyFilePath must be an absolute path: " + soyFilePath);
@@ -114,14 +114,14 @@ export function calcOutputPath(
 
 function calcOutputPathFormat(
   soyFilePath: string,
-  soyOptions: DuckConfig["soyOptions"]
+  soyOptions: DuckConfig["soyOptions"],
 ): string {
   const { outputPathFormat } = soyOptions;
   const inputDirectory = path.dirname(soyFilePath) + path.sep;
   const inputFileName = path.basename(soyFilePath);
   const inputFileNameNoExt = inputFileName.slice(
     0,
-    -path.extname(inputFileName).length
+    -path.extname(inputFileName).length,
   );
   return resolveOutputPathFormat(assertString(outputPathFormat), {
     inputDirectory,
@@ -143,7 +143,7 @@ export function resolveOutputPathFormat(
     inputDirectory: string;
     inputFileName: string;
     inputFileNameNoExt: string;
-  }
+  },
 ): string {
   const outputPath = outputPathFormat
     .replace("{INPUT_DIRECTORY}", inputDirectory)
@@ -168,7 +168,7 @@ export function normalizeSoyOptoins(config: DuckConfig, configDir: string) {
 
 function calcOutputDirectory(
   soyFilePath: string,
-  soyOptions: DuckConfig["soyOptions"]
+  soyOptions: DuckConfig["soyOptions"],
 ): string {
   if (!path.isAbsolute(soyFilePath)) {
     throw new TypeError("soyFilePath must be an absolute path: " + soyFilePath);
@@ -176,7 +176,7 @@ function calcOutputDirectory(
   const { outputDirectory, inputRoots } = soyOptions;
   if (!outputDirectory || !path.isAbsolute(outputDirectory)) {
     throw new TypeError(
-      "outputDirectory must be an absolute path: " + outputDirectory
+      "outputDirectory must be an absolute path: " + outputDirectory,
     );
   }
   for (const inputRoot of inputRoots || []) {
@@ -191,7 +191,7 @@ function calcOutputDirectory(
   const outputPath = path.resolve(outputDirectory, soyFilePath);
   if (!soyFilePath.endsWith(".soy")) {
     throw new TypeError(
-      `Soy filename must be end with ".soy", but actually "${soyFilePath}".`
+      `Soy filename must be end with ".soy", but actually "${soyFilePath}".`,
     );
   }
   return `${outputPath}.js`;

@@ -18,7 +18,7 @@ goog.scope(() => {
     ) {
       trustedModuleUris[id] = [
         goog.html.legacyconversions.trustedResourceUrlFromString(
-          goog.global["PLOVR_MODULE_URIS"][id]
+          goog.global["PLOVR_MODULE_URIS"][id],
         ),
       ];
     }

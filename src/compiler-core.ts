@@ -77,7 +77,7 @@ export interface CompilerOutput {
  * @throws If compiler throws errors
  */
 export async function compileToJson(
-  extendedOpts: ExtendedCompilerOptions
+  extendedOpts: ExtendedCompilerOptions,
 ): Promise<[CompilerOutput[], CompileErrorItem[]]> {
   extendedOpts.compilerOptions = {
     ...extendedOpts.compilerOptions,
@@ -99,7 +99,7 @@ export async function compileToJson(
 }
 
 async function compile(
-  extendedOpts: ExtendedCompilerOptions
+  extendedOpts: ExtendedCompilerOptions,
 ): Promise<{ stdout: string; stderr: string | undefined }> {
   let opts = extendedOpts.compilerOptions;
   if (isInAwsLambda()) {
@@ -111,7 +111,7 @@ async function compile(
   }
   if (extendedOpts.warningsWhitelist) {
     opts.warnings_whitelist_file = createWarningsWhitelistFile(
-      extendedOpts.warningsWhitelist
+      extendedOpts.warningsWhitelist,
     );
   }
   const compiler = new ClosureCompiler(opts as any);
@@ -142,10 +142,10 @@ function rewriteNodePathForAwsLambda(options: CompilerOptions): void {
     // The relative path is different from local environment.
     // So convert options.js paths.
     const closureLibraryDir = dirname(
-      __non_webpack_require__.resolve("google-closure-library/package.json")
+      __non_webpack_require__.resolve("google-closure-library/package.json"),
     );
     options.js = options.js.map((js) =>
-      js.replace(/^node_modules\/google-closure-library/, closureLibraryDir)
+      js.replace(/^node_modules\/google-closure-library/, closureLibraryDir),
     );
   }
 }
@@ -220,12 +220,12 @@ function escape(str: string): string {
  * Create a warnings whitelist file and return the file path
  */
 function createWarningsWhitelistFile(
-  whitelist: WarningsWhitelistItem[]
+  whitelist: WarningsWhitelistItem[],
 ): string {
   const content = whitelist
     .map(
       ({ file, line, description }) =>
-        `${file}:${line ? line : ""}  ${description}`
+        `${file}:${line ? line : ""}  ${description}`,
     )
     .join("\n");
   const file = temporaryFile({ name: "warnings-whitelist.txt" });

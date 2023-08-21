@@ -40,7 +40,7 @@ function snakeCase(key: string): string {
 function createBaseOptions(
   entryConfig: EntryConfig,
   duckConfig: DuckConfig,
-  outputToFile: boolean
+  outputToFile: boolean,
 ): CompilerOptions {
   const opts: CompilerOptions = {};
   if (entryConfig["experimental-compiler-options"]) {
@@ -58,7 +58,7 @@ function createBaseOptions(
 
   function copy(
     entryKey: keyof EntryConfig,
-    closureKey = entryKey.replace(/-/g, "_")
+    closureKey = entryKey.replace(/-/g, "_"),
   ) {
     if (entryKey in entryConfig) {
       opts[closureKey] = entryConfig[entryKey];
@@ -91,7 +91,7 @@ function createBaseOptions(
       const suffix = "%s.js";
       if (!outputPath.endsWith(suffix)) {
         throw new TypeError(
-          `"chunk-output-path" must end with "${suffix}", but actual "${outputPath}"`
+          `"chunk-output-path" must end with "${suffix}", but actual "${outputPath}"`,
         );
       }
       opts.chunk_output_path_prefix = outputPath.slice(0, suffix.length * -1);
@@ -138,7 +138,7 @@ function createBaseOptions(
       if (typeof value === "string") {
         if (value.includes("'")) {
           throw new Error(
-            `define value should not include single-quote: "${key}: ${value}"`
+            `define value should not include single-quote: "${key}: ${value}"`,
           );
         }
         value = `'${value}'`;
@@ -187,16 +187,16 @@ function createBaseOptions(
 export function createCompilerOptionsForPage(
   entryConfig: EntryConfig,
   duckConfig: DuckConfig,
-  outputToFile: boolean
+  outputToFile: boolean,
 ): ExtendedCompilerOptions {
   const compilerOptions = createBaseOptions(
     entryConfig,
     duckConfig,
-    outputToFile
+    outputToFile,
   );
   const wrapper = createOutputWrapper(
     entryConfig,
-    assertNonNullable(compilerOptions.compilation_level)
+    assertNonNullable(compilerOptions.compilation_level),
   );
   if (wrapper && wrapper !== wrapperMarker) {
     compilerOptions.output_wrapper = wrapper;
@@ -204,7 +204,7 @@ export function createCompilerOptionsForPage(
   const options: ExtendedCompilerOptions = createExtendedCompilerOptions(
     compilerOptions,
     duckConfig,
-    entryConfig
+    entryConfig,
   );
   return options;
 }
@@ -213,7 +213,7 @@ export async function createCompilerOptionsForChunks(
   entryConfig: EntryConfig,
   duckConfig: DuckConfig,
   outputToFile: boolean,
-  createChunkUris: (chunkId: string) => string[]
+  createChunkUris: (chunkId: string) => string[],
 ): Promise<{
   options: ExtendedCompilerOptions;
   sortedChunkIds: string[];
@@ -222,7 +222,7 @@ export async function createCompilerOptionsForChunks(
   // TODO: separate EntryConfigChunks from EntryConfig
   const chunks = assertNonNullable(entryConfig.chunks);
   const ignoreDirs = duckConfig.depsJsIgnoreDirs.concat(
-    duckConfig.closureLibraryDir
+    duckConfig.closureLibraryDir,
   );
   const dependencies = (
     await Promise.all([
@@ -235,17 +235,17 @@ export async function createCompilerOptionsForChunks(
   const chunkToTransitiveDepPathSet = findTransitiveDeps(
     sortedChunkIds,
     dependencies,
-    chunks
+    chunks,
   );
   const chunkToInputPathSet = splitDepsIntoChunks(
     sortedChunkIds,
     chunkToTransitiveDepPathSet,
-    dag
+    dag,
   );
   const compilerOptions = createBaseOptions(
     entryConfig,
     duckConfig,
-    outputToFile
+    outputToFile,
   );
   compilerOptions.js = [...chunkToInputPathSet.values()]
     .map((inputs) => [...inputs])
@@ -258,7 +258,7 @@ export async function createCompilerOptionsForChunks(
     entryConfig,
     sortedChunkIds,
     assertNonNullable(compilerOptions.compilation_level),
-    createChunkUris
+    createChunkUris,
   );
   if (duckConfig.batch === "aws") {
     convertCompilerOptionsToRelative(compilerOptions);
@@ -267,7 +267,7 @@ export async function createCompilerOptionsForChunks(
   const options: ExtendedCompilerOptions = createExtendedCompilerOptions(
     compilerOptions,
     duckConfig,
-    entryConfig
+    entryConfig,
   );
   return { options, sortedChunkIds, rootChunkId: sortedChunkIds[0] };
 }
@@ -277,7 +277,7 @@ const wrapperMarker = "%output%";
 function createExtendedCompilerOptions(
   compilerOptions: CompilerOptions,
   duckConfig: DuckConfig,
-  entryConfig: EntryConfig
+  entryConfig: EntryConfig,
 ) {
   const options: ExtendedCompilerOptions = {
     compilerOptions,
@@ -285,7 +285,7 @@ function createExtendedCompilerOptions(
   if (entryConfig.warningsWhitelist) {
     options.warningsWhitelist = createWarningsWhitelist(
       entryConfig.warningsWhitelist,
-      duckConfig
+      duckConfig,
     );
   }
   if (duckConfig.batch) {
@@ -302,7 +302,7 @@ function createExtendedCompilerOptions(
 
 function createOutputWrapper(
   entryConfig: EntryConfig,
-  level: CompilationLevel
+  level: CompilationLevel,
 ): string {
   // output_wrapper doesn't support "%n%"
   return createBaseOutputWrapper(entryConfig, level, true).replace(/\n+/g, "");
@@ -312,18 +312,18 @@ function createChunkWrapper(
   entryConfig: EntryConfig,
   sortedChunkIds: readonly string[],
   compilationLevel: CompilationLevel,
-  createModuleUris: (id: string) => string[]
+  createModuleUris: (id: string) => string[],
 ): string[] {
   const { chunkInfo, chunkUris } = convertChunkInfos(
     entryConfig,
-    createModuleUris
+    createModuleUris,
   );
   return sortedChunkIds.map((chunkId, index) => {
     const isRootChunk = index === 0;
     let wrapper = createBaseOutputWrapper(
       entryConfig,
       compilationLevel,
-      isRootChunk
+      isRootChunk,
     );
     if (isRootChunk) {
       wrapper = stripIndents`
@@ -343,7 +343,7 @@ function createChunkWrapper(
 function createBaseOutputWrapper(
   entryConfig: EntryConfig,
   level: CompilationLevel,
-  isRoot: boolean
+  isRoot: boolean,
 ): string {
   let wrapper = wrapperMarker;
   if (entryConfig["output-wrapper"]) {
@@ -366,10 +366,10 @@ function findTransitiveDeps(
   dependencies: readonly depGraph.Dependency[],
   chunks: {
     [id: string]: { inputs: readonly string[]; deps: readonly string[] };
-  }
+  },
 ): Map<string, Set<string>> {
   const pathToDep = new Map(
-    dependencies.map((dep) => [dep.path, dep] as [string, depGraph.Dependency])
+    dependencies.map((dep) => [dep.path, dep] as [string, depGraph.Dependency]),
   );
   const googBase = findGoogBaseFromDeps(dependencies);
   const graph = new depGraph.Graph(dependencies);
@@ -379,8 +379,8 @@ function findTransitiveDeps(
     const entryPoints = chunkConfig.inputs.map((input) =>
       assertNonNullable(
         pathToDep.get(input),
-        `entryConfig.paths does not include the inputs: ${input}`
-      )
+        `entryConfig.paths does not include the inputs: ${input}`,
+      ),
     );
     let useGoogBase = false;
     const depPaths = graph.order(...entryPoints).map((dep) => {
@@ -403,12 +403,12 @@ function dependsOnGoogBase(dep: depGraph.Dependency): boolean {
 }
 
 function findGoogBaseFromDeps(
-  dependencies: readonly depGraph.Dependency[]
+  dependencies: readonly depGraph.Dependency[],
 ): depGraph.Dependency {
   const googBase = dependencies.find(
     (dep) =>
       dep instanceof depGraph.ParsedDependency &&
-      dep.closureRelativePath === "base.js"
+      dep.closureRelativePath === "base.js",
   );
   if (!googBase) {
     throw new TypeError("base.js is not found in dependencies");
@@ -422,7 +422,7 @@ function findGoogBaseFromDeps(
 function splitDepsIntoChunks(
   sortedChunkIds: readonly string[],
   chunkToTransitiveDepPathSet: Map<string, Set<string>>,
-  dag: Dag
+  dag: Dag,
 ): Map<string, Set<string>> {
   const chunkToInputPathSet: Map<string, Set<string>> = new Map();
   sortedChunkIds.forEach((chunk) => {
@@ -438,7 +438,7 @@ function splitDepsIntoChunks(
       });
       const targetChunk = dag.getLcaNode(...chunkIdsWithDep);
       assertNonNullable(chunkToInputPathSet.get(targetChunk.id)).add(
-        targetDepPath
+        targetDepPath,
       );
     }
   }
@@ -447,7 +447,7 @@ function splitDepsIntoChunks(
 
 export function convertChunkInfos(
   entryConfig: EntryConfig,
-  createChunkUris: (id: string) => string[]
+  createChunkUris: (id: string) => string[],
 ): {
   chunkInfo: { [id: string]: string[] };
   chunkUris: { [id: string]: string[] };
@@ -468,7 +468,7 @@ export function convertChunkInfos(
 function createWarningsWhitelist(
   warningsWhitelist: WarningsWhitelistItem[],
   duckConfig: DuckConfig,
-  basepath: string = process.cwd()
+  basepath: string = process.cwd(),
 ): WarningsWhitelistItem[] {
   return warningsWhitelist.map((item) => {
     const newItem = { ...item };
@@ -481,7 +481,7 @@ function createWarningsWhitelist(
 
 function convertCompilerOptionsToRelative(
   options: CompilerOptions,
-  basepath: string = process.cwd()
+  basepath: string = process.cwd(),
 ): void {
   if (options.js) {
     options.js = options.js.map((file) => {
@@ -493,12 +493,12 @@ function convertCompilerOptionsToRelative(
   }
   if (options.externs) {
     options.externs = options.externs.map((file) =>
-      path.relative(basepath, file)
+      path.relative(basepath, file),
     );
   }
   if (options.entry_point) {
     options.entry_point = options.entry_point.map((file) =>
-      path.relative(basepath, file)
+      path.relative(basepath, file),
     );
   }
 }

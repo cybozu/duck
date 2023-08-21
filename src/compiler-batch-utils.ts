@@ -7,7 +7,7 @@ import { strict as assert } from "assert";
 
 export function splitIntoChunks(
   str: string,
-  maxChunkSizeInBytes: number
+  maxChunkSizeInBytes: number,
 ): string[] {
   assert(maxChunkSizeInBytes > 0);
   const chunks: string[] = [];
@@ -24,7 +24,7 @@ export function splitIntoChunks(
       length = Math.floor(length * 0.95);
       if (length === 0) {
         throw new TypeError(
-          `maxChunkSizeInBytes: ${maxChunkSizeInBytes} is too small`
+          `maxChunkSizeInBytes: ${maxChunkSizeInBytes} is too small`,
         );
       }
     }

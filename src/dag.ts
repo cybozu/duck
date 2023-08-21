@@ -77,7 +77,7 @@ export class Dag {
     node.deps.forEach((dep) => {
       this.populateAncestors(
         assertNonNullable(this.idToNode.get(dep)),
-        ancestors
+        ancestors,
       );
     });
     return ancestors;

@@ -27,7 +27,7 @@ import type { CompileErrorItem, ErrorReason } from "../report.js";
 export async function buildJs(
   config: DuckConfig,
   entryConfigs?: readonly string[],
-  printConfig = false
+  printConfig = false,
 ): Promise<ErrorReason[]> {
   let compileFn = compileToJson;
   let cleanup: ((opt?: CleanupOptions) => Promise<void>) | null = null;
@@ -42,7 +42,7 @@ export async function buildJs(
     ? entryConfigs
     : (
         await findEntryConfigs(
-          assertString(config.entryConfigDir, '"entryConfigDir" is required')
+          assertString(config.entryConfigDir, '"entryConfigDir" is required'),
         )
       ).sort();
   let runningJobCount = 1;
@@ -57,7 +57,7 @@ export async function buildJs(
             if (!restoringDepsJs) {
               restoringDepsJs = restoreDepsJs(
                 config.depsJs,
-                config.closureLibraryDir
+                config.closureLibraryDir,
               );
             }
             await restoringDepsJs;
@@ -90,14 +90,14 @@ export async function buildJs(
         logWithCount(entryConfigPath, completedJobCount++, "Failed");
         throw e;
       }
-    }
+    },
   );
 
   try {
     return await waitAllAndThrowIfAnyCompilationsFailed(
       compileFunctions,
       entryConfigPaths,
-      config
+      config,
     );
   } finally {
     if (cleanup) {
@@ -112,7 +112,7 @@ export async function buildJs(
   function logWithCount(
     entryConfigPath: string,
     count: number,
-    msg: string
+    msg: string,
   ): void {
     log(entryConfigPath, `[${count}/${entryConfigPaths.length}] ${msg}`);
   }
@@ -129,7 +129,7 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
     () => Promise<CompileErrorItem[] | undefined>
   >,
   entryConfigPaths: readonly string[],
-  config: DuckConfig
+  config: DuckConfig,
 ): Promise<ErrorReason[]> {
   const results = await pSettled(compileFunctions, {
     concurrency: config.concurrency || 1,
@@ -170,7 +170,7 @@ async function waitAllAndThrowIfAnyCompilationsFailed(
 
   function parseErrorReason(
     reason: any,
-    config: DuckConfig
+    config: DuckConfig,
   ): { command: string; items: CompileErrorItem[] } {
     let message: string;
     if (config.batch) {
@@ -208,11 +208,11 @@ async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
 
 async function createCompilerOptionsForChunks_(
   entryConfig: EntryConfig,
-  config: DuckConfig
+  config: DuckConfig,
 ): Promise<compilerCoreFunctions.ExtendedCompilerOptions> {
   function createChunkUris(chunkId: string): string[] {
     const chunkProductionUri = assertString(
-      entryConfig["chunk-production-uri"]
+      entryConfig["chunk-production-uri"],
     );
     return [chunkProductionUri.replace(/%s/g, chunkId)];
   }
@@ -220,7 +220,7 @@ async function createCompilerOptionsForChunks_(
     entryConfig,
     config,
     true,
-    createChunkUris
+    createChunkUris,
   );
   return options;
 }

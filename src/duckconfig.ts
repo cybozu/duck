@@ -152,11 +152,11 @@ export function loadConfig(opts: any = {}): DuckConfig {
     if (config.https) {
       assertString(
         config.https.keyPath,
-        `"https.keyPath" is required in duck.config`
+        `"https.keyPath" is required in duck.config`,
       );
       assertString(
         config.https.certPath,
-        `"https.certPath" is required in duck.config`
+        `"https.certPath" is required in duck.config`,
       );
       toAbsPath(config.https, configDir, "keyPath");
       toAbsPath(config.https, configDir, "certPath");
@@ -176,12 +176,12 @@ export function loadConfig(opts: any = {}): DuckConfig {
   if (result.batchAwsCustomCompiler) {
     if (!result.batchAwsCustomCompiler.name) {
       throw new TypeError(
-        "batchAwsCustomCompiler.name is required in duck.config"
+        "batchAwsCustomCompiler.name is required in duck.config",
       );
     }
     if (!result.batchAwsCustomCompiler.version) {
       throw new TypeError(
-        "batchAwsCustomCompiler.version is required in duck.config"
+        "batchAwsCustomCompiler.version is required in duck.config",
       );
     }
   }

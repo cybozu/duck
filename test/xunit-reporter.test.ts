@@ -46,7 +46,7 @@ describe("output()", () => {
     await reporter.output(reasons);
     const actual = await fs.readFile(
       path.join(outputDir, "entry", "results.xml"),
-      "utf8"
+      "utf8",
     );
     assert.equal(actual, expected);
     assert.equal(actualMessage, undefined);
@@ -88,7 +88,7 @@ describe("format()", () => {
       oneLineTrim`<?xml version="1.0"?>
       <testsuites>
         <testsuite name="${entryConfigPath}"/>
-      </testsuites>`
+      </testsuites>`,
     );
   });
 
@@ -122,7 +122,7 @@ describe("format()", () => {
             </failure>
           </testcase>
         </testsuite>
-      </testsuites>`.replace(/%%newline%%/g, "\n")
+      </testsuites>`.replace(/%%newline%%/g, "\n"),
     );
   });
 
@@ -152,7 +152,7 @@ describe("format()", () => {
             <failure message="Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead. (line 57, col 32)"/>
           </testcase>
         </testsuite>
-      </testsuites>`.replace(/%%newline%%/g, "\n")
+      </testsuites>`.replace(/%%newline%%/g, "\n"),
     );
   });
 });

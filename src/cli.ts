@@ -47,7 +47,7 @@ function wrap(task: () => Promise<any>): () => Observable<string> {
           return String(obj.msg);
         }
         return String(obj);
-      })
+      }),
     );
   };
 }
@@ -70,7 +70,7 @@ function assertStringWithConfig(config: DuckConfig, key: keyof DuckConfig) {
 }
 function assertNonNullableWithConfig(
   config: DuckConfig,
-  key: keyof DuckConfig
+  key: keyof DuckConfig,
 ) {
   const value = config[key];
   return assertNonNullable(value, `'${key}' is ${value}.`);
@@ -231,7 +231,7 @@ export function run(processArgv: readonly string[]): void {
         const hasSoyConfig = Boolean(
           config.soyJarPath &&
             config.soyFileRoots.length > 0 &&
-            config.soyOptions
+            config.soyOptions,
         );
         const tasks = listr(
           [
@@ -246,12 +246,12 @@ export function run(processArgv: readonly string[]): void {
               task: wrap(() => buildDeps(config)),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
         console.log(""); // a blank line
         await serve(config);
-      }
+      },
     )
     .command(
       "build [entryConfigDir]",
@@ -278,7 +278,7 @@ export function run(processArgv: readonly string[]): void {
                   config.soyOptions
                 ),
               task: wrap(() =>
-                buildSoy(config as BuildSoyConfig, argv.printConfig)
+                buildSoy(config as BuildSoyConfig, argv.printConfig),
               ),
             },
             {
@@ -292,19 +292,19 @@ export function run(processArgv: readonly string[]): void {
                 warnings = await buildJs(
                   config,
                   argv.entryConfigs as string[],
-                  argv.printConfig
+                  argv.printConfig,
                 );
               }),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run().catch(printOnlyCompilationError(config));
         printResultInfo();
         if (warnings.length > 0 && !argv.printConfig) {
           reportTestResults(warnings, config);
         }
-      }
+      },
     )
     .command(
       "build:js [entryConfigDir]",
@@ -321,19 +321,19 @@ export function run(processArgv: readonly string[]): void {
                 warnings = await buildJs(
                   config,
                   argv.entryConfigs as string[],
-                  argv.printConfig
+                  argv.printConfig,
                 );
               }),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run().catch(printOnlyCompilationError(config));
         printResultInfo();
         if (warnings.length > 0 && !argv.printConfig) {
           reportTestResults(warnings, config);
         }
-      }
+      },
     )
     .command(
       "build:soy",
@@ -349,15 +349,15 @@ export function run(processArgv: readonly string[]): void {
             {
               title: `Compile Soy templates`,
               task: wrap(() =>
-                buildSoy(config as BuildSoyConfig, argv.printConfig)
+                buildSoy(config as BuildSoyConfig, argv.printConfig),
               ),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
         printResultInfo();
-      }
+      },
     )
     .command(
       "build:deps",
@@ -372,11 +372,11 @@ export function run(processArgv: readonly string[]): void {
               task: wrap(() => buildDeps(config)),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
         printResultInfo();
-      }
+      },
     )
     .command(
       "clean:soy",
@@ -392,10 +392,10 @@ export function run(processArgv: readonly string[]): void {
               task: wrap(() => cleanSoy(config as CleanSoyConfig)),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
-      }
+      },
     )
     .command(
       "clean:deps",
@@ -408,14 +408,14 @@ export function run(processArgv: readonly string[]): void {
             {
               title: `Clean up deps.js: ${config.depsJs}`,
               task: wrap(() =>
-                cleanDeps(assertStringWithConfig(config, "depsJs"))
+                cleanDeps(assertStringWithConfig(config, "depsJs")),
               ),
             },
           ],
-          argv
+          argv,
         );
         await tasks.run();
-      }
+      },
     )
     .completion("completion", "Generate completion script for bash/zsh")
     .demandCommand(1, 1)
@@ -435,7 +435,7 @@ export function run(processArgv: readonly string[]): void {
 function listr<T>(
   tasks: ReadonlyArray<Listr.ListrTask<T>>,
   argv: { nonTTY: boolean },
-  options: Listr.ListrOptions<T> = {}
+  options: Listr.ListrOptions<T> = {},
 ): Listr<T> {
   return new Listr<T>(tasks, {
     ...options,

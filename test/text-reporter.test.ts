@@ -60,7 +60,7 @@ ${command}
 
 /path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - [JSC_DEPRECATED_CLASS_REASON] Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.
   this.outstandingEvents_ = new goog.structs.Map();\n                                ^^^^^^^^^^^^^^^^
-`
+`,
     );
   });
 
@@ -88,7 +88,7 @@ ${command}
 ${command}
 
 /path/to/node_modules/google-closure-library/closure/goog/debug/tracer.js:57:32 ERROR - [JSC_DEPRECATED_CLASS_REASON] Class goog.structs.Map has been deprecated: This type is misleading: use ES6 Map instead.
-`
+`,
     );
   });
 });
