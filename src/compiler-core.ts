@@ -175,7 +175,7 @@ export class CompilerError extends Error {
 }
 
 function assertRunInWebpack(): void {
-  if (typeof __non_webpack_require__ === undefined) {
+  if (typeof __non_webpack_require__ === "undefined") {
     throw new TypeError("This function must be run in webpack context.");
   }
 }
