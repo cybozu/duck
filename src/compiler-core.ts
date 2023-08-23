@@ -32,11 +32,6 @@ export interface CompilerOptions {
   compilation_level?: CompilationLevel;
   js?: readonly string[];
   js_output_file?: string;
-  // chunk: `name:num-js-files[:[dep,...][:]]`, ex) "chunk1:3:app"
-  chunk?: readonly string[];
-  // chunkname:wrappercode
-  chunk_wrapper?: readonly string[];
-  chunk_output_path_prefix?: string;
   language_in?: string;
   language_out?: string;
   json_streams?: "IN" | "OUT" | "BOTH";

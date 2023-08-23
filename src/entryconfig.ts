@@ -1,7 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
 import stripJsonComments from "strip-json-comments";
-import { Dag, Node } from "./dag.js";
 
 export interface EntryConfig {
   id: string;
@@ -9,18 +8,6 @@ export interface EntryConfig {
   paths: readonly string[];
   inherits?: string;
   inputs?: readonly string[];
-  chunks?: {
-    [id: string]: {
-      // string is normalized to string[]
-      inputs: readonly string[];
-      // undefined, null and string are normalized to string[]
-      deps: readonly string[];
-    };
-  };
-  // like "../compiled/chunks/%s.js",
-  "chunk-output-path"?: string;
-  // like "/js/compiled/chunks/%s.js"
-  "chunk-production-uri"?: string;
   define?: {
     [key: string]: boolean | number | string;
   };
@@ -100,11 +87,6 @@ export async function loadEntryConfig(
       entryConfig["output-file"],
     );
   }
-  if (entryConfig.chunks) {
-    Object.values(entryConfig.chunks).forEach((mod) => {
-      mod.inputs = mod.inputs.map((input) => path.resolve(basedir, input));
-    });
-  }
   if (entryConfig.warningsWhitelist) {
     entryConfig.warningsWhitelist.forEach((item) => {
       item.file = path.resolve(basedir, item.file);
@@ -113,12 +95,6 @@ export async function loadEntryConfig(
   if (entryConfig["test-excludes"]) {
     entryConfig["test-excludes"] = entryConfig["test-excludes"].map((p) =>
       path.resolve(basedir, p),
-    );
-  }
-  if (entryConfig["chunk-output-path"]) {
-    entryConfig["chunk-output-path"] = path.resolve(
-      basedir,
-      entryConfig["chunk-output-path"],
     );
   }
   if (mode) {
@@ -156,36 +132,8 @@ async function loadInheritedJson(
 }
 
 function normalize(json: any): EntryConfig {
-  if (json.chunks) {
-    for (const id in json.chunks) {
-      if (Object.prototype.hasOwnProperty.call(json.chunks, id)) {
-        const chunk = json.chunks[id];
-        if (!chunk.inputs) {
-          throw new TypeError(`No chunk inputs: ${id}`);
-        } else if (!Array.isArray(chunk.inputs)) {
-          chunk.inputs = [chunk.inputs];
-        }
-        if (!chunk.deps) {
-          chunk.deps = [];
-        } else if (!Array.isArray(chunk.deps)) {
-          chunk.deps = [chunk.deps];
-        }
-      }
-    }
-  }
   if (json["test-excludes"] && !Array.isArray(json["test-excludes"])) {
     json["test-excludes"] = [json["test-excludes"]];
   }
   return json;
-}
-
-export function createDag(entryConfig: EntryConfig): Dag {
-  const chunkNodes: Node[] = [];
-  for (const id in entryConfig.chunks) {
-    if (Object.prototype.hasOwnProperty.call(entryConfig.chunks, id)) {
-      const chunk = entryConfig.chunks[id];
-      chunkNodes.push(new Node(id, chunk.deps));
-    }
-  }
-  return new Dag(chunkNodes);
 }

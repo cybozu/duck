@@ -6,17 +6,11 @@ import { fastify } from "fastify";
 import { promises as fs } from "fs";
 import path from "path";
 import { pino } from "pino";
-import { assertNonNullable, assertString } from "../assert.js";
-import type { CompilerOutput } from "../compiler.js";
-import {
-  compileToJson,
-  convertChunkInfos,
-  createCompilerOptionsForChunks,
-  createCompilerOptionsForPage,
-} from "../compiler.js";
+import { assertNonNullable } from "../assert.js";
+import { compileToJson, createCompilerOptionsForPage } from "../compiler.js";
 import type { DuckConfig } from "../duckconfig.js";
 import type { EntryConfig, PlovrMode } from "../entryconfig.js";
-import { createDag, loadEntryConfigById } from "../entryconfig.js";
+import { loadEntryConfigById } from "../entryconfig.js";
 import {
   generateDepFileText,
   restoreDepsJs,
@@ -31,11 +25,6 @@ import {
   inputsUrlPath,
 } from "../urls.js";
 import { watchJsAndSoy } from "../watch.js";
-
-const entryIdToChunkCache: Map<
-  string,
-  Map<string, { [id: string]: CompilerOutput }>
-> = new Map();
 
 function getScriptBaseUrl(reply: FastifyReply, isHttps: boolean): URL {
   const { hostname } = reply.request;
@@ -100,8 +89,6 @@ export async function serve(config: DuckConfig, watch = true) {
   interface CompileQuery {
     id: string;
     mode?: PlovrMode;
-    chunk?: string;
-    parentRequest?: string;
   }
 
   const opts = {
@@ -114,8 +101,6 @@ export async function serve(config: DuckConfig, watch = true) {
             type: "string",
             enum: ["RAW", "WHITESPACE", "SIMPLE", "ADVANCED"],
           },
-          chunk: { type: "string" },
-          parentRequest: { type: "string" },
         },
         required: ["id"],
       },
@@ -132,20 +117,7 @@ export async function serve(config: DuckConfig, watch = true) {
         request.query,
       );
       if (entryConfig.mode === "RAW") {
-        if (entryConfig.chunks) {
-          return replyChunksRaw(reply, entryConfig);
-        }
         return replyPageRaw(reply, entryConfig);
-      }
-      if (entryConfig.chunks) {
-        return replyChunksCompile(
-          reply,
-          entryConfig,
-          assertString(request.raw.url),
-          // convert number to string
-          String(request.id),
-          request.query,
-        );
       }
       return replyPageCompile(reply, entryConfig, config);
     },
@@ -158,94 +130,6 @@ export async function serve(config: DuckConfig, watch = true) {
     return inputs
       .map((input) => path.relative(config.inputsRoot, input))
       .map((input) => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
-  }
-
-  function replyChunksRaw(reply: FastifyReply, entryConfig: EntryConfig) {
-    const baseUrl = getScriptBaseUrl(reply, !!config.https);
-    const chunks = assertNonNullable(entryConfig.chunks);
-    const { chunkInfo, chunkUris } = convertChunkInfos(entryConfig, (id) => {
-      return inputsToUrisForRaw(chunks[id].inputs, baseUrl);
-    });
-    // The root chunk loads all chunks in RAW mode
-    const sortedChunkIds = createDag(entryConfig).getSortedIds();
-    const rootId = sortedChunkIds[0];
-    chunkUris[rootId] = sortedChunkIds.map((id) => chunkUris[id]).flat();
-    for (const id in chunkUris) {
-      if (id !== rootId) {
-        chunkUris[id] = [];
-      }
-    }
-    const rootModuleUris = chunkUris[rootId];
-    reply.code(200).type("application/javascript").send(stripIndents`
-    document.write('<script src="${getGoogBaseUrl(baseUrl)}"></script>');
-    document.write('<script src="${getDepsUrl(
-      baseUrl,
-      entryConfig.id,
-    )}"></script>');
-    document.write('<script>var PLOVR_MODULE_INFO = ${JSON.stringify(
-      chunkInfo,
-    )};</script>');
-    document.write('<script>var PLOVR_MODULE_URIS = ${JSON.stringify(
-      chunkUris,
-    )};</script>');
-    document.write('<script>var PLOVR_MODULE_USE_DEBUG_MODE = ${!!entryConfig.debug};</script>');
-    ${rootModuleUris
-      .map(
-        (uri) => `document.write('<script>goog.require("${uri}")</script>');`,
-      )
-      .join("\n")}
-    `);
-  }
-
-  async function replyChunksCompile(
-    reply: FastifyReply,
-    entryConfig: EntryConfig,
-    url: string,
-    requestId: string,
-    query: CompileQuery,
-  ) {
-    const { parentRequest, chunk: requestedChunkId } = query;
-    if (!entryIdToChunkCache.has(entryConfig.id)) {
-      entryIdToChunkCache.set(entryConfig.id, new Map());
-    }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const chunkCache = entryIdToChunkCache.get(entryConfig.id)!;
-    if (requestedChunkId && parentRequest && chunkCache.has(parentRequest)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const parentChunkCache = chunkCache.get(parentRequest)!;
-      if (!parentChunkCache[requestedChunkId]) {
-        throw new Error(`Unexpected requested chunk: ${requestedChunkId}`);
-      }
-      return parentChunkCache[requestedChunkId].src;
-    }
-    const baseUrl = getScriptBaseUrl(reply, !!config.https);
-    function createModuleUris(chunkId: string): string[] {
-      const uri = new URL(url, baseUrl);
-      const params = uri.searchParams;
-      params.set("chunk", chunkId);
-      params.set("parentRequest", requestId);
-      uri.search = params.toString();
-      return [uri.toString()];
-    }
-
-    const { options, sortedChunkIds, rootChunkId } =
-      await createCompilerOptionsForChunks(
-        entryConfig,
-        config,
-        false,
-        createModuleUris,
-      );
-    updateDepsJsCache(config);
-    const [chunkOutputs] = await compileToJson(options);
-    const chunkIdToOutput: { [id: string]: CompilerOutput } = {};
-    sortedChunkIds.forEach((id, index) => {
-      chunkIdToOutput[id] = chunkOutputs[index];
-    });
-    chunkCache.set(requestId, chunkIdToOutput);
-    reply
-      .code(200)
-      .type("application/javascript")
-      .send(chunkIdToOutput[requestedChunkId || rootChunkId].src);
   }
 
   function replyPageRaw(reply: FastifyReply, entryConfig: EntryConfig) {
@@ -280,7 +164,7 @@ export async function serve(config: DuckConfig, watch = true) {
     const [compileOutputs] = await compileToJson(options);
     if (compileOutputs.length !== 1) {
       throw new Error(
-        `Unexpectedly chunkOutputs.length must be 1, but actual ${compileOutputs.length}`,
+        `Unexpectedly compileOutputs.length must be 1, but actual ${compileOutputs.length}`,
       );
     }
     reply.code(200).type("application/javascript").send(compileOutputs[0].src);
@@ -394,11 +278,4 @@ async function createServer(config: DuckConfig): Promise<FastifyInstance> {
     );
   });
   return server;
-}
-
-/**
- * Clear all compiled chunks
- */
-export function clearEntryIdToChunkCache() {
-  entryIdToChunkCache.clear();
 }

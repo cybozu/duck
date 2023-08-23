@@ -7,17 +7,13 @@ import path from "path";
 import recursive from "recursive-readdir";
 import { assertString } from "../assert.js";
 import { resultInfoLogType } from "../cli.js";
-import type * as compilerCoreFunctions from "../compiler-core.js";
 import {
   CompilerError,
   compileToJson,
-  createCompilerOptionsForChunks,
   createCompilerOptionsForPage,
 } from "../compiler.js";
 import type { DuckConfig } from "../duckconfig.js";
-import type { EntryConfig } from "../entryconfig.js";
 import { loadEntryConfig } from "../entryconfig.js";
-import { restoreDepsJs } from "../gendeps.js";
 import { logger } from "../logger.js";
 import type { CompileErrorItem, ErrorReason } from "../report.js";
 
@@ -37,7 +33,7 @@ export async function buildJs(
     compileFn = func.compileToJson;
     cleanup = func.cleanup;
   }
-  let restoringDepsJs: Promise<void> | null = null;
+  const restoringDepsJs: Promise<void> | null = null;
   const entryConfigPaths = entryConfigs
     ? entryConfigs
     : (
@@ -51,21 +47,7 @@ export async function buildJs(
     (entryConfigPath) => async () => {
       try {
         const entryConfig = await loadEntryConfig(entryConfigPath);
-        let options: compilerCoreFunctions.ExtendedCompilerOptions;
-        if (entryConfig.chunks) {
-          if (config.depsJs) {
-            if (!restoringDepsJs) {
-              restoringDepsJs = restoreDepsJs(
-                config.depsJs,
-                config.closureLibraryDir,
-              );
-            }
-            await restoringDepsJs;
-          }
-          options = await createCompilerOptionsForChunks_(entryConfig, config);
-        } else {
-          options = createCompilerOptionsForPage(entryConfig, config, true);
-        }
+        const options = createCompilerOptionsForPage(entryConfig, config, true);
 
         if (printConfig) {
           logger.info({
@@ -204,23 +186,4 @@ export class BuildJsCompilationError extends Error {
 async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
   const files = await recursive(entryConfigDir);
   return files.filter((file) => /\.json$/.test(file));
-}
-
-async function createCompilerOptionsForChunks_(
-  entryConfig: EntryConfig,
-  config: DuckConfig,
-): Promise<compilerCoreFunctions.ExtendedCompilerOptions> {
-  function createChunkUris(chunkId: string): string[] {
-    const chunkProductionUri = assertString(
-      entryConfig["chunk-production-uri"],
-    );
-    return [chunkProductionUri.replace(/%s/g, chunkId)];
-  }
-  const { options } = await createCompilerOptionsForChunks(
-    entryConfig,
-    config,
-    true,
-    createChunkUris,
-  );
-  return options;
 }

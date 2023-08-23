@@ -1,7 +1,6 @@
 import chokidar from "chokidar";
 import { promises as fs } from "fs";
 import path from "path";
-import { clearEntryIdToChunkCache } from "./commands/serve.js";
 import type { DuckConfig } from "./duckconfig.js";
 import { removeDepCacheByPath } from "./gendeps.js";
 import { logger } from "./logger.js";
@@ -53,11 +52,10 @@ const jsHandlers = {
 
 /**
  * This handler just invalidates cache for the updated JS file.
- * The deps.js or chunk cache will be actually updated on the request.
+ * The deps.js cache will be actually updated on the request.
  */
 function handleJsUpdated(event: string, filepath: string) {
   logger.info(`[JS_${event}]: ${path.relative(process.cwd(), filepath)}`);
-  clearEntryIdToChunkCache();
   removeDepCacheByPath(filepath);
 }
 

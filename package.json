@@ -58,8 +58,7 @@
     "tempy": "3.0.0",
     "workerpool": "^6.4.2",
     "xmlbuilder": "^15.1.1",
-    "yargs": "^17.7.2",
-    "zet": "^1.1.0"
+    "yargs": "^17.7.2"
   },
   "peerDependencies": {
     "google-closure-compiler": ">=20180910.1.0"
