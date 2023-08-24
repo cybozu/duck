@@ -1,6 +1,5 @@
-import rimraf from "rimraf";
-import util from "util";
+import { rimraf } from "rimraf";
 
-export async function cleanDeps(depsJsPath: string): Promise<void> {
-  return util.promisify(rimraf)(depsJsPath);
+export async function cleanDeps(depsJsPath: string): Promise<boolean> {
+  return rimraf(depsJsPath);
 }

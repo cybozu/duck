@@ -1,5 +1,4 @@
-import rimraf from "rimraf";
-import util from "util";
+import { rimraf } from "rimraf";
 import { assertString } from "../assert.js";
 import type { DuckConfig } from "../duckconfig.js";
 import { logger } from "../logger.js";
@@ -24,6 +23,6 @@ export async function cleanSoy(config: CleanSoyConfig): Promise<string> {
     }
   }
   logger.info(`rm ${outputPath}`);
-  await util.promisify(rimraf)(outputPath);
+  await rimraf(outputPath);
   return outputPath;
 }
