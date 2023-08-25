@@ -2,9 +2,6 @@
   "name": "build-js-chunk",
   "version": "1.0.0",
   "author": "Cybozu, Inc.",
-  "engines": {
-    "node": ">=16"
-  },
   "type": "commonjs",
   "scripts": {
     "build": "duck build",

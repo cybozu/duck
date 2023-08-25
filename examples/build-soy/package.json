@@ -2,9 +2,6 @@
   "name": "build-deps",
   "version": "1.0.0",
   "author": "Cybozu, Inc.",
-  "engines": {
-    "node": ">=16"
-  },
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
