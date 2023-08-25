@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.35.4](https://github.com/cybozu/duck/compare/v0.35.3...v0.35.4) (2023-08-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @fastify/cors to ^8.3.0 ([#858](https://github.com/cybozu/duck/issues/858)) ([94cbc30](https://github.com/cybozu/duck/commit/94cbc305b18526296e1483d91cbc3089a78e9bc3))
+* **deps:** update dependency @fastify/static to ^6.10.2 ([#859](https://github.com/cybozu/duck/issues/859)) ([bf75530](https://github.com/cybozu/duck/commit/bf755307d419139c6d5f28f86148964bb807cac0))
+* **deps:** update dependency @fastify/static to ^6.5.1 ([#849](https://github.com/cybozu/duck/issues/849)) ([faaebe7](https://github.com/cybozu/duck/commit/faaebe7386fc5b092e85ddc34c972f1d15c3d5eb))
+* **deps:** update dependency faastjs to ^6.3.9 ([#851](https://github.com/cybozu/duck/issues/851)) ([19a5e32](https://github.com/cybozu/duck/commit/19a5e3293a7f45d386fd1a189ba81aafd6a229fa))
+* **deps:** update dependency faastjs to ^6.4.11 ([#861](https://github.com/cybozu/duck/issues/861)) ([89dd3e0](https://github.com/cybozu/duck/commit/89dd3e02b11bc0213bfc8a0a05d7c53f757bab3c))
+* **deps:** update dependency fast-glob to ^3.3.1 ([#862](https://github.com/cybozu/duck/issues/862)) ([00f7277](https://github.com/cybozu/duck/commit/00f7277765000ff0ccd42cdf4c5437f17c902f0e))
+* **deps:** update dependency fastify to v4.10.2 [security] ([#841](https://github.com/cybozu/duck/issues/841)) ([715ab0c](https://github.com/cybozu/duck/commit/715ab0ccde8a61f52912f6a62530073251b1e938))
+* **deps:** update dependency google-closure-deps to v20230802 ([#874](https://github.com/cybozu/duck/issues/874)) ([cdd8a12](https://github.com/cybozu/duck/commit/cdd8a12738bd3663593fe46aacdb54ab98025746))
+* **deps:** update dependency pino to ^8.15.0 ([#809](https://github.com/cybozu/duck/issues/809)) ([bd96ee4](https://github.com/cybozu/duck/commit/bd96ee4d38402623e780d871fffe4aebb5af2814))
+* **deps:** update dependency pino-pretty to ^9.4.1 ([#793](https://github.com/cybozu/duck/issues/793)) ([68e0416](https://github.com/cybozu/duck/commit/68e0416a978647cd9410de72a1a521517795af29))
+* **deps:** update dependency semver to ^7.5.4 ([#852](https://github.com/cybozu/duck/issues/852)) ([8162862](https://github.com/cybozu/duck/commit/8162862938778ff02510630ff4976ff7e0b4a9c3))
+* **deps:** update dependency split2 to ^4.2.0 ([#853](https://github.com/cybozu/duck/issues/853)) ([2311e6f](https://github.com/cybozu/duck/commit/2311e6f2576544c916afa8b9f3b5e69147834dd6))
+* **deps:** update dependency strip-json-comments to ^5.0.1 ([#854](https://github.com/cybozu/duck/issues/854)) ([137816c](https://github.com/cybozu/duck/commit/137816c1d63cca2ca6cb96b2893b3c7c4a204900))
+* **deps:** update dependency workerpool to ^6.4.1 ([#830](https://github.com/cybozu/duck/issues/830)) ([4843069](https://github.com/cybozu/duck/commit/4843069b39d7ea579f28a4ed1fe16b9efc04e26a))
+* **deps:** update dependency workerpool to ^6.4.2 ([#865](https://github.com/cybozu/duck/issues/865)) ([7d80e78](https://github.com/cybozu/duck/commit/7d80e78a6a10a30007a851b392f62b126918d5fe))
+* **deps:** update dependency yargs to ^17.7.2 ([#855](https://github.com/cybozu/duck/issues/855)) ([d361b16](https://github.com/cybozu/duck/commit/d361b16375db98d44cac29053cc69ab3f1526117))
+* move rimraf from devDeps to deps ([#881](https://github.com/cybozu/duck/issues/881)) ([4701d01](https://github.com/cybozu/duck/commit/4701d01588865a09831062d2196e9d7751f3f898))
+* pin tempy to 3.0.0 to prevent a webpack error for ESM ([#878](https://github.com/cybozu/duck/issues/878)) ([c3b46b3](https://github.com/cybozu/duck/commit/c3b46b39db8f2f53e55a589579a9ead2400ee8a1))
+
 ### [0.35.3](https://github.com/cybozu/duck/compare/v0.35.2...v0.35.3) (2023-01-26)
 
 
