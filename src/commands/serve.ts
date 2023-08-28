@@ -7,7 +7,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { pino } from "pino";
 import { assertNonNullable } from "../assert.js";
-import { compileToJson, createCompilerOptionsForPage } from "../compiler.js";
+import { compileToJson, createCompilerOptions } from "../compiler.js";
 import type { DuckConfig } from "../duckconfig.js";
 import type { EntryConfig, PlovrMode } from "../entryconfig.js";
 import { loadEntryConfigById } from "../entryconfig.js";
@@ -81,11 +81,7 @@ export async function serve(config: DuckConfig, watch = true) {
     decorateReply: false,
   });
 
-  // route
-  server.get("/", async (request, reply) => {
-    return { hello: "world" };
-  });
-
+  // routes
   interface CompileQuery {
     id: string;
     mode?: PlovrMode;
@@ -107,6 +103,9 @@ export async function serve(config: DuckConfig, watch = true) {
     },
   };
 
+  /**
+   * GET RAW or compiled script for the entry config
+   */
   server.get<{ Querystring: CompileQuery }>(
     compileUrlPath,
     opts,
@@ -117,59 +116,15 @@ export async function serve(config: DuckConfig, watch = true) {
         request.query,
       );
       if (entryConfig.mode === "RAW") {
-        return replyPageRaw(reply, entryConfig);
+        return replyRaw(reply, entryConfig, config);
       }
-      return replyPageCompile(reply, entryConfig, config);
+      return replyCompile(reply, entryConfig, config);
     },
   );
 
-  function inputsToUrisForRaw(
-    inputs: readonly string[],
-    baseUrl: URL,
-  ): string[] {
-    return inputs
-      .map((input) => path.relative(config.inputsRoot, input))
-      .map((input) => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
-  }
-
-  function replyPageRaw(reply: FastifyReply, entryConfig: EntryConfig) {
-    // TODO: separate EntryConfigPage from EntryConfig
-    const inputs = assertNonNullable(entryConfig.inputs);
-    const baseUrl = getScriptBaseUrl(reply, !!config.https);
-    const uris = inputsToUrisForRaw(inputs, baseUrl);
-    reply.code(200).type("application/javascript").send(stripIndents`
-    document.write('<script src="${getGoogBaseUrl(baseUrl)}"></script>');
-    document.write('<script src="${getDepsUrl(
-      baseUrl,
-      entryConfig.id,
-    )}"></script>');
-    ${uris
-      .map(
-        (uri) => `document.write('<script>goog.require("${uri}")</script>');`,
-      )
-      .join("\n")}
-  `);
-  }
-
-  async function replyPageCompile(
-    reply: FastifyReply,
-    entryConfig: EntryConfig,
-    duckConfig: DuckConfig,
-  ) {
-    const options = createCompilerOptionsForPage(
-      entryConfig,
-      duckConfig,
-      false,
-    );
-    const [compileOutputs] = await compileToJson(options);
-    if (compileOutputs.length !== 1) {
-      throw new Error(
-        `Unexpectedly compileOutputs.length must be 1, but actual ${compileOutputs.length}`,
-      );
-    }
-    reply.code(200).type("application/javascript").send(compileOutputs[0].src);
-  }
-
+  /**
+   * Get deps.js in RAW mode for the entry config
+   */
   server.get<{ Querystring: CompileQuery }>(
     depsUrlPath,
     opts,
@@ -202,6 +157,53 @@ export async function serve(config: DuckConfig, watch = true) {
   };
 
   start();
+}
+
+function inputsToUrisForRaw(
+  inputs: readonly string[],
+  baseUrl: URL,
+  inputsRoot: string,
+): string[] {
+  return inputs
+    .map((input) => path.relative(inputsRoot, input))
+    .map((input) => new URL(`${inputsUrlPath}/${input}`, baseUrl).toString());
+}
+
+function replyRaw(
+  reply: FastifyReply,
+  entryConfig: EntryConfig,
+  duckConfig: DuckConfig,
+) {
+  const inputs = assertNonNullable(entryConfig.inputs);
+  const baseUrl = getScriptBaseUrl(reply, !!duckConfig.https);
+  const uris = inputsToUrisForRaw(inputs, baseUrl, duckConfig.inputsRoot);
+  reply.code(200).type("application/javascript").send(stripIndents`
+    document.write('<script src="${getGoogBaseUrl(baseUrl)}"></script>');
+    document.write('<script src="${getDepsUrl(
+      baseUrl,
+      entryConfig.id,
+    )}"></script>');
+    ${uris
+      .map(
+        (uri) => `document.write('<script>goog.require("${uri}")</script>');`,
+      )
+      .join("\n")}
+  `);
+}
+
+async function replyCompile(
+  reply: FastifyReply,
+  entryConfig: EntryConfig,
+  duckConfig: DuckConfig,
+) {
+  const options = createCompilerOptions(entryConfig, duckConfig, false);
+  const [compileOutputs] = await compileToJson(options);
+  if (compileOutputs.length !== 1) {
+    throw new Error(
+      `Unexpectedly compileOutputs.length must be 1, but actual ${compileOutputs.length}`,
+    );
+  }
+  reply.code(200).type("application/javascript").send(compileOutputs[0].src);
 }
 
 function updateDepsJsCache(config: DuckConfig) {

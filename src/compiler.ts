@@ -164,7 +164,7 @@ function createBaseOptions(
   return opts;
 }
 
-export function createCompilerOptionsForPage(
+export function createCompilerOptions(
   entryConfig: EntryConfig,
   duckConfig: DuckConfig,
   outputToFile: boolean,

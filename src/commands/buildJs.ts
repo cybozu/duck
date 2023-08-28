@@ -10,7 +10,7 @@ import { resultInfoLogType } from "../cli.js";
 import {
   CompilerError,
   compileToJson,
-  createCompilerOptionsForPage,
+  createCompilerOptions,
 } from "../compiler.js";
 import type { DuckConfig } from "../duckconfig.js";
 import { loadEntryConfig } from "../entryconfig.js";
@@ -33,21 +33,20 @@ export async function buildJs(
     compileFn = func.compileToJson;
     cleanup = func.cleanup;
   }
-  const restoringDepsJs: Promise<void> | null = null;
-  const entryConfigPaths = entryConfigs
-    ? entryConfigs
-    : (
-        await findEntryConfigs(
-          assertString(config.entryConfigDir, '"entryConfigDir" is required'),
-        )
-      ).sort();
+  const entryConfigPaths =
+    entryConfigs ??
+    (
+      await findEntryConfigs(
+        assertString(config.entryConfigDir, '"entryConfigDir" is required'),
+      )
+    ).sort();
   let runningJobCount = 1;
   let completedJobCount = 1;
   const compileFunctions = entryConfigPaths.map(
     (entryConfigPath) => async () => {
       try {
         const entryConfig = await loadEntryConfig(entryConfigPath);
-        const options = createCompilerOptionsForPage(entryConfig, config, true);
+        const options = createCompilerOptions(entryConfig, config, true);
 
         if (printConfig) {
           logger.info({
