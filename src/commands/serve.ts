@@ -1,10 +1,9 @@
 import cors from "@fastify/cors";
 import serveStatic from "@fastify/static";
 import { stripIndents } from "common-tags";
-import type { FastifyInstance, FastifyReply } from "fastify";
+import type { FastifyBaseLogger, FastifyInstance, FastifyReply } from "fastify";
 import { fastify } from "fastify";
 import { promises as fs } from "fs";
-import type http2 from "http2";
 import path from "path";
 import { pino } from "pino";
 import { assertNonNullable, assertString } from "../assert.js";
@@ -336,7 +335,8 @@ function updateDepsJsCache(config: DuckConfig) {
 
 async function createServer(config: DuckConfig): Promise<FastifyInstance> {
   const opts = {
-    logger,
+    // TODO: Work around for https://github.com/fastify/fastify/issues/4960
+    logger: logger as FastifyBaseLogger,
     disableRequestLogging: true,
   };
   let server: FastifyInstance;
@@ -348,7 +348,7 @@ async function createServer(config: DuckConfig): Promise<FastifyInstance> {
     // Use `any` because the types of http, https and http2 modules in Node.js are not compatible.
     // But it is not a big deal.
     if (config.http2) {
-      server = fastify<http2.Http2SecureServer>({
+      server = fastify({
         ...opts,
         https: httpsOptions,
         http2: true,
@@ -361,7 +361,7 @@ async function createServer(config: DuckConfig): Promise<FastifyInstance> {
   }
 
   // enable CORS at first
-  server.register(cors as any);
+  server.register(cors);
 
   // customize log output
   server.addHook("onRequest", async ({ raw, log }, reply) => {
