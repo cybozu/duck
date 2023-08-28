@@ -1,10 +1,9 @@
 import { strict as assert } from "assert";
 import type { CleanupOptions } from "faastjs";
 import { FaastError } from "faastjs";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import pSettled from "p-settle";
 import path from "path";
-import recursive from "recursive-readdir";
 import { assertString } from "../assert.js";
 import { resultInfoLogType } from "../cli.js";
 import {
@@ -14,6 +13,7 @@ import {
 } from "../compiler.js";
 import type { DuckConfig } from "../duckconfig.js";
 import { loadEntryConfig } from "../entryconfig.js";
+import { readdirRecursive } from "../fs.js";
 import { logger } from "../logger.js";
 import type { CompileErrorItem, ErrorReason } from "../report.js";
 
@@ -183,6 +183,6 @@ export class BuildJsCompilationError extends Error {
 }
 
 async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
-  const files = await recursive(entryConfigDir);
+  const files = await readdirRecursive(entryConfigDir);
   return files.filter((file) => /\.json$/.test(file));
 }

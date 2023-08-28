@@ -1,5 +1,5 @@
-import recursive from "recursive-readdir";
 import type { DuckConfig } from "../duckconfig.js";
+import { readdirRecursive } from "../fs.js";
 import { logger } from "../logger.js";
 import { compileSoy } from "../soy.js";
 
@@ -20,14 +20,16 @@ export async function buildSoy(
   printConfig = false,
 ): Promise<string[]> {
   logger.info("Finding soy templates");
-  const soyFiles = await findSoyFiles(config);
+  const soyFiles = await findSoyFiles(config.soyFileRoots);
   await compileSoy(soyFiles, config, printConfig);
   return soyFiles;
 }
 
-async function findSoyFiles(config: BuildSoyConfig): Promise<string[]> {
-  const soyFilePromises = config.soyFileRoots.map(async (p) => {
-    const files = await recursive(p);
+async function findSoyFiles(
+  soyFileRoots: readonly string[],
+): Promise<string[]> {
+  const soyFilePromises = soyFileRoots.map(async (root) => {
+    const files = await readdirRecursive(root);
     return files.filter((file) => /\.soy$/.test(file));
   });
   const soyFiles = await Promise.all(soyFilePromises);
