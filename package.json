@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "clean": "rimraf dist lib .tsbuildinfo",
+    "clean": "rimraf dist",
     "lint": "run-p lint:*",
     "lint:tsc": "tsc -p tsconfig.test.json",
     "lint:eslint": "eslint --ext js,ts src test types examples",
