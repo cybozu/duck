@@ -6,13 +6,14 @@
   "scripts": {
     "build": "duck build",
     "build:ci": "duck build --batch local -n",
+    "clean": "rimraf build",
     "serve": "duck serve",
     "start": "run-p static serve",
     "static": "st",
     "test": "npm run build:ci"
   },
   "dependencies": {
-    "google-closure-library": "^20220719.0.0"
+    "google-closure-library": "^20230802.0.0"
   },
   "devDependencies": {
     "@cybozu/duck": "file:../..",
