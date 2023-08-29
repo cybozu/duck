@@ -119,7 +119,7 @@ async function compile(
       if (exitCode !== 0) {
         return reject(new CompilerError(stderr || "No stderr", exitCode));
       }
-      resolve({ stdout, stderr });
+      return resolve({ stdout, stderr });
     });
   });
 }

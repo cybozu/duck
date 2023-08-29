@@ -152,7 +152,7 @@ export async function serve(config: DuckConfig, watch = true) {
       await server.listen({ port, host });
     } catch (err: unknown) {
       server.log.error(err as any);
-      process.exit(1);
+      throw err;
     }
   };
 

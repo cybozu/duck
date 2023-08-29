@@ -43,7 +43,7 @@ export async function buildJs(
   let runningJobCount = 1;
   let completedJobCount = 1;
   const compileFunctions = entryConfigPaths.map(
-    (entryConfigPath) => async () => {
+    (entryConfigPath) => async (): Promise<CompileErrorItem[] | undefined> => {
       try {
         const entryConfig = await loadEntryConfig(entryConfigPath);
         const options = createCompilerOptions(entryConfig, config, true);
@@ -55,7 +55,7 @@ export async function buildJs(
             title: "Compiler config",
             bodyObject: options,
           });
-          return;
+          return undefined;
         }
 
         logWithCount(entryConfigPath, runningJobCount++, "Compiling");
