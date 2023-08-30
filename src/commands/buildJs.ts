@@ -1,23 +1,19 @@
 import { strict as assert } from "assert";
 import type { CleanupOptions } from "faastjs";
 import { FaastError } from "faastjs";
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import pSettled from "p-settle";
 import path from "path";
-import recursive from "recursive-readdir";
 import { assertString } from "../assert.js";
 import { resultInfoLogType } from "../cli.js";
-import type * as compilerCoreFunctions from "../compiler-core.js";
 import {
   CompilerError,
   compileToJson,
-  createCompilerOptionsForChunks,
-  createCompilerOptionsForPage,
+  createCompilerOptions,
 } from "../compiler.js";
 import type { DuckConfig } from "../duckconfig.js";
-import type { EntryConfig } from "../entryconfig.js";
 import { loadEntryConfig } from "../entryconfig.js";
-import { restoreDepsJs } from "../gendeps.js";
+import { readdirRecursive } from "../fs.js";
 import { logger } from "../logger.js";
 import type { CompileErrorItem, ErrorReason } from "../report.js";
 
@@ -37,35 +33,20 @@ export async function buildJs(
     compileFn = func.compileToJson;
     cleanup = func.cleanup;
   }
-  let restoringDepsJs: Promise<void> | null = null;
-  const entryConfigPaths = entryConfigs
-    ? entryConfigs
-    : (
-        await findEntryConfigs(
-          assertString(config.entryConfigDir, '"entryConfigDir" is required'),
-        )
-      ).sort();
+  const entryConfigPaths =
+    entryConfigs ??
+    (
+      await findEntryConfigs(
+        assertString(config.entryConfigDir, '"entryConfigDir" is required'),
+      )
+    ).sort();
   let runningJobCount = 1;
   let completedJobCount = 1;
   const compileFunctions = entryConfigPaths.map(
-    (entryConfigPath) => async () => {
+    (entryConfigPath) => async (): Promise<CompileErrorItem[] | undefined> => {
       try {
         const entryConfig = await loadEntryConfig(entryConfigPath);
-        let options: compilerCoreFunctions.ExtendedCompilerOptions;
-        if (entryConfig.chunks) {
-          if (config.depsJs) {
-            if (!restoringDepsJs) {
-              restoringDepsJs = restoreDepsJs(
-                config.depsJs,
-                config.closureLibraryDir,
-              );
-            }
-            await restoringDepsJs;
-          }
-          options = await createCompilerOptionsForChunks_(entryConfig, config);
-        } else {
-          options = createCompilerOptionsForPage(entryConfig, config, true);
-        }
+        const options = createCompilerOptions(entryConfig, config, true);
 
         if (printConfig) {
           logger.info({
@@ -74,7 +55,7 @@ export async function buildJs(
             title: "Compiler config",
             bodyObject: options,
           });
-          return;
+          return undefined;
         }
 
         logWithCount(entryConfigPath, runningJobCount++, "Compiling");
@@ -202,25 +183,6 @@ export class BuildJsCompilationError extends Error {
 }
 
 async function findEntryConfigs(entryConfigDir: string): Promise<string[]> {
-  const files = await recursive(entryConfigDir);
+  const files = await readdirRecursive(entryConfigDir);
   return files.filter((file) => /\.json$/.test(file));
-}
-
-async function createCompilerOptionsForChunks_(
-  entryConfig: EntryConfig,
-  config: DuckConfig,
-): Promise<compilerCoreFunctions.ExtendedCompilerOptions> {
-  function createChunkUris(chunkId: string): string[] {
-    const chunkProductionUri = assertString(
-      entryConfig["chunk-production-uri"],
-    );
-    return [chunkProductionUri.replace(/%s/g, chunkId)];
-  }
-  const { options } = await createCompilerOptionsForChunks(
-    entryConfig,
-    config,
-    true,
-    createChunkUris,
-  );
-  return options;
 }

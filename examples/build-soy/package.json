@@ -16,7 +16,7 @@
   "license": "MIT",
   "devDependencies": {
     "@cybozu/duck": "file:../..",
-    "google-closure-library": "^20220719.0.0",
+    "google-closure-library": "^20230802.0.0",
     "st": "^3.0.0"
   }
 }

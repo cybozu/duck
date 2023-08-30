@@ -36,11 +36,6 @@ jobs:
           cd examples/build-js
           npm i
           npm test
-      - name: Test examples (build-js-chunk)
-        run: |
-          cd examples/build-js-chunk
-          npm i
-          npm test
       - name: Test example (build-soy)
         run: |
           cd examples/build-soy

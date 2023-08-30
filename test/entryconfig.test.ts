@@ -2,7 +2,7 @@ import { strict as assert } from "assert";
 import path from "path";
 import { fileURLToPath } from "url";
 import { describe, it } from "vitest";
-import { loadEntryConfigById, PlovrMode } from "../src/entryconfig.js";
+import { PlovrMode, loadEntryConfigById } from "../src/entryconfig.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const fixturesBaseDir = path.join(__dirname, "fixtures");
@@ -34,45 +34,6 @@ describe("loadEntryConfig", () => {
       mode: PlovrMode.ADVANCED,
     });
     assert(config.mode === PlovrMode.ADVANCED);
-  });
-  it("load chunks config", async () => {
-    const config = await loadEntryConfigById("chunks", fixturesDir);
-    assert.deepEqual(config, {
-      id: "chunks",
-      mode: "RAW",
-      paths: [path.join(fixturesBaseDir, "path1")],
-      chunks: {
-        base: {
-          inputs: [path.join(fixturesBaseDir, "js", "base.js")],
-          deps: [],
-        },
-        chunk1: {
-          inputs: [path.join(fixturesDir, "js", "chunk1.js")],
-          deps: ["base"],
-        },
-      },
-      "chunk-output-path": path.join(fixturesBaseDir, "chunks", "%s.js"),
-      "chunk-production-uri": "../output/%s.js",
-    });
-  });
-  it("normalizes chunks config", async () => {
-    const config = await loadEntryConfigById("chunks-normalize", fixturesDir);
-    assert.deepEqual(config, {
-      id: "chunks-normalize",
-      mode: "RAW",
-      paths: [path.join(fixturesBaseDir, "path1")],
-      "test-excludes": [fixturesBaseDir],
-      chunks: {
-        base: {
-          inputs: [path.join(fixturesBaseDir, "js", "base.js")],
-          deps: [],
-        },
-        chunk1: {
-          inputs: [path.join(fixturesDir, "js", "chunk1.js")],
-          deps: ["base"],
-        },
-      },
-    });
   });
   it("inherits parent configs", async () => {
     const config = await loadEntryConfigById(

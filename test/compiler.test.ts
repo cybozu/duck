@@ -3,11 +3,8 @@ import { stripIndents } from "common-tags";
 import { readFileSync } from "fs";
 import path from "path";
 import { afterEach, beforeEach, describe, it } from "vitest";
-import {
-  convertToFlagfile,
-  createCompilerOptionsForPage,
-} from "../src/compiler.js";
 import type { ExtendedCompilerOptions } from "../src/compiler-core.js";
+import { convertToFlagfile, createCompilerOptions } from "../src/compiler.js";
 import type { DuckConfig } from "../src/duckconfig.js";
 import { PlovrMode } from "../src/entryconfig.js";
 
@@ -27,7 +24,7 @@ const DEPS_MODE_FOR_PAGE = process.env.OLDEST_COMPILER ? "STRICT" : "PRUNE";
 
 describe("createComiplerOptionsForPage()", () => {
   it("minimum", async () => {
-    const actual = createCompilerOptionsForPage(
+    const actual = createCompilerOptions(
       {
         id: "simple",
         mode: PlovrMode.RAW,
@@ -50,7 +47,7 @@ describe("createComiplerOptionsForPage()", () => {
   });
 
   it("experimental-compiler-options", async () => {
-    const actual = createCompilerOptionsForPage(
+    const actual = createCompilerOptions(
       {
         id: "simple",
         mode: PlovrMode.RAW,
@@ -76,7 +73,7 @@ describe("createComiplerOptionsForPage()", () => {
     assert.deepEqual(actual, expected);
   });
   it("warningsWhitelist", async () => {
-    const actual = createCompilerOptionsForPage(
+    const actual = createCompilerOptions(
       {
         id: "simple",
         mode: PlovrMode.RAW,
@@ -98,7 +95,7 @@ describe("createComiplerOptionsForPage()", () => {
     // assert.equal(whitelist, "/path/to/file1.js:1  Error1\n/path/to/file2.js:  Error2");
   });
   it("full", async () => {
-    const actual = createCompilerOptionsForPage(
+    const actual = createCompilerOptions(
       {
         id: "simple",
         mode: PlovrMode.SIMPLE,
@@ -158,7 +155,7 @@ describe("createComiplerOptionsForPage()", () => {
   });
 });
 it("batch: aws", async () => {
-  const actual = createCompilerOptionsForPage(
+  const actual = createCompilerOptions(
     {
       id: "simple",
       mode: PlovrMode.RAW,

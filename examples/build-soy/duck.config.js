@@ -4,7 +4,7 @@ module.exports = {
   depsJs: "build/deps.js",
   depsJsIgnoreDirs: ["node_modules", "build"],
   entryConfigDir: "entry-config/entries",
-  soyJarPath: "closure-templates/soy-2022-07-20-SoyToJsSrcCompiler.jar",
+  soyJarPath: "closure-templates/soy-2023-07-19-SoyToJsSrcCompiler.jar",
   soyFileRoots: ["soy"],
   soySrcsRelativeFrom: "soy",
   soyOptions: {
