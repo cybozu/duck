@@ -40,7 +40,7 @@
     "chokidar": "^3.5.3",
     "common-tags": "^1.8.2",
     "execa": "^8.0.1",
-    "faastjs": "^8.0.47",
+    "faastjs": "^8.0.48",
     "fast-glob": "^3.3.1",
     "fastify": "^4.23.0",
     "google-closure-deps": ">=20210406.0.0",
