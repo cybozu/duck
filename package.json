@@ -70,7 +70,7 @@
     "@types/rimraf": "^4.0.5",
     "@types/semver": "^7.5.2",
     "@types/split2": "^4.2.0",
-    "@types/workerpool": "^6.4.1",
+    "@types/workerpool": "^6.4.2",
     "@types/yargs": "^17.0.24",
     "@vitest/coverage-v8": "^0.34.4",
     "eslint": "^8.49.0",
