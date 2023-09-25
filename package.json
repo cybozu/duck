@@ -68,7 +68,7 @@
     "@types/listr": "^0.14.5",
     "@types/node": "~18.17.19",
     "@types/rimraf": "^4.0.5",
-    "@types/semver": "^7.5.2",
+    "@types/semver": "^7.5.3",
     "@types/split2": "^4.2.0",
     "@types/workerpool": "^6.4.3",
     "@types/yargs": "^17.0.24",
