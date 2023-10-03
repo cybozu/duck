@@ -47,7 +47,7 @@
     "listr": "^0.14.3",
     "merge-options": "^3.0.4",
     "p-settle": "^5.1.0",
-    "pino": "^8.15.3",
+    "pino": "^8.15.4",
     "pino-pretty": "^10.2.0",
     "rimraf": "^5.0.5",
     "rxjs": "^6.6.7",
