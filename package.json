@@ -46,7 +46,7 @@
     "google-closure-deps": ">=20210406.0.0",
     "listr": "^0.14.3",
     "merge-options": "^3.0.4",
-    "p-settle": "^5.1.0",
+    "p-settle": "^5.1.1",
     "pino": "^8.15.7",
     "pino-pretty": "^10.2.3",
     "rimraf": "^5.0.5",
