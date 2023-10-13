@@ -63,7 +63,7 @@
     "google-closure-compiler": ">=20180910.1.0"
   },
   "devDependencies": {
-    "@cybozu/eslint-config": "^22.0.1",
+    "@cybozu/eslint-config": "^22.0.2",
     "@types/common-tags": "^1.8.2",
     "@types/listr": "^0.14.6",
     "@types/node": "~18.17.19",
