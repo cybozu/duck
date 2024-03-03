@@ -11,10 +11,16 @@ const chokidarEvents = ["add", "change", "unlink"] as const;
 export function watchJsAndSoy(config: DuckConfig) {
   let target = "JS";
   const paths = [`${config.inputsRoot}/**/*.js`];
-  const { soyJarPath, soyClasspaths, soyFileRoots, soyOptions } = config;
+  const {
+    soyJarPath,
+    soyClasspaths,
+    soyFileRoots,
+    soyOptions,
+    soySrcsRelativeFrom,
+  } = config;
   let soyConfig: SoyConfig | null = null;
   if (soyJarPath && soyFileRoots && soyOptions) {
-    soyConfig = { soyJarPath, soyClasspaths, soyOptions };
+    soyConfig = { soyJarPath, soyClasspaths, soyOptions, soySrcsRelativeFrom };
     paths.push(...soyFileRoots.map((p) => `${p}/**/*.soy`));
     target = "JS and Soy";
   }
@@ -65,8 +71,9 @@ const soyHandlers = {
   unlink: handleSoyDeleted,
 } as const;
 
-type SoyConfig = Required<
-  Pick<DuckConfig, "soyJarPath" | "soyClasspaths" | "soyOptions">
+type SoyConfig = Pick<
+  DuckConfig,
+  "soyJarPath" | "soyClasspaths" | "soyOptions" | "soySrcsRelativeFrom"
 >;
 
 async function handleSoyUpdated(
