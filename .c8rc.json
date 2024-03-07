@@ -1,5 +1,0 @@
-{
-  "all": true,
-  "include": ["src/**/*.ts"],
-  "reporter": ["lcov", "text"]
-}
