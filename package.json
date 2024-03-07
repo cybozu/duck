@@ -37,7 +37,7 @@
     "@fastify/cors": "^8.5.0",
     "@fastify/static": "^6.11.2",
     "@teppeis/stream-to-observable": "^0.3.1",
-    "chokidar": "^3.5.3",
+    "chokidar": "^3.6.0",
     "common-tags": "^1.8.2",
     "execa": "^8.0.1",
     "faastjs": "^8.0.72",
