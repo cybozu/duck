@@ -10,7 +10,7 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const script = path.join(__dirname, "../dist/dependency-parser-worker.js");
 
 export class DependencyParserWithWorkers {
-  private pool: workerpool.WorkerPool;
+  private pool: workerpool.Pool;
   constructor(numOfWorkers = 1) {
     if (numOfWorkers < 1) {
       throw new TypeError(
@@ -45,7 +45,7 @@ export class DependencyParserWithWorkers {
     );
   }
 
-  async terminate(): Promise<any[]> {
+  async terminate(): Promise<void> {
     return this.pool.terminate();
   }
 }
