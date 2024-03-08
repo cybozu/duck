@@ -7,6 +7,7 @@
   "rules": {
     "dot-notation": "off",
     "node/no-exports-assign": "off",
+    "node/no-unsupported-features/es-builtins": "off",
     "node/no-unsupported-features/es-syntax": "off",
     "node/no-unsupported-features/node-builtins": "off"
   },

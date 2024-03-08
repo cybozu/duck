@@ -4,18 +4,20 @@
   let url;
   if (mode.toLowerCase() === "compiled") {
     url = new URL(location.origin);
-    if (basename === "chunks") {
-      url.pathname = "/build/chunks/chunks.js";
-    } else {
-      url.pathname = `/build/${basename}.js`;
-    }
+    url.pathname = `/build/${basename}.js`;
   } else {
+    // dev server
     const params = new URLSearchParams();
     params.set("id", basename);
     params.set("mode", mode.toUpperCase());
     url = new URL("http://localhost:9810/compile");
     // url = new URL("https://localhost:9810/compile");
     url.search = params.toString();
+  }
+  if (mode.toUpperCase() === "RAW") {
+    globalThis.CLOSURE_DEFINES = {
+      "goog.ENABLE_DEBUG_LOADER": true,
+    };
   }
   document.write(`<script src="${url}"></script>`);
   const h1 = document.querySelector("h1");
