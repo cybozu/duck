@@ -1,9 +1,9 @@
 /* istanbul ignore file */
-// This is exected in a worker, sot it's hard to instrument.
+// This is exected in a worker, so it's hard to instrument.
 
 import workerpool from "workerpool";
-import { parseDependency } from "./dependency-parser.js";
 import type { DependencyTransferData } from "./dependency-parser-wrapper.js";
+import { parseDependency } from "./dependency-parser.js";
 
 async function parse(filepath: string): Promise<DependencyTransferData> {
   const dep = await parseDependency(filepath);
