@@ -22,7 +22,7 @@ function relative(filepath: string): string {
  */
 const DEPS_MODE_FOR_PAGE = process.env.OLDEST_COMPILER ? "STRICT" : "PRUNE";
 
-describe("createComiplerOptionsForPage()", () => {
+describe("createCompilerOptionsForPage()", () => {
   it("minimum", async () => {
     const actual = createCompilerOptions(
       {

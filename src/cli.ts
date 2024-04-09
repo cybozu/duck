@@ -96,7 +96,7 @@ const closureLibraryDir = {
 } as const;
 
 const config = {
-  desc: "A path to duck.config.js, the extension can be ommited",
+  desc: "A path to duck.config.js, the extension can be omitted",
   type: "string",
   coerce: path.resolve,
 } as const;
