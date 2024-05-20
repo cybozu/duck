@@ -82,7 +82,36 @@ async function handleSoyUpdated(
   filepath: string,
 ) {
   logger.info(`[SOY_${event}]: ${path.relative(process.cwd(), filepath)}`);
-  return compileSoy([filepath], config);
+  return compileSoy(
+    await listSoyDependencies(filepath, config.soySrcsRelativeFrom),
+    config,
+  );
+}
+
+export async function listSoyDependencies(
+  filepath: string,
+  soySrcsRelativeFrom: string | undefined,
+): Promise<string[]> {
+  const queue: string[] = [filepath];
+  const targets: string[] = [];
+  let file;
+  while ((file = queue.shift())) {
+    if (!targets.includes(file)) {
+      targets.push(file);
+      const soySource = await fs.readFile(file, "utf-8");
+      const importPattern =
+        /^\s*import\s+.*?\s+from\s['"]([^'"]*?\.soy)['"]\s*;/gms;
+      let match;
+      while ((match = importPattern.exec(soySource))) {
+        let importedFile = match[1];
+        if (soySrcsRelativeFrom) {
+          importedFile = path.resolve(soySrcsRelativeFrom, importedFile);
+        }
+        queue.push(importedFile);
+      }
+    }
+  }
+  return targets;
 }
 
 async function handleSoyDeleted(config: SoyConfig, filepath: string) {
