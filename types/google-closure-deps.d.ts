@@ -60,7 +60,7 @@ namespace GoogleClosureDeps.parser {
 
   /**
    * Parses a file that contains only goog.addDependency statements. This is regex
-   * based to be lightweight and avoid addtional dependencies.
+   * based to be lightweight and avoid additional dependencies.
    */
   function parseDependencyFile(text: string, filePath: string): ParseResult;
 }
@@ -124,7 +124,7 @@ namespace GoogleClosureDeps.depGraph {
   }
 
   /**
-   * A dependency that was parsed from an goog.addDependnecy call.
+   * A dependency that was parsed from an goog.addDependency call.
    */
   class ParsedDependency extends Dependency {
     /**

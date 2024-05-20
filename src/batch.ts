@@ -121,5 +121,5 @@ function getOsForNativeImage(config: DuckConfig) {
   } else if (platform === "darwin") {
     return "osx";
   }
-  throw new Error(`Unsuported Platform: ${platform}`);
+  throw new Error(`Unsupported Platform: ${platform}`);
 }

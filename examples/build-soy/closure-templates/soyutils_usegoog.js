@@ -1800,7 +1800,7 @@ const $$escapeCssString = function(value) {
  *
  * @param {?} value The value to escape. May not be a string, but the value
  *     will be coerced to a string.
- * @return {string} A safe CSS identifier part, keyword, or quanitity.
+ * @return {string} A safe CSS identifier part, keyword, or quantity.
  */
 const $$filterCssValue = function(value) {
   if (soyChecks.isCss(value)) {

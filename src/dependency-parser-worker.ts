@@ -1,5 +1,5 @@
 /* istanbul ignore file */
-// This is exected in a worker, so it's hard to instrument.
+// This is executed in a worker, so it's hard to instrument.
 
 import workerpool from "workerpool";
 import type { DependencyTransferData } from "./dependency-parser-wrapper.js";

@@ -152,7 +152,7 @@ export function resolveOutputPathFormat(
   return outputPath;
 }
 
-export function normalizeSoyOptoins(config: DuckConfig, configDir: string) {
+export function normalizeSoyOptions(config: DuckConfig, configDir: string) {
   config.soyOptions ||= {};
   const { soyOptions } = config;
   if (soyOptions.outputDirectory && soyOptions.outputPathFormat) {

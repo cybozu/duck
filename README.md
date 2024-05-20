@@ -47,7 +47,7 @@ Options:
   --closureLibraryDir     A root directory of Closure Library                             [string]
   --depsJs                A path to deps.js to save and load                              [string]
   --depsWorkers           The number of workers to analyze deps              [number] [default: 4]
-  --config                A path to duck.config.js, the extension can be ommited          [string]
+  --config                A path to duck.config.js, the extension can be omitted          [string]
   --nonTTY, --noTTY, -n   Output in nonTTY mode                         [boolean] [default: false]
   --skipInitialBuild, -s  Skip initial building of Soy and deps.js      [boolean] [default: false]
   --port                  A port number to listen                         [number] [default: 9810]
@@ -66,7 +66,7 @@ Build Soy, deps.js and JS
 Options:
   --entryConfigs, -e      Entry config files (this option ignores entryConfigDir)          [array]
   --closureLibraryDir     A root directory of Closure Library                             [string]
-  --config                A path to duck.config.js, the extension can be ommited          [string]
+  --config                A path to duck.config.js, the extension can be omitted          [string]
   --concurrency, -c       Concurrency limit of Closure Compiler                           [number]
   --batch                 Build in batch mode (on AWS or local for debug)[choices: "aws", "local"]
   --reporters             Test reporters ("text", "xunit" or "json")   [array] [default: ["text"]]
@@ -94,7 +94,7 @@ module.exports = {
   /**
    * Common settings
    */
-  // (Required) A path to Closure Library direcotry
+  // (Required) A path to Closure Library directory
   closureLibraryDir: "node_modules/google-closure-library",
   // (Required) A directory where entry config JSONs are stored flat
   entryConfigDir: "entry-configs",
@@ -138,7 +138,7 @@ module.exports = {
     name: "my-custom-closure-compiler",
     version: "^1.0.0",
   },
-  // Max chunk size in bytes for spliting return value from faastjs module (default: 204,800 (200kb))
+  // Max chunk size in bytes for splitting return value from faastjs module (default: 204,800 (200kb))
   batchMaxChunkSize?: number;
   // Options for faast.js in batch mode. See https://faastjs.org/docs/api/faastjs.awsoptions
   batchOptions: {},
@@ -164,7 +164,7 @@ module.exports = {
   host: "localhost",
   // Port number for serve command (default: 9810)
   port: 1234,
-  // Use HTTP/2 in serve command (deafult: false)
+  // Use HTTP/2 in serve command (default: false)
   http2: true,
   // Settings for HTTPS (HTTP/2) (default: not specified, HTTP is used)
   https: {

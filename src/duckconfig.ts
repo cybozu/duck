@@ -7,13 +7,13 @@ import type { JsonReporterOptions } from "./reporters/json-reporter.js";
 import type { TextReporterOptions } from "./reporters/text-reporter.js";
 import type { XUnitReporterOptions } from "./reporters/xunit-reporter.js";
 import type { SoyToJsOptions } from "./soy.js";
-import { normalizeSoyOptoins } from "./soy.js";
+import { normalizeSoyOptions } from "./soy.js";
 
 const nodeRequire = createRequire(import.meta.url);
 
 export interface DuckConfig {
   /**
-   * (Required) A path to Closure Library direcotry
+   * (Required) A path to Closure Library directory
    * @example "node_modules/google-closure-library"
    */
   closureLibraryDir: string;
@@ -70,7 +70,7 @@ export interface DuckConfig {
   batch?: "aws" | "local";
   /**
    * Custom Closure Compiler package used in AWS batch mode (default: undefined)
-   * It must be published as a public npm pacakge.
+   * It must be published as a public npm package.
    * @example {name: "my-custom-closure-compiler", version: "^1.0.0"}
    */
   batchAwsCustomCompiler?: {
@@ -78,7 +78,7 @@ export interface DuckConfig {
     version: string;
   };
   /**
-   * Max chunk size in bytes for spliting return value from faastjs module.
+   * Max chunk size in bytes for splitting return value from faastjs module.
    * The upper limit is 256kb. (default: 204,800 (200kb))
    */
   batchMaxChunkSize?: number;
@@ -108,7 +108,7 @@ export interface DuckConfig {
    */
   port: number;
   /**
-   * Use HTTP/2 in serve command (deafult: false)
+   * Use HTTP/2 in serve command (default: false)
    */
   http2?: boolean;
   /**
@@ -148,7 +148,7 @@ export function loadConfig(opts: any = {}): DuckConfig {
     toAbsPathArray(config, configDir, "depsJsIgnoreDirs");
     toAbsPathArray(config, configDir, "soyClasspaths");
     toAbsPathArray(config, configDir, "soyFileRoots");
-    normalizeSoyOptoins(config, configDir);
+    normalizeSoyOptions(config, configDir);
     if (config.https) {
       assertString(
         config.https.keyPath,
