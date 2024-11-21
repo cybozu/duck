@@ -96,7 +96,7 @@ describe("err.message", () => {
     assert.fail("compileToJson must throw error in this test");
   }, 20000);
 
-  it("first line is the command excuted by compileToJson", () => {
+  it("first line is the command executed by compileToJson", () => {
     assert(/^java -jar/.test(first));
   });
 
