@@ -51,7 +51,7 @@ jobs:
           npm test
       - name: Report coverage to codecov
         if: matrix.node-version == '18.17.x'
-        uses: codecov/codecov-action@54bcd8715eee62d40e33596ef5e8f0f48dbbccab # v4
+        uses: codecov/codecov-action@1af58845a975a7985b0beb0cbe6fbbb71a41dbad # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # required
           verbose: true # optional (default = false)
